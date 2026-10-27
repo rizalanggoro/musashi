@@ -77,6 +77,8 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/musashi:frontend
             ${{ secrets.DOCKERHUB_USERNAME }}/musashi:frontend-${{ github.sha }}

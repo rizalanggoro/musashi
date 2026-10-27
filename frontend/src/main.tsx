@@ -4,7 +4,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import { AuthProvider } from './lib/auth'
+import { client } from './api/client.gen'
 import './index.css'
+
+if (import.meta.env.VITE_API_BASE_URL) {
+  client.setConfig({
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
+  })
+}
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },

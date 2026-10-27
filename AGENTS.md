@@ -13,5 +13,5 @@
 
 - **Jangan gunakan Docker untuk database.** User menggunakan **DBngin** untuk menjalankan PostgreSQL secara lokal.
 - Database lokal PostgreSQL berjalan pada port default (`localhost:5432`) dengan nama database `musashi`.
-- Konfigurasi koneksi PostgreSQL dikelola melalui `backend/.env` (`DATABASE_URL`).
+- Konfigurasi koneksi PostgreSQL dikelola melalui `backend/.env` secara terpisah (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSLMODE`) atau `DATABASE_URL`.
 

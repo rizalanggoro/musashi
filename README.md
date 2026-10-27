@@ -16,7 +16,7 @@ backend/    Go 1.26 + Fiber v3, GORM, golang-migrate, PostgreSQL (DBngin / local
    ```bash
    cp backend/.env.example backend/.env
    ```
-   Sesuaikan `DATABASE_URL` jika port atau password PostgreSQL di DBngin Anda berbeda (misal tanpa password: `postgres://postgres@localhost:5432/musashi?sslmode=disable`).
+   Sesuaikan konfigurasi database (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSLMODE`) sesuai service PostgreSQL di DBngin Anda (kosongkan `DB_PASSWORD` jika tanpa password).
 
 ### 2. Backend
 ```bash
