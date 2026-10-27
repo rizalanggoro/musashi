@@ -13,8 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AhspRouteImport } from './routes/ahsp'
 import { Route as BoqRouteImport } from './routes/boq'
 import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as RabRouteImport } from './routes/rab'
 import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as UnitPricesRouteImport } from './routes/unit-prices'
+import { Route as VolumeRouteImport } from './routes/volume'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,6 +38,11 @@ const ProjectsRoute = ProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RabRoute = RabRouteImport.update({
+  id: '/rab',
+  path: '/rab',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScheduleRoute = ScheduleRouteImport.update({
   id: '/schedule',
   path: '/schedule',
@@ -46,22 +53,31 @@ const UnitPricesRoute = UnitPricesRouteImport.update({
   path: '/unit-prices',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VolumeRoute = VolumeRouteImport.update({
+  id: '/volume',
+  path: '/volume',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ahsp': typeof AhspRoute
   '/boq': typeof BoqRoute
   '/projects': typeof ProjectsRoute
+  '/rab': typeof RabRoute
   '/schedule': typeof ScheduleRoute
   '/unit-prices': typeof UnitPricesRoute
+  '/volume': typeof VolumeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ahsp': typeof AhspRoute
   '/boq': typeof BoqRoute
   '/projects': typeof ProjectsRoute
+  '/rab': typeof RabRoute
   '/schedule': typeof ScheduleRoute
   '/unit-prices': typeof UnitPricesRoute
+  '/volume': typeof VolumeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,22 +85,42 @@ export interface FileRoutesById {
   '/ahsp': typeof AhspRoute
   '/boq': typeof BoqRoute
   '/projects': typeof ProjectsRoute
+  '/rab': typeof RabRoute
   '/schedule': typeof ScheduleRoute
   '/unit-prices': typeof UnitPricesRoute
+  '/volume': typeof VolumeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ahsp' | '/boq' | '/projects' | '/schedule' | '/unit-prices'
+  fullPaths:
+    | '/'
+    | '/ahsp'
+    | '/boq'
+    | '/projects'
+    | '/rab'
+    | '/schedule'
+    | '/unit-prices'
+    | '/volume'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ahsp' | '/boq' | '/projects' | '/schedule' | '/unit-prices'
+  to:
+    | '/'
+    | '/ahsp'
+    | '/boq'
+    | '/projects'
+    | '/rab'
+    | '/schedule'
+    | '/unit-prices'
+    | '/volume'
   id:
     | '__root__'
     | '/'
     | '/ahsp'
     | '/boq'
     | '/projects'
+    | '/rab'
     | '/schedule'
     | '/unit-prices'
+    | '/volume'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -92,8 +128,10 @@ export interface RootRouteChildren {
   AhspRoute: typeof AhspRoute
   BoqRoute: typeof BoqRoute
   ProjectsRoute: typeof ProjectsRoute
+  RabRoute: typeof RabRoute
   ScheduleRoute: typeof ScheduleRoute
   UnitPricesRoute: typeof UnitPricesRoute
+  VolumeRoute: typeof VolumeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rab': {
+      id: '/rab'
+      path: '/rab'
+      fullPath: '/rab'
+      preLoaderRoute: typeof RabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/schedule': {
       id: '/schedule'
       path: '/schedule'
@@ -140,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnitPricesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volume': {
+      id: '/volume'
+      path: '/volume'
+      fullPath: '/volume'
+      preLoaderRoute: typeof VolumeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -148,8 +200,10 @@ const rootRouteChildren: RootRouteChildren = {
   AhspRoute: AhspRoute,
   BoqRoute: BoqRoute,
   ProjectsRoute: ProjectsRoute,
+  RabRoute: RabRoute,
   ScheduleRoute: ScheduleRoute,
   UnitPricesRoute: UnitPricesRoute,
+  VolumeRoute: VolumeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

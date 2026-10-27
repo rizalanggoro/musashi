@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetHealthData, GetHealthErrors, GetHealthResponses } from './types.gen';
+import type { CreateAhspData, CreateAhspResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateRabItemData, CreateRabItemResponses, CreateScheduleData, CreateScheduleResponses, CreateUnitPriceData, CreateUnitPriceErrors, CreateUnitPriceResponses, CreateVolumeData, CreateVolumeResponses, DeleteAhspData, DeleteAhspResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteRabItemData, DeleteRabItemResponses, DeleteScheduleData, DeleteScheduleResponses, DeleteUnitPriceData, DeleteUnitPriceErrors, DeleteUnitPriceResponses, DeleteVolumeData, DeleteVolumeResponses, ExportRabExcelData, ExportRabExcelResponses, ExportRabPdfData, ExportRabPdfResponses, ExportVolumeExcelData, ExportVolumeExcelResponses, GetAhspData, GetAhspErrors, GetAhspResponses, GetCostEstimateData, GetCostEstimateResponses, GetHealthData, GetHealthErrors, GetHealthResponses, GetMeData, GetMeErrors, GetMeResponses, GetProjectBoqData, GetProjectBoqResponses, GetProjectData, GetProjectErrors, GetProjectRabData, GetProjectRabResponses, GetProjectResponses, ListAhspsData, ListAhspsResponses, ListBoqProjectsData, ListBoqProjectsResponses, ListProjectsData, ListProjectsResponses, ListSchedulesData, ListSchedulesResponses, ListUnitPricesData, ListUnitPricesResponses, ListVolumesData, ListVolumesResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutResponses, UpdateAhspData, UpdateAhspResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateRabItemData, UpdateRabItemResponses, UpdateScheduleData, UpdateScheduleResponses, UpdateUnitPriceData, UpdateUnitPriceResponses, UpdateVolumeData, UpdateVolumeResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -22,3 +22,269 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  * Service health
  */
 export const getHealth = <ThrowOnError extends boolean = false>(options?: Options<GetHealthData, ThrowOnError>): RequestResult<GetHealthResponses, GetHealthErrors, ThrowOnError> => (options?.client ?? client).get<GetHealthResponses, GetHealthErrors, ThrowOnError>({ url: '/health', ...options });
+
+/**
+ * Login
+ */
+export const login = <ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>): RequestResult<LoginResponses, LoginErrors, ThrowOnError> => (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
+    url: '/auth/login',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Logout
+ */
+export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>): RequestResult<LogoutResponses, unknown, ThrowOnError> => (options?.client ?? client).post<LogoutResponses, unknown, ThrowOnError>({ url: '/auth/logout', ...options });
+
+/**
+ * Get current authenticated user
+ */
+export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({ url: '/auth/me', ...options });
+
+/**
+ * List projects
+ */
+export const listProjects = <ThrowOnError extends boolean = false>(options?: Options<ListProjectsData, ThrowOnError>): RequestResult<ListProjectsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListProjectsResponses, unknown, ThrowOnError>({ url: '/projects', ...options });
+
+/**
+ * Create new project
+ */
+export const createProject = <ThrowOnError extends boolean = false>(options: Options<CreateProjectData, ThrowOnError>): RequestResult<CreateProjectResponses, CreateProjectErrors, ThrowOnError> => (options.client ?? client).post<CreateProjectResponses, CreateProjectErrors, ThrowOnError>({
+    url: '/projects',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete project (soft delete)
+ */
+export const deleteProject = <ThrowOnError extends boolean = false>(options: Options<DeleteProjectData, ThrowOnError>): RequestResult<DeleteProjectResponses, DeleteProjectErrors, ThrowOnError> => (options.client ?? client).delete<DeleteProjectResponses, DeleteProjectErrors, ThrowOnError>({ url: '/projects/{id}', ...options });
+
+/**
+ * Get project by ID
+ */
+export const getProject = <ThrowOnError extends boolean = false>(options: Options<GetProjectData, ThrowOnError>): RequestResult<GetProjectResponses, GetProjectErrors, ThrowOnError> => (options.client ?? client).get<GetProjectResponses, GetProjectErrors, ThrowOnError>({ url: '/projects/{id}', ...options });
+
+/**
+ * Update project
+ */
+export const updateProject = <ThrowOnError extends boolean = false>(options: Options<UpdateProjectData, ThrowOnError>): RequestResult<UpdateProjectResponses, UpdateProjectErrors, ThrowOnError> => (options.client ?? client).put<UpdateProjectResponses, UpdateProjectErrors, ThrowOnError>({
+    url: '/projects/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List project schedules
+ */
+export const listSchedules = <ThrowOnError extends boolean = false>(options: Options<ListSchedulesData, ThrowOnError>): RequestResult<ListSchedulesResponses, unknown, ThrowOnError> => (options.client ?? client).get<ListSchedulesResponses, unknown, ThrowOnError>({ url: '/projects/{id}/schedules', ...options });
+
+/**
+ * Create schedule item
+ */
+export const createSchedule = <ThrowOnError extends boolean = false>(options: Options<CreateScheduleData, ThrowOnError>): RequestResult<CreateScheduleResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateScheduleResponses, unknown, ThrowOnError>({
+    url: '/projects/{id}/schedules',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete schedule item
+ */
+export const deleteSchedule = <ThrowOnError extends boolean = false>(options: Options<DeleteScheduleData, ThrowOnError>): RequestResult<DeleteScheduleResponses, unknown, ThrowOnError> => (options.client ?? client).delete<DeleteScheduleResponses, unknown, ThrowOnError>({ url: '/schedules/{id}', ...options });
+
+/**
+ * Update schedule item
+ */
+export const updateSchedule = <ThrowOnError extends boolean = false>(options: Options<UpdateScheduleData, ThrowOnError>): RequestResult<UpdateScheduleResponses, unknown, ThrowOnError> => (options.client ?? client).put<UpdateScheduleResponses, unknown, ThrowOnError>({
+    url: '/schedules/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List unit prices
+ */
+export const listUnitPrices = <ThrowOnError extends boolean = false>(options?: Options<ListUnitPricesData, ThrowOnError>): RequestResult<ListUnitPricesResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListUnitPricesResponses, unknown, ThrowOnError>({ url: '/unit-prices', ...options });
+
+/**
+ * Create unit price
+ */
+export const createUnitPrice = <ThrowOnError extends boolean = false>(options: Options<CreateUnitPriceData, ThrowOnError>): RequestResult<CreateUnitPriceResponses, CreateUnitPriceErrors, ThrowOnError> => (options.client ?? client).post<CreateUnitPriceResponses, CreateUnitPriceErrors, ThrowOnError>({
+    url: '/unit-prices',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete unit price
+ */
+export const deleteUnitPrice = <ThrowOnError extends boolean = false>(options: Options<DeleteUnitPriceData, ThrowOnError>): RequestResult<DeleteUnitPriceResponses, DeleteUnitPriceErrors, ThrowOnError> => (options.client ?? client).delete<DeleteUnitPriceResponses, DeleteUnitPriceErrors, ThrowOnError>({ url: '/unit-prices/{id}', ...options });
+
+/**
+ * Update unit price
+ */
+export const updateUnitPrice = <ThrowOnError extends boolean = false>(options: Options<UpdateUnitPriceData, ThrowOnError>): RequestResult<UpdateUnitPriceResponses, unknown, ThrowOnError> => (options.client ?? client).put<UpdateUnitPriceResponses, unknown, ThrowOnError>({
+    url: '/unit-prices/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List AHSPs
+ */
+export const listAhsps = <ThrowOnError extends boolean = false>(options?: Options<ListAhspsData, ThrowOnError>): RequestResult<ListAhspsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListAhspsResponses, unknown, ThrowOnError>({ url: '/ahsps', ...options });
+
+/**
+ * Create AHSP
+ */
+export const createAhsp = <ThrowOnError extends boolean = false>(options: Options<CreateAhspData, ThrowOnError>): RequestResult<CreateAhspResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateAhspResponses, unknown, ThrowOnError>({
+    url: '/ahsps',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete AHSP
+ */
+export const deleteAhsp = <ThrowOnError extends boolean = false>(options: Options<DeleteAhspData, ThrowOnError>): RequestResult<DeleteAhspResponses, unknown, ThrowOnError> => (options.client ?? client).delete<DeleteAhspResponses, unknown, ThrowOnError>({ url: '/ahsps/{id}', ...options });
+
+/**
+ * Get AHSP detail with items
+ */
+export const getAhsp = <ThrowOnError extends boolean = false>(options: Options<GetAhspData, ThrowOnError>): RequestResult<GetAhspResponses, GetAhspErrors, ThrowOnError> => (options.client ?? client).get<GetAhspResponses, GetAhspErrors, ThrowOnError>({ url: '/ahsps/{id}', ...options });
+
+/**
+ * Update AHSP
+ */
+export const updateAhsp = <ThrowOnError extends boolean = false>(options: Options<UpdateAhspData, ThrowOnError>): RequestResult<UpdateAhspResponses, unknown, ThrowOnError> => (options.client ?? client).put<UpdateAhspResponses, unknown, ThrowOnError>({
+    url: '/ahsps/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List projects with BOQ status
+ */
+export const listBoqProjects = <ThrowOnError extends boolean = false>(options?: Options<ListBoqProjectsData, ThrowOnError>): RequestResult<ListBoqProjectsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListBoqProjectsResponses, unknown, ThrowOnError>({ url: '/boq', ...options });
+
+/**
+ * Get project BOQ items
+ */
+export const getProjectBoq = <ThrowOnError extends boolean = false>(options: Options<GetProjectBoqData, ThrowOnError>): RequestResult<GetProjectBoqResponses, unknown, ThrowOnError> => (options.client ?? client).get<GetProjectBoqResponses, unknown, ThrowOnError>({ url: '/projects/{id}/boq', ...options });
+
+/**
+ * List project volume take-offs
+ */
+export const listVolumes = <ThrowOnError extends boolean = false>(options: Options<ListVolumesData, ThrowOnError>): RequestResult<ListVolumesResponses, unknown, ThrowOnError> => (options.client ?? client).get<ListVolumesResponses, unknown, ThrowOnError>({ url: '/projects/{id}/volumes', ...options });
+
+/**
+ * Add volume take-off row
+ */
+export const createVolume = <ThrowOnError extends boolean = false>(options: Options<CreateVolumeData, ThrowOnError>): RequestResult<CreateVolumeResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateVolumeResponses, unknown, ThrowOnError>({
+    url: '/projects/{id}/volumes',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete volume take-off row
+ */
+export const deleteVolume = <ThrowOnError extends boolean = false>(options: Options<DeleteVolumeData, ThrowOnError>): RequestResult<DeleteVolumeResponses, unknown, ThrowOnError> => (options.client ?? client).delete<DeleteVolumeResponses, unknown, ThrowOnError>({ url: '/volumes/{id}', ...options });
+
+/**
+ * Update volume take-off row
+ */
+export const updateVolume = <ThrowOnError extends boolean = false>(options: Options<UpdateVolumeData, ThrowOnError>): RequestResult<UpdateVolumeResponses, unknown, ThrowOnError> => (options.client ?? client).put<UpdateVolumeResponses, unknown, ThrowOnError>({
+    url: '/volumes/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get project RAB
+ */
+export const getProjectRab = <ThrowOnError extends boolean = false>(options: Options<GetProjectRabData, ThrowOnError>): RequestResult<GetProjectRabResponses, unknown, ThrowOnError> => (options.client ?? client).get<GetProjectRabResponses, unknown, ThrowOnError>({ url: '/projects/{id}/rab', ...options });
+
+/**
+ * Add RAB item
+ */
+export const createRabItem = <ThrowOnError extends boolean = false>(options: Options<CreateRabItemData, ThrowOnError>): RequestResult<CreateRabItemResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateRabItemResponses, unknown, ThrowOnError>({
+    url: '/projects/{id}/rab',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete RAB item
+ */
+export const deleteRabItem = <ThrowOnError extends boolean = false>(options: Options<DeleteRabItemData, ThrowOnError>): RequestResult<DeleteRabItemResponses, unknown, ThrowOnError> => (options.client ?? client).delete<DeleteRabItemResponses, unknown, ThrowOnError>({ url: '/rab-items/{id}', ...options });
+
+/**
+ * Update RAB item
+ */
+export const updateRabItem = <ThrowOnError extends boolean = false>(options: Options<UpdateRabItemData, ThrowOnError>): RequestResult<UpdateRabItemResponses, unknown, ThrowOnError> => (options.client ?? client).put<UpdateRabItemResponses, unknown, ThrowOnError>({
+    url: '/rab-items/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get project cost estimate summary
+ */
+export const getCostEstimate = <ThrowOnError extends boolean = false>(options: Options<GetCostEstimateData, ThrowOnError>): RequestResult<GetCostEstimateResponses, unknown, ThrowOnError> => (options.client ?? client).get<GetCostEstimateResponses, unknown, ThrowOnError>({ url: '/projects/{id}/cost-estimate', ...options });
+
+/**
+ * Export project volume take-off as Excel
+ */
+export const exportVolumeExcel = <ThrowOnError extends boolean = false>(options: Options<ExportVolumeExcelData, ThrowOnError>): RequestResult<ExportVolumeExcelResponses, unknown, ThrowOnError> => (options.client ?? client).get<ExportVolumeExcelResponses, unknown, ThrowOnError>({ url: '/projects/{id}/exports/volume.xlsx', ...options });
+
+/**
+ * Export project RAB as Excel
+ */
+export const exportRabExcel = <ThrowOnError extends boolean = false>(options: Options<ExportRabExcelData, ThrowOnError>): RequestResult<ExportRabExcelResponses, unknown, ThrowOnError> => (options.client ?? client).get<ExportRabExcelResponses, unknown, ThrowOnError>({ url: '/projects/{id}/exports/rab.xlsx', ...options });
+
+/**
+ * Export project RAB as PDF
+ */
+export const exportRabPdf = <ThrowOnError extends boolean = false>(options: Options<ExportRabPdfData, ThrowOnError>): RequestResult<ExportRabPdfResponses, unknown, ThrowOnError> => (options.client ?? client).get<ExportRabPdfResponses, unknown, ThrowOnError>({ url: '/projects/{id}/exports/rab.pdf', ...options });

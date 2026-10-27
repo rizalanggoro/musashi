@@ -20,6 +20,281 @@ export type Error = {
     };
 };
 
+export type User = {
+    id: string;
+    email: string;
+    name: string;
+    role: 'admin' | 'staff';
+};
+
+export type LoginRequest = {
+    email: string;
+    password: string;
+};
+
+export type Project = {
+    id: string;
+    name: string;
+    section: string;
+    plant: string;
+    implementation_plan?: string;
+    /**
+     * Money formatted string e.g. "1000000000"
+     */
+    budget: string;
+    information?: string;
+    status: 'planning' | 'on_going' | 'completed' | 'cancelled';
+    progress_spb: 'pending' | 'done';
+    progress_rab: 'pending' | 'done';
+    progress_xxx: 'pending' | 'done';
+    created_at?: string;
+    updated_at?: string;
+};
+
+export type ProjectListResponse = {
+    data: Array<Project>;
+    meta: {
+        page: number;
+        per_page: number;
+        total: number;
+    };
+};
+
+export type CreateProjectRequest = {
+    name: string;
+    section?: string;
+    plant?: string;
+    implementation_plan?: string;
+    budget?: string;
+    information?: string;
+    progress_spb?: 'pending' | 'done';
+    progress_rab?: 'pending' | 'done';
+    progress_xxx?: 'pending' | 'done';
+};
+
+export type UpdateProjectRequest = {
+    name?: string;
+    section?: string;
+    plant?: string;
+    implementation_plan?: string;
+    budget?: string;
+    information?: string;
+    status?: 'planning' | 'on_going' | 'completed' | 'cancelled';
+    progress_spb?: 'pending' | 'done';
+    progress_rab?: 'pending' | 'done';
+    progress_xxx?: 'pending' | 'done';
+};
+
+export type Schedule = {
+    id: string;
+    project_id: string;
+    code?: string;
+    work_item: string;
+    start_date: string;
+    end_date: string;
+    duration: number;
+    weight: string;
+    progress: string;
+    status: 'planning' | 'on_going' | 'done' | 'late';
+};
+
+export type CreateScheduleRequest = {
+    code?: string;
+    work_item: string;
+    start_date: string;
+    end_date: string;
+    weight?: string;
+    progress?: string;
+    status?: 'planning' | 'on_going' | 'done' | 'late';
+};
+
+export type UpdateScheduleRequest = {
+    code?: string;
+    work_item?: string;
+    start_date?: string;
+    end_date?: string;
+    weight?: string;
+    progress?: string;
+    status?: 'planning' | 'on_going' | 'done' | 'late';
+};
+
+export type UnitPrice = {
+    id: string;
+    code: string;
+    category: 'LABOR' | 'MATERIALS' | 'EQUIPMENT' | 'OTHER';
+    work_item: string;
+    unit: string;
+    unit_price: string;
+    information?: string;
+};
+
+export type CreateUnitPriceRequest = {
+    code: string;
+    category: 'LABOR' | 'MATERIALS' | 'EQUIPMENT' | 'OTHER';
+    work_item: string;
+    unit: string;
+    unit_price: string;
+    information?: string;
+};
+
+export type UpdateUnitPriceRequest = {
+    code?: string;
+    category?: 'LABOR' | 'MATERIALS' | 'EQUIPMENT' | 'OTHER';
+    work_item?: string;
+    unit?: string;
+    unit_price?: string;
+    information?: string;
+};
+
+export type Ahsp = {
+    id: string;
+    code: string;
+    work_item: string;
+    unit: string;
+    overhead_profit_pct?: string;
+    total_labor?: string;
+    total_material?: string;
+    total_equipment?: string;
+    total_cost?: string;
+    unit_price_of_work: string;
+    status: 'draft' | 'final';
+};
+
+export type AhspItem = {
+    id: string;
+    unit_price_id?: string;
+    category: 'LABOR' | 'MATERIALS' | 'EQUIPMENT';
+    sort: number;
+    description: string;
+    code: string;
+    unit: string;
+    coefficient: string;
+    unit_price: string;
+    cost: string;
+};
+
+export type AhspDetail = Ahsp & {
+    items: Array<AhspItem>;
+};
+
+export type CreateAhspItemInput = {
+    unit_price_id?: string;
+    category: 'LABOR' | 'MATERIALS' | 'EQUIPMENT';
+    sort?: number;
+    description: string;
+    code?: string;
+    unit: string;
+    coefficient: string;
+    unit_price: string;
+};
+
+export type CreateAhspRequest = {
+    code: string;
+    work_item: string;
+    unit: string;
+    overhead_profit_pct?: string;
+    status?: 'draft' | 'final';
+    items: Array<CreateAhspItemInput>;
+};
+
+export type BoqProjectSummary = {
+    id: string;
+    name: string;
+    section?: string;
+    plant?: string;
+    volume_status: 'empty' | 'partial' | 'complete';
+    rab_status: 'empty' | 'partial' | 'complete';
+};
+
+export type BoqItem = {
+    id: string;
+    project_id: string;
+    ahsp_id?: string;
+    work_item: string;
+    unit: string;
+    planned_volume: string;
+};
+
+export type VolumeRow = {
+    id: string;
+    boq_item_id: string;
+    work_item: string;
+    unit: string;
+    planned_volume: string;
+    date?: string;
+    length?: string;
+    width?: string;
+    height?: string;
+    quantity: string;
+    unit_weight: string;
+    total_quantity: string;
+    description?: string;
+};
+
+export type CreateVolumeRequest = {
+    boq_item_id?: string;
+    ahsp_id?: string;
+    work_item: string;
+    unit: string;
+    planned_volume?: string;
+    date?: string;
+    length?: string;
+    width?: string;
+    height?: string;
+    unit_weight?: string;
+    description?: string;
+};
+
+export type UpdateVolumeRequest = {
+    date?: string;
+    length?: string;
+    width?: string;
+    height?: string;
+    unit_weight?: string;
+    description?: string;
+};
+
+export type RabItem = {
+    id: string;
+    project_id: string;
+    boq_item_id?: string;
+    work_item: string;
+    unit: string;
+    volume: string;
+    unit_price: string;
+    total_cost: string;
+};
+
+export type RabResponse = {
+    project_id: string;
+    items: Array<RabItem>;
+    total_rab: string;
+};
+
+export type CreateRabItemRequest = {
+    boq_item_id?: string;
+    work_item: string;
+    unit: string;
+    volume: string;
+    unit_price: string;
+};
+
+export type UpdateRabItemRequest = {
+    work_item?: string;
+    unit?: string;
+    volume?: string;
+    unit_price?: string;
+};
+
+export type CostEstimateSummary = {
+    project_id: string;
+    budget: string;
+    rab: string;
+    spb: string;
+    variance: string;
+    sisa: string;
+};
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -44,3 +319,711 @@ export type GetHealthResponses = {
 };
 
 export type GetHealthResponse = GetHealthResponses[keyof GetHealthResponses];
+
+export type LoginData = {
+    body: LoginRequest;
+    path?: never;
+    query?: never;
+    url: '/auth/login';
+};
+
+export type LoginErrors = {
+    /**
+     * Invalid credentials
+     */
+    401: Error;
+};
+
+export type LoginError = LoginErrors[keyof LoginErrors];
+
+export type LoginResponses = {
+    /**
+     * Logged in successfully
+     */
+    200: User;
+};
+
+export type LoginResponse = LoginResponses[keyof LoginResponses];
+
+export type LogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type LogoutResponses = {
+    /**
+     * Logged out
+     */
+    200: {
+        ok?: boolean;
+    };
+};
+
+export type LogoutResponse = LogoutResponses[keyof LogoutResponses];
+
+export type GetMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/me';
+};
+
+export type GetMeErrors = {
+    /**
+     * Unauthenticated
+     */
+    401: Error;
+};
+
+export type GetMeError = GetMeErrors[keyof GetMeErrors];
+
+export type GetMeResponses = {
+    /**
+     * Current user profile
+     */
+    200: User;
+};
+
+export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
+
+export type ListProjectsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        q?: string;
+        page?: number;
+        per_page?: number;
+    };
+    url: '/projects';
+};
+
+export type ListProjectsResponses = {
+    /**
+     * Project list
+     */
+    200: ProjectListResponse;
+};
+
+export type ListProjectsResponse = ListProjectsResponses[keyof ListProjectsResponses];
+
+export type CreateProjectData = {
+    body: CreateProjectRequest;
+    path?: never;
+    query?: never;
+    url: '/projects';
+};
+
+export type CreateProjectErrors = {
+    /**
+     * Validation error
+     */
+    400: Error;
+};
+
+export type CreateProjectError = CreateProjectErrors[keyof CreateProjectErrors];
+
+export type CreateProjectResponses = {
+    /**
+     * Project created
+     */
+    201: Project;
+};
+
+export type CreateProjectResponse = CreateProjectResponses[keyof CreateProjectResponses];
+
+export type DeleteProjectData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}';
+};
+
+export type DeleteProjectErrors = {
+    /**
+     * Not found
+     */
+    404: Error;
+};
+
+export type DeleteProjectError = DeleteProjectErrors[keyof DeleteProjectErrors];
+
+export type DeleteProjectResponses = {
+    /**
+     * Deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteProjectResponse = DeleteProjectResponses[keyof DeleteProjectResponses];
+
+export type GetProjectData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}';
+};
+
+export type GetProjectErrors = {
+    /**
+     * Not found
+     */
+    404: Error;
+};
+
+export type GetProjectError = GetProjectErrors[keyof GetProjectErrors];
+
+export type GetProjectResponses = {
+    /**
+     * Project details
+     */
+    200: Project;
+};
+
+export type GetProjectResponse = GetProjectResponses[keyof GetProjectResponses];
+
+export type UpdateProjectData = {
+    body: UpdateProjectRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}';
+};
+
+export type UpdateProjectErrors = {
+    /**
+     * Not found
+     */
+    404: Error;
+};
+
+export type UpdateProjectError = UpdateProjectErrors[keyof UpdateProjectErrors];
+
+export type UpdateProjectResponses = {
+    /**
+     * Project updated
+     */
+    200: Project;
+};
+
+export type UpdateProjectResponse = UpdateProjectResponses[keyof UpdateProjectResponses];
+
+export type ListSchedulesData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/schedules';
+};
+
+export type ListSchedulesResponses = {
+    /**
+     * List of schedules
+     */
+    200: Array<Schedule>;
+};
+
+export type ListSchedulesResponse = ListSchedulesResponses[keyof ListSchedulesResponses];
+
+export type CreateScheduleData = {
+    body: CreateScheduleRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/schedules';
+};
+
+export type CreateScheduleResponses = {
+    /**
+     * Schedule created
+     */
+    201: Schedule;
+};
+
+export type CreateScheduleResponse = CreateScheduleResponses[keyof CreateScheduleResponses];
+
+export type DeleteScheduleData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/schedules/{id}';
+};
+
+export type DeleteScheduleResponses = {
+    /**
+     * Deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteScheduleResponse = DeleteScheduleResponses[keyof DeleteScheduleResponses];
+
+export type UpdateScheduleData = {
+    body: UpdateScheduleRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/schedules/{id}';
+};
+
+export type UpdateScheduleResponses = {
+    /**
+     * Schedule updated
+     */
+    200: Schedule;
+};
+
+export type UpdateScheduleResponse = UpdateScheduleResponses[keyof UpdateScheduleResponses];
+
+export type ListUnitPricesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        q?: string;
+        category?: 'LABOR' | 'MATERIALS' | 'EQUIPMENT' | 'OTHER';
+    };
+    url: '/unit-prices';
+};
+
+export type ListUnitPricesResponses = {
+    /**
+     * Unit price list
+     */
+    200: Array<UnitPrice>;
+};
+
+export type ListUnitPricesResponse = ListUnitPricesResponses[keyof ListUnitPricesResponses];
+
+export type CreateUnitPriceData = {
+    body: CreateUnitPriceRequest;
+    path?: never;
+    query?: never;
+    url: '/unit-prices';
+};
+
+export type CreateUnitPriceErrors = {
+    /**
+     * Code already exists
+     */
+    409: Error;
+};
+
+export type CreateUnitPriceError = CreateUnitPriceErrors[keyof CreateUnitPriceErrors];
+
+export type CreateUnitPriceResponses = {
+    /**
+     * Unit price created
+     */
+    201: UnitPrice;
+};
+
+export type CreateUnitPriceResponse = CreateUnitPriceResponses[keyof CreateUnitPriceResponses];
+
+export type DeleteUnitPriceData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/unit-prices/{id}';
+};
+
+export type DeleteUnitPriceErrors = {
+    /**
+     * Conflict (used in AHSP)
+     */
+    409: Error;
+};
+
+export type DeleteUnitPriceError = DeleteUnitPriceErrors[keyof DeleteUnitPriceErrors];
+
+export type DeleteUnitPriceResponses = {
+    /**
+     * Deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteUnitPriceResponse = DeleteUnitPriceResponses[keyof DeleteUnitPriceResponses];
+
+export type UpdateUnitPriceData = {
+    body: UpdateUnitPriceRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/unit-prices/{id}';
+};
+
+export type UpdateUnitPriceResponses = {
+    /**
+     * Unit price updated
+     */
+    200: UnitPrice;
+};
+
+export type UpdateUnitPriceResponse = UpdateUnitPriceResponses[keyof UpdateUnitPriceResponses];
+
+export type ListAhspsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        q?: string;
+    };
+    url: '/ahsps';
+};
+
+export type ListAhspsResponses = {
+    /**
+     * AHSP list
+     */
+    200: Array<Ahsp>;
+};
+
+export type ListAhspsResponse = ListAhspsResponses[keyof ListAhspsResponses];
+
+export type CreateAhspData = {
+    body: CreateAhspRequest;
+    path?: never;
+    query?: never;
+    url: '/ahsps';
+};
+
+export type CreateAhspResponses = {
+    /**
+     * AHSP created
+     */
+    201: AhspDetail;
+};
+
+export type CreateAhspResponse = CreateAhspResponses[keyof CreateAhspResponses];
+
+export type DeleteAhspData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/ahsps/{id}';
+};
+
+export type DeleteAhspResponses = {
+    /**
+     * Deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteAhspResponse = DeleteAhspResponses[keyof DeleteAhspResponses];
+
+export type GetAhspData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/ahsps/{id}';
+};
+
+export type GetAhspErrors = {
+    /**
+     * Not found
+     */
+    404: Error;
+};
+
+export type GetAhspError = GetAhspErrors[keyof GetAhspErrors];
+
+export type GetAhspResponses = {
+    /**
+     * AHSP detail
+     */
+    200: AhspDetail;
+};
+
+export type GetAhspResponse = GetAhspResponses[keyof GetAhspResponses];
+
+export type UpdateAhspData = {
+    body: CreateAhspRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/ahsps/{id}';
+};
+
+export type UpdateAhspResponses = {
+    /**
+     * AHSP updated
+     */
+    200: AhspDetail;
+};
+
+export type UpdateAhspResponse = UpdateAhspResponses[keyof UpdateAhspResponses];
+
+export type ListBoqProjectsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        q?: string;
+    };
+    url: '/boq';
+};
+
+export type ListBoqProjectsResponses = {
+    /**
+     * List of projects with volume/RAB status
+     */
+    200: Array<BoqProjectSummary>;
+};
+
+export type ListBoqProjectsResponse = ListBoqProjectsResponses[keyof ListBoqProjectsResponses];
+
+export type GetProjectBoqData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/boq';
+};
+
+export type GetProjectBoqResponses = {
+    /**
+     * List of BOQ items
+     */
+    200: Array<BoqItem>;
+};
+
+export type GetProjectBoqResponse = GetProjectBoqResponses[keyof GetProjectBoqResponses];
+
+export type ListVolumesData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        q?: string;
+    };
+    url: '/projects/{id}/volumes';
+};
+
+export type ListVolumesResponses = {
+    /**
+     * List of volume rows
+     */
+    200: Array<VolumeRow>;
+};
+
+export type ListVolumesResponse = ListVolumesResponses[keyof ListVolumesResponses];
+
+export type CreateVolumeData = {
+    body: CreateVolumeRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/volumes';
+};
+
+export type CreateVolumeResponses = {
+    /**
+     * Created volume row
+     */
+    201: VolumeRow;
+};
+
+export type CreateVolumeResponse = CreateVolumeResponses[keyof CreateVolumeResponses];
+
+export type DeleteVolumeData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/volumes/{id}';
+};
+
+export type DeleteVolumeResponses = {
+    /**
+     * Deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteVolumeResponse = DeleteVolumeResponses[keyof DeleteVolumeResponses];
+
+export type UpdateVolumeData = {
+    body: UpdateVolumeRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/volumes/{id}';
+};
+
+export type UpdateVolumeResponses = {
+    /**
+     * Updated volume row
+     */
+    200: VolumeRow;
+};
+
+export type UpdateVolumeResponse = UpdateVolumeResponses[keyof UpdateVolumeResponses];
+
+export type GetProjectRabData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        q?: string;
+    };
+    url: '/projects/{id}/rab';
+};
+
+export type GetProjectRabResponses = {
+    /**
+     * RAB detail and items
+     */
+    200: RabResponse;
+};
+
+export type GetProjectRabResponse = GetProjectRabResponses[keyof GetProjectRabResponses];
+
+export type CreateRabItemData = {
+    body: CreateRabItemRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/rab';
+};
+
+export type CreateRabItemResponses = {
+    /**
+     * Added RAB item
+     */
+    201: RabItem;
+};
+
+export type CreateRabItemResponse = CreateRabItemResponses[keyof CreateRabItemResponses];
+
+export type DeleteRabItemData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/rab-items/{id}';
+};
+
+export type DeleteRabItemResponses = {
+    /**
+     * Deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteRabItemResponse = DeleteRabItemResponses[keyof DeleteRabItemResponses];
+
+export type UpdateRabItemData = {
+    body: UpdateRabItemRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/rab-items/{id}';
+};
+
+export type UpdateRabItemResponses = {
+    /**
+     * Updated RAB item
+     */
+    200: RabItem;
+};
+
+export type UpdateRabItemResponse = UpdateRabItemResponses[keyof UpdateRabItemResponses];
+
+export type GetCostEstimateData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/cost-estimate';
+};
+
+export type GetCostEstimateResponses = {
+    /**
+     * Cost estimate numbers
+     */
+    200: CostEstimateSummary;
+};
+
+export type GetCostEstimateResponse = GetCostEstimateResponses[keyof GetCostEstimateResponses];
+
+export type ExportVolumeExcelData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/exports/volume.xlsx';
+};
+
+export type ExportVolumeExcelResponses = {
+    /**
+     * Excel file
+     */
+    200: Blob | File;
+};
+
+export type ExportVolumeExcelResponse = ExportVolumeExcelResponses[keyof ExportVolumeExcelResponses];
+
+export type ExportRabExcelData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/exports/rab.xlsx';
+};
+
+export type ExportRabExcelResponses = {
+    /**
+     * Excel file
+     */
+    200: Blob | File;
+};
+
+export type ExportRabExcelResponse = ExportRabExcelResponses[keyof ExportRabExcelResponses];
+
+export type ExportRabPdfData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/projects/{id}/exports/rab.pdf';
+};
+
+export type ExportRabPdfResponses = {
+    /**
+     * PDF file
+     */
+    200: Blob | File;
+};
+
+export type ExportRabPdfResponse = ExportRabPdfResponses[keyof ExportRabPdfResponses];
