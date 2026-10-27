@@ -24,6 +24,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	if cfg.AutoMigrate {
+		if err := database.Migrate(db); err != nil {
+			slog.Error("auto-migrate database", "err", err)
+			os.Exit(1)
+		}
+		slog.Info("database migrations applied")
+	}
+
 	app := server.New(db, cfg)
 
 	go func() {

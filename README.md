@@ -21,9 +21,9 @@ backend/    Go 1.26 + Fiber v3, GORM, golang-migrate, PostgreSQL (DBngin / local
 ### 2. Backend
 ```bash
 cd backend
-go run ./cmd/migrate        # terapkan migrasi tabel dan seed admin
-go run ./cmd/api            # http://localhost:8080/api/v1/health
+go run ./cmd/api            # http://localhost:8080/api/v1/health (migrasi otomatis diterapkan saat start)
 ```
+*(Opsional: migrasi manual tetap bisa dijalankan via `go run ./cmd/migrate`)*
 
 ### 3. Frontend
 ```bash
