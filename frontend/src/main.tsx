@@ -8,8 +8,10 @@ import { client } from './api/client.gen'
 import './index.css'
 
 if (import.meta.env.VITE_API_BASE_URL) {
+  const rawBase = import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '')
+  const baseUrl = rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`
   client.setConfig({
-    baseUrl: import.meta.env.VITE_API_BASE_URL,
+    baseUrl,
   })
 }
 

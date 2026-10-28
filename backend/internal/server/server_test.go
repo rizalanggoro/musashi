@@ -9,10 +9,22 @@ import (
 func TestHealthRouteRegistered(t *testing.T) {
 	app := New(nil, config.Config{AllowedOrigins: "http://localhost:5173"})
 
+	hasRootHealth := false
+	hasV1Health := false
+
 	for _, r := range app.GetRoutes(true) {
+		if r.Method == "GET" && r.Path == "/health" {
+			hasRootHealth = true
+		}
 		if r.Method == "GET" && r.Path == "/api/v1/health" {
-			return
+			hasV1Health = true
 		}
 	}
-	t.Fatal("GET /api/v1/health is not registered")
+
+	if !hasRootHealth {
+		t.Fatal("GET /health is not registered")
+	}
+	if !hasV1Health {
+		t.Fatal("GET /api/v1/health is not registered")
+	}
 }

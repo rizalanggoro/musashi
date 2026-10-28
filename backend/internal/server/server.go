@@ -41,6 +41,9 @@ func New(db *gorm.DB, cfg config.Config) *fiber.App {
 		MaxAge:           300,
 	}))
 
+	// Root health check
+	app.Get("/health", health(db))
+
 	api := app.Group("/api/v1")
 
 	// System & Health
