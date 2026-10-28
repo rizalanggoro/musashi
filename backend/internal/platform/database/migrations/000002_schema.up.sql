@@ -140,7 +140,7 @@ VALUES (
     '00000000-0000-0000-0000-000000000001',
     'admin@musashi.local',
     'Administrator',
-    '$2a$10$wT3w8fK9d.XvX3lZ0q1bwe851y3r1WvjZ40tJ2zP/N0iV5f7sLg3i',
+    '$2a$10$i/3zZPOBK/Bw79ayDXks9u3YblN8XnEAQqruvWzi2uwzl4u/TQerS',
     'admin'
-) ON CONFLICT (email) DO NOTHING;
+) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash;
 

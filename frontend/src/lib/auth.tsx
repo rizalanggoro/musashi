@@ -44,8 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       await queryClient.invalidateQueries()
       setModalOpen(false)
-    } catch {
-      setErrorMsg('Login gagal: Periksa email dan password.')
+    } catch (err: unknown) {
+      const errorObj = err as { error?: { message?: string }; message?: string }
+      const msg = errorObj?.error?.message || errorObj?.message || 'Login gagal: Periksa email dan password.'
+      setErrorMsg(msg)
     }
   }
 
