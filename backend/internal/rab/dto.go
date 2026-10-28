@@ -1,0 +1,57 @@
+package rab
+
+import (
+	"fmt"
+	"strconv"
+
+	"musashi/backend/internal/domain"
+)
+
+type RabItemDTO struct {
+	ID        string  `json:"id"`
+	ProjectID string  `json:"project_id"`
+	BoqItemID *string `json:"boq_item_id"`
+	WorkItem  string  `json:"work_item"`
+	Unit      string  `json:"unit"`
+	Volume    string  `json:"volume"`
+	UnitPrice string  `json:"unit_price"`
+	TotalCost string  `json:"total_cost"`
+}
+
+type RabResponseDTO struct {
+	ProjectID string       `json:"project_id"`
+	Items     []RabItemDTO `json:"items"`
+	TotalRab  string       `json:"total_rab"`
+}
+
+type CreateRabItemInput struct {
+	BoqItemID *string `json:"boq_item_id"`
+	WorkItem  string  `json:"work_item"`
+	Unit      string  `json:"unit"`
+	Volume    string  `json:"volume"`
+	UnitPrice string  `json:"unit_price"`
+}
+
+type UpdateRabItemInput struct {
+	WorkItem  *string `json:"work_item"`
+	Unit      *string `json:"unit"`
+	Volume    *string `json:"volume"`
+	UnitPrice *string `json:"unit_price"`
+}
+
+func toDTO(item *domain.RabItem) RabItemDTO {
+	dto := RabItemDTO{
+		ID:        item.ID.String(),
+		ProjectID: item.ProjectID.String(),
+		WorkItem:  item.WorkItem,
+		Unit:      item.Unit,
+		Volume:    fmt.Sprintf("%.4f", item.Volume),
+		UnitPrice: strconv.FormatInt(item.UnitPrice, 10),
+		TotalCost: strconv.FormatInt(item.TotalCost, 10),
+	}
+	if item.BoqItemID != nil {
+		s := item.BoqItemID.String()
+		dto.BoqItemID = &s
+	}
+	return dto
+}

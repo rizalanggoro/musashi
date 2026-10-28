@@ -9,24 +9,27 @@ import {
 } from '@/api/@tanstack/react-query.gen'
 import { PageHeader } from '@/components/page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth'
 
 export const Route = createFileRoute('/schedule')({
   component: SchedulePage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    projectId: (search.projectId as string) || '',
+  validateSearch: (search: Record<string, unknown>): { projectId?: string } => ({
+    projectId: (search.projectId as string) || undefined,
   }),
 })
 
 function SchedulePage() {
   const queryClient = useQueryClient()
-  const { projectId: queryProjectId } = Route.useSearch()
+  const searchParams = Route.useSearch()
+  const queryProjectId = searchParams.projectId || ''
   const { isAdmin, user, openLoginModal } = useAuth()
 
   const [selectedProjectId, setSelectedProjectId] = useState<string>(queryProjectId)
@@ -101,33 +104,46 @@ function SchedulePage() {
       await queryClient.invalidateQueries()
       setIsAddOpen(false)
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Gagal menyimpan item jadwal.')
+      setErrorMessage(err?.message || 'Gagal menyimpan schedule.')
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus item jadwal ini?')) return
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Hapus jadwal "${name}"?`)) return
     try {
       await deleteMut.mutateAsync({ path: { id } })
       await queryClient.invalidateQueries()
     } catch (err: any) {
-      alert(err?.message || 'Gagal menghapus item jadwal.')
+      alert(err?.message || 'Gagal menghapus schedule.')
     }
   }
 
-  const filtered = schedules.filter((s) => {
-    if (!search) return true
-    const q = search.toLowerCase()
-    return s.work_item.toLowerCase().includes(q) || (s.code ? s.code.toLowerCase().includes(q) : false)
-  })
+  const filtered = schedules.filter(
+    (s) =>
+      s.work_item.toLowerCase().includes(search.toLowerCase()) ||
+      (s.code ? s.code.toLowerCase().includes(search.toLowerCase()) : false)
+  )
+
+  const getStatusBadgeVariant = (st: string) => {
+    switch (st) {
+      case 'done':
+        return 'default'
+      case 'on_going':
+        return 'secondary'
+      case 'late':
+        return 'destructive'
+      default:
+        return 'outline'
+    }
+  }
 
   return (
-    <div>
-      <PageHeader title="SCHEDULE" onSearch={setSearch} onAdd={handleOpenAdd} />
+    <div className="flex flex-col gap-4">
+      <PageHeader title="Schedule" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="Schedule" />
 
-      {/* Project Selector */}
-      <div className="mb-4 flex items-center gap-3 rounded-xl bg-white p-3 border shadow-xs">
-        <span className="text-xs font-bold text-foreground">PROJECT:</span>
+      {/* Project Selector Bar */}
+      <div className="flex items-center gap-4 rounded-lg border bg-card p-3">
+        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Proyek:</span>
         <div className="w-80">
           <Select
             value={activeProjectId}
@@ -135,63 +151,72 @@ function SchedulePage() {
               if (val) setSelectedProjectId(val)
             }}
           >
-            <SelectTrigger className="h-9 text-xs font-semibold">
-              <SelectValue placeholder="Pilih Proyek..." />
+            <SelectTrigger>
+              <SelectValue placeholder="Pilih Proyek" />
             </SelectTrigger>
             <SelectContent>
-              {projects.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name} {p.section ? `(${p.section})` : ''}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                {projects.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name} {p.section ? `(${p.section})` : ''}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className="overflow-x-auto border bg-white shadow-sm">
-        <Table className="text-xs">
-          <TableHeader className="bg-white">
-            <TableRow className="border-b hover:bg-transparent">
-              <TableHead className="w-12 border-r text-center font-bold">NO</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">CODE</TableHead>
-              <TableHead className="min-w-64 border-r text-center font-bold">WORK ITEM</TableHead>
-              <TableHead className="w-28 border-r text-center font-bold">START DATE</TableHead>
-              <TableHead className="w-28 border-r text-center font-bold">END DATE</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">DURATION</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">WEIGHT (%)</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">PROGRESS (%)</TableHead>
-              <TableHead className="w-28 border-r text-center font-bold">STATUS</TableHead>
-              {isAdmin && <TableHead className="w-16 text-center font-bold">AKSI</TableHead>}
+      <div className="rounded-md border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12 text-center">No</TableHead>
+              <TableHead className="w-28">Code</TableHead>
+              <TableHead>Work Item</TableHead>
+              <TableHead className="w-28 text-center">Start Date</TableHead>
+              <TableHead className="w-28 text-center">End Date</TableHead>
+              <TableHead className="w-24 text-center">Duration</TableHead>
+              <TableHead className="w-24 text-right">Weight (%)</TableHead>
+              <TableHead className="w-24 text-right">Progress (%)</TableHead>
+              <TableHead className="w-28 text-center">Status</TableHead>
+              {isAdmin && <TableHead className="w-20 text-center">Action</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 10 : 9} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  Memuat data...
+                <TableCell colSpan={isAdmin ? 10 : 9} className="h-32 text-center text-muted-foreground">
+                  Loading data...
                 </TableCell>
               </TableRow>
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 10 : 9} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  {search ? `Tidak ada jadwal yang cocok dengan "${search}".` : 'Belum ada jadwal untuk proyek ini. Klik ADD untuk membuat.'}
+                <TableCell colSpan={isAdmin ? 10 : 9} className="h-48 text-center">
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyTitle>Belum ada jadwal pekerjaan</EmptyTitle>
+                      <EmptyDescription>
+                        {search ? `Tidak ada item cocok dengan "${search}".` : 'Tambahkan tahapan jadwal baru untuk proyek ini.'}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((item, idx) => (
-                <TableRow key={item.id} className="border-b bg-muted/40 hover:bg-muted/80">
-                  <TableCell className="border-r text-center font-medium">{idx + 1}</TableCell>
-                  <TableCell className="border-r font-mono font-medium">{item.code || '-'}</TableCell>
-                  <TableCell className="border-r font-medium text-foreground">{item.work_item}</TableCell>
-                  <TableCell className="border-r text-center">{item.start_date}</TableCell>
-                  <TableCell className="border-r text-center">{item.end_date}</TableCell>
-                  <TableCell className="border-r text-center font-medium">{item.duration} hari</TableCell>
-                  <TableCell className="border-r text-right">{item.weight}%</TableCell>
-                  <TableCell className="border-r text-right font-semibold">{item.progress}%</TableCell>
-                  <TableCell className="border-r text-center">
-                    <Badge variant={item.status === 'done' ? 'default' : 'secondary'} className="text-[10px]">
-                      {item.status}
+              filtered.map((s, idx) => (
+                <TableRow key={s.id}>
+                  <TableCell className="text-center text-muted-foreground">{idx + 1}</TableCell>
+                  <TableCell className="font-mono text-xs font-semibold">{s.code || '-'}</TableCell>
+                  <TableCell className="font-medium text-foreground">{s.work_item}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">{s.start_date}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">{s.end_date}</TableCell>
+                  <TableCell className="text-center">{s.duration} hari</TableCell>
+                  <TableCell className="text-right font-medium">{s.weight}%</TableCell>
+                  <TableCell className="text-right font-medium">{s.progress}%</TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant={getStatusBadgeVariant(s.status)} className="capitalize text-xs font-normal">
+                      {s.status.replace('_', ' ')}
                     </Badge>
                   </TableCell>
                   {isAdmin && (
@@ -199,10 +224,10 @@ function SchedulePage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => handleDelete(item.id)}
+                        className="text-xs text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDelete(s.id, s.work_item)}
                       >
-                        Hapus
+                        Delete
                       </Button>
                     </TableCell>
                   )}
@@ -215,106 +240,118 @@ function SchedulePage() {
 
       {/* Modal Add Schedule */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-md rounded-2xl">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold tracking-wide">TAMBAH ITEM JADWAL</DialogTitle>
+            <DialogTitle>Add Schedule Item</DialogTitle>
+            <DialogDescription>Tambahkan jadwal tahapan pekerjaan proyek.</DialogDescription>
           </DialogHeader>
 
           {errorMessage && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-600">
-              {errorMessage}
-            </div>
+            <Alert variant="destructive">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
           )}
 
-          <form onSubmit={handleCreate} className="space-y-4 text-xs font-semibold">
-            <div>
-              <Label className="text-xs">CODE</Label>
-              <Input
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="misal WBS-01"
-                className="mt-1 font-mono"
-              />
-            </div>
-
-            <div>
-              <Label className="text-xs">WORK ITEM</Label>
-              <Input
-                value={workItem}
-                onChange={(e) => setWorkItem(e.target.value)}
-                placeholder="Uraian pekerjaan jadwal..."
-                className="mt-1"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">START DATE</Label>
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="mt-1"
-                  required
-                />
+          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+            <FieldGroup>
+              <div className="grid grid-cols-3 gap-3">
+                <Field>
+                  <FieldLabel htmlFor="sch-code">Code</FieldLabel>
+                  <Input
+                    id="sch-code"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="W-01"
+                  />
+                </Field>
+                <div className="col-span-2">
+                  <Field>
+                    <FieldLabel htmlFor="sch-workitem">Work Item</FieldLabel>
+                    <Input
+                      id="sch-workitem"
+                      value={workItem}
+                      onChange={(e) => setWorkItem(e.target.value)}
+                      placeholder="Nama Tahapan..."
+                      required
+                    />
+                  </Field>
+                </div>
               </div>
-              <div>
-                <Label className="text-xs">END DATE</Label>
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="mt-1"
-                  required
-                />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">WEIGHT (BOBOT %)</Label>
-                <Input
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder="0.00"
-                  className="mt-1"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="sch-start">Start Date</FieldLabel>
+                  <Input
+                    id="sch-start"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    required
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="sch-end">End Date</FieldLabel>
+                  <Input
+                    id="sch-end"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    required
+                  />
+                </Field>
               </div>
-              <div>
-                <Label className="text-xs">PROGRESS (%)</Label>
-                <Input
-                  value={progress}
-                  onChange={(e) => setProgress(e.target.value)}
-                  placeholder="0.00"
-                  className="mt-1"
-                />
+
+              <div className="grid grid-cols-3 gap-3">
+                <Field>
+                  <FieldLabel htmlFor="sch-weight">Weight (%)</FieldLabel>
+                  <Input
+                    id="sch-weight"
+                    type="number"
+                    step="0.01"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="sch-prog">Progress (%)</FieldLabel>
+                  <Input
+                    id="sch-prog"
+                    type="number"
+                    step="0.01"
+                    value={progress}
+                    onChange={(e) => setProgress(e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="sch-status">Status</FieldLabel>
+                  <Select
+                    value={status}
+                    onValueChange={(val) => setStatus(val as any)}
+                  >
+                    <SelectTrigger id="sch-status">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="planning">Planning</SelectItem>
+                        <SelectItem value="on_going">On Going</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem value="late">Late</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
               </div>
-            </div>
+            </FieldGroup>
 
-            <div>
-              <Label className="text-xs">STATUS</Label>
-              <Select value={status} onValueChange={(val: any) => setStatus(val)}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="planning">Planning (Rencana)</SelectItem>
-                  <SelectItem value="on_going">On Going (Berjalan)</SelectItem>
-                  <SelectItem value="done">Done (Selesai)</SelectItem>
-                  <SelectItem value="late">Late (Terlambat)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
-                Batal
+                Cancel
               </Button>
-              <Button type="submit" disabled={createMut.isPending} className="px-8">
-                {createMut.isPending ? 'Menyimpan...' : 'ADD'}
+              <Button type="submit" disabled={createMut.isPending}>
+                {createMut.isPending ? 'Saving...' : 'Save'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

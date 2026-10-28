@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -19,7 +20,33 @@ type Config struct {
 	AutoMigrate    bool
 }
 
+func loadDotEnv(files ...string) {
+	for _, f := range files {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			continue
+		}
+		for _, line := range strings.Split(string(data), "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" || strings.HasPrefix(line, "#") {
+				continue
+			}
+			parts := strings.SplitN(line, "=", 2)
+			if len(parts) == 2 {
+				key := strings.TrimSpace(parts[0])
+				val := strings.TrimSpace(parts[1])
+				val = strings.Trim(val, `"'`)
+				if os.Getenv(key) == "" {
+					os.Setenv(key, val)
+				}
+			}
+		}
+	}
+}
+
 func Load() Config {
+	loadDotEnv(".env", "backend/.env")
+
 	host := env("DB_HOST", "localhost")
 	port := env("DB_PORT", "5432")
 	user := env("DB_USER", "postgres")

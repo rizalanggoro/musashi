@@ -3,9 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getMeOptions, loginMutation, logoutMutation } from '@/api/@tanstack/react-query.gen'
 import type { User } from '@/api/types.gen'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface AuthContextValue {
   user: User | undefined
@@ -82,9 +83,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           </DialogHeader>
 
           {errorMsg && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-              {errorMsg}
-            </div>
+            <Alert variant="destructive">
+              <AlertDescription>{errorMsg}</AlertDescription>
+            </Alert>
           )}
 
           <form
@@ -92,34 +93,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               e.preventDefault()
               handleLogin()
             }}
-            className="space-y-4"
+            className="flex flex-col gap-4"
           >
-            <div>
-              <Label htmlFor="auth-email">EMAIL</Label>
-              <Input
-                id="auth-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="auth-pass">PASSWORD</Label>
-              <Input
-                id="auth-pass"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="auth-email">Email</FieldLabel>
+                <Input
+                  id="auth-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="auth-pass">Password</FieldLabel>
+                <Input
+                  id="auth-pass"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </Field>
+            </FieldGroup>
+
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
                 Batal
               </Button>
               <Button type="submit" disabled={loginMut.isPending}>
-                {loginMut.isPending ? 'Memproses...' : 'MASUK'}
+                {loginMut.isPending ? 'Memproses...' : 'Masuk'}
               </Button>
             </div>
           </form>

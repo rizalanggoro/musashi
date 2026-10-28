@@ -49,70 +49,88 @@ func New(db *gorm.DB, cfg config.Config) *fiber.App {
 	// System & Health
 	api.Get("/health", health(db))
 
+	// Feature handlers (Repository -> Service -> Handler)
+	authHandler := auth.NewHandler(auth.NewService(auth.NewRepository(db)))
+	projectHandler := project.NewHandler(project.NewService(project.NewRepository(db)))
+	scheduleHandler := schedule.NewHandler(schedule.NewService(schedule.NewRepository(db)))
+	unitPriceHandler := unitprice.NewHandler(unitprice.NewService(unitprice.NewRepository(db)))
+	ahspHandler := ahsp.NewHandler(ahsp.NewService(ahsp.NewRepository(db)))
+	boqHandler := boq.NewHandler(boq.NewService(boq.NewRepository(db)))
+	volumeHandler := volume.NewHandler(volume.NewService(volume.NewRepository(db)))
+	rabHandler := rab.NewHandler(rab.NewService(rab.NewRepository(db)))
+	costEstimateHandler := costestimate.NewHandler(costestimate.NewService(costestimate.NewRepository(db)))
+	exportHandler := export.NewHandler(export.NewService(export.NewRepository(db)))
+
 	// Auth
-	api.Post("/auth/login", auth.LoginHandler(db))
-	api.Post("/auth/logout", auth.LogoutHandler())
-	api.Get("/auth/me", auth.AuthMiddleware(), auth.MeHandler())
+	api.Post("/auth/login", authHandler.Login)
+	api.Post("/auth/logout", authHandler.Logout)
+	api.Get("/auth/me", authHandler.AuthMiddleware(), authHandler.Me)
 
 	// Protected routes
-	authReq := auth.AuthMiddleware()
-	adminOnly := auth.RequireRole(domain.RoleAdmin)
+	authReq := authHandler.AuthMiddleware()
+	adminOnly := authHandler.RequireRole(domain.RoleAdmin)
 
 	// Projects
-	api.Get("/projects", authReq, project.ListHandler(db))
-	api.Post("/projects", authReq, adminOnly, project.CreateHandler(db))
-	api.Get("/projects/:id", authReq, project.GetHandler(db))
-	api.Put("/projects/:id", authReq, adminOnly, project.UpdateHandler(db))
-	api.Delete("/projects/:id", authReq, adminOnly, project.DeleteHandler(db))
+	api.Get("/projects", authReq, projectHandler.List)
+	api.Post("/projects", authReq, adminOnly, projectHandler.Create)
+	api.Get("/projects/:id", authReq, projectHandler.Get)
+	api.Put("/projects/:id", authReq, adminOnly, projectHandler.Update)
+	api.Delete("/projects/:id", authReq, adminOnly, projectHandler.Delete)
 
 	// Schedules
-	api.Get("/projects/:id/schedules", authReq, schedule.ListByProjectHandler(db))
-	api.Post("/projects/:id/schedules", authReq, adminOnly, schedule.CreateHandler(db))
-	api.Put("/schedules/:id", authReq, adminOnly, schedule.UpdateHandler(db))
-	api.Delete("/schedules/:id", authReq, adminOnly, schedule.DeleteHandler(db))
+	api.Get("/projects/:id/schedules", authReq, scheduleHandler.ListByProject)
+	api.Post("/projects/:id/schedules", authReq, adminOnly, scheduleHandler.Create)
+	api.Put("/schedules/:id", authReq, adminOnly, scheduleHandler.Update)
+	api.Delete("/schedules/:id", authReq, adminOnly, scheduleHandler.Delete)
 
 	// Unit Prices
-	api.Get("/unit-prices", authReq, unitprice.ListHandler(db))
-	api.Post("/unit-prices", authReq, adminOnly, unitprice.CreateHandler(db))
-	api.Put("/unit-prices/:id", authReq, adminOnly, unitprice.UpdateHandler(db))
-	api.Delete("/unit-prices/:id", authReq, adminOnly, unitprice.DeleteHandler(db))
+	api.Get("/unit-prices", authReq, unitPriceHandler.List)
+	api.Post("/unit-prices", authReq, adminOnly, unitPriceHandler.Create)
+	api.Put("/unit-prices/:id", authReq, adminOnly, unitPriceHandler.Update)
+	api.Delete("/unit-prices/:id", authReq, adminOnly, unitPriceHandler.Delete)
 
 	// AHSP
-	api.Get("/ahsps", authReq, ahsp.ListHandler(db))
-	api.Post("/ahsps", authReq, adminOnly, ahsp.CreateHandler(db))
-	api.Get("/ahsps/:id", authReq, ahsp.GetHandler(db))
-	api.Put("/ahsps/:id", authReq, adminOnly, ahsp.UpdateHandler(db))
-	api.Delete("/ahsps/:id", authReq, adminOnly, ahsp.DeleteHandler(db))
+	api.Get("/ahsps", authReq, ahspHandler.List)
+	api.Post("/ahsps", authReq, adminOnly, ahspHandler.Create)
+	api.Get("/ahsps/:id", authReq, ahspHandler.Get)
+	api.Put("/ahsps/:id", authReq, adminOnly, ahspHandler.Update)
+	api.Delete("/ahsps/:id", authReq, adminOnly, ahspHandler.Delete)
 
 	// BOQ
-	api.Get("/boq", authReq, boq.ListSummaryHandler(db))
-	api.Get("/projects/:id/boq", authReq, boq.GetProjectBoqHandler(db))
+	api.Get("/boq", authReq, boqHandler.ListSummary)
+	api.Get("/projects/:id/boq", authReq, boqHandler.GetProjectBoq)
 
 	// Volume (take-off)
-	api.Get("/projects/:id/volumes", authReq, volume.ListHandler(db))
-	api.Post("/projects/:id/volumes", authReq, volume.CreateHandler(db))
-	api.Put("/volumes/:id", authReq, volume.UpdateHandler(db))
-	api.Delete("/volumes/:id", authReq, adminOnly, volume.DeleteHandler(db))
+	api.Get("/projects/:id/volumes", authReq, volumeHandler.List)
+	api.Post("/projects/:id/volumes", authReq, volumeHandler.Create)
+	api.Put("/volumes/:id", authReq, volumeHandler.Update)
+	api.Delete("/volumes/:id", authReq, adminOnly, volumeHandler.Delete)
 
 	// RAB
-	api.Get("/projects/:id/rab", authReq, rab.GetProjectRabHandler(db))
-	api.Post("/projects/:id/rab", authReq, adminOnly, rab.CreateHandler(db))
-	api.Put("/rab-items/:id", authReq, adminOnly, rab.UpdateHandler(db))
-	api.Delete("/rab-items/:id", authReq, adminOnly, rab.DeleteHandler(db))
+	api.Get("/projects/:id/rab", authReq, rabHandler.GetProjectRab)
+	api.Post("/projects/:id/rab", authReq, adminOnly, rabHandler.Create)
+	api.Put("/rab-items/:id", authReq, adminOnly, rabHandler.Update)
+	api.Delete("/rab-items/:id", authReq, adminOnly, rabHandler.Delete)
 
 	// Cost Estimate
-	api.Get("/projects/:id/cost-estimate", authReq, costestimate.GetSummaryHandler(db))
+	api.Get("/projects/:id/cost-estimate", authReq, costEstimateHandler.GetSummary)
 
 	// Exports
-	api.Get("/projects/:id/exports/volume.xlsx", authReq, export.VolumeExcelHandler(db))
-	api.Get("/projects/:id/exports/rab.xlsx", authReq, export.RabExcelHandler(db))
-	api.Get("/projects/:id/exports/rab.pdf", authReq, export.RabPdfHandler(db))
+	api.Get("/projects/:id/exports/volume.xlsx", authReq, exportHandler.VolumeExcel)
+	api.Get("/projects/:id/exports/rab.xlsx", authReq, exportHandler.RabExcel)
+	api.Get("/projects/:id/exports/rab.pdf", authReq, exportHandler.RabPdf)
 
 	return app
 }
 
 func health(db *gorm.DB) fiber.Handler {
 	return func(c fiber.Ctx) error {
+		if db == nil {
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"status":   "degraded",
+				"database": "down",
+			})
+		}
 		sqlDB, err := db.DB()
 		if err != nil || sqlDB.PingContext(c.Context()) != nil {
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{

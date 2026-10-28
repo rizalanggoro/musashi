@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -10,14 +10,18 @@ import {
   listAhspsOptions,
 } from '@/api/@tanstack/react-query.gen'
 import { PageHeader } from '@/components/page-header'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent } from '@/components/ui/card'
 import { formatRupiah, formatDecimal } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
+import { AlertCircle, Download } from 'lucide-react'
 
 export const Route = createFileRoute('/rab')({
   component: RabPage,
@@ -99,38 +103,22 @@ function RabPage() {
     if (boq) {
       setWorkItem(boq.work_item)
       setUnit(boq.unit)
-      setVolume(boq.planned_volume || '1')
+      setVolume(boq.planned_volume)
 
-      // Look up AHSP price if linked
       if (boq.ahsp_id) {
-        const foundAhsp = ahsps.find((a) => a.id === boq.ahsp_id)
-        if (foundAhsp) {
-          setUnitPrice(foundAhsp.unit_price_of_work)
+        const ahsp = ahsps.find((a) => a.id === boq.ahsp_id)
+        if (ahsp) {
+          setUnitPrice(ahsp.unit_price_of_work)
         }
       }
     }
   }
 
-  const handleSelectAhspDirect = (ahspId: string) => {
-    const foundAhsp = ahsps.find((a) => a.id === ahspId)
-    if (foundAhsp) {
-      setWorkItem(foundAhsp.work_item)
-      setUnit(foundAhsp.unit)
-      setUnitPrice(foundAhsp.unit_price_of_work)
-    }
-  }
-
-  const previewTotal = useMemo(() => {
-    const v = Number.parseFloat(volume) || 0
-    const p = Number.parseInt(unitPrice.replace(/\D/g, ''), 10) || 0
-    return Math.round(v * p)
-  }, [volume, unitPrice])
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage('')
     if (!workItem.trim() || !unit.trim()) {
-      setErrorMessage('Work item dan unit wajib diisi.')
+      setErrorMessage('Nama item pekerjaan dan unit wajib diisi.')
       return
     }
 
@@ -166,81 +154,117 @@ function RabPage() {
   const hasZeroPrice = items.some((it) => it.unit_price === '0')
 
   return (
-    <div>
-      <PageHeader title="RAB" onSearch={setSearch} onAdd={handleOpenAdd} />
+    <div className="flex flex-col gap-4">
+      <PageHeader title="RAB (Rencana Anggaran Biaya)" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="RAB Item" />
 
-      {/* Project Selector (Mockup Hal. 10) */}
-      <div className="mb-4 flex items-center gap-3 rounded-xl bg-white p-3 border shadow-xs">
-        <span className="text-xs font-bold text-foreground">PROJECT:</span>
-        <div className="w-80">
-          <Select
-            value={activeProjectId}
-            onValueChange={(val) => {
-              if (val) setSelectedProjectId(val)
-            }}
-          >
-            <SelectTrigger className="h-9 text-xs font-semibold">
-              <SelectValue placeholder="Pilih Proyek..." />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name} {p.section ? `(${p.section})` : ''}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* Project Selector Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border bg-card p-3">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Proyek:</span>
+          <div className="w-80">
+            <Select
+              value={activeProjectId}
+              onValueChange={(val) => {
+                if (val) setSelectedProjectId(val)
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih Proyek..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} {p.section ? `(${p.section})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+
+        {activeProjectId && (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              render={<a href={`/api/v1/projects/${activeProjectId}/exports/rab.xlsx`} download />}
+              nativeButton={false}
+            >
+              <Download data-icon="inline-start" />
+              Excel
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              render={<a href={`/api/v1/projects/${activeProjectId}/exports/rab.pdf`} target="_blank" rel="noreferrer" />}
+              nativeButton={false}
+            >
+              <Download data-icon="inline-start" />
+              PDF
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Warning banner if any item lacks price */}
+      {/* Warning banner using Alert */}
       {hasZeroPrice && (
-        <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-800">
-          ⚠️ Ada item pekerjaan yang belum memiliki harga satuan (Unit Price = Rp0).
-        </div>
+        <Alert>
+          <AlertCircle />
+          <AlertTitle>Perhatian</AlertTitle>
+          <AlertDescription>Terdapat item pekerjaan yang belum memiliki harga satuan (Unit Price = Rp0).</AlertDescription>
+        </Alert>
       )}
 
-      <div className="overflow-x-auto border bg-white shadow-sm">
-        <Table className="text-xs">
-          <TableHeader className="bg-white">
-            <TableRow className="border-b hover:bg-transparent">
-              <TableHead className="w-12 border-r text-center font-bold">NO</TableHead>
-              <TableHead className="min-w-64 border-r text-center font-bold">WORK ITEM</TableHead>
-              <TableHead className="w-28 border-r text-center font-bold">VOLUME</TableHead>
-              <TableHead className="w-20 border-r text-center font-bold">UNIT</TableHead>
-              <TableHead className="w-40 border-r text-center font-bold">UNIT PRICE</TableHead>
-              <TableHead className="w-44 border-r text-center font-bold">TOTAL COST</TableHead>
-              {isAdmin && <TableHead className="w-16 text-center font-bold">AKSI</TableHead>}
+      <div className="rounded-md border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12 text-center">No</TableHead>
+              <TableHead>Work Item</TableHead>
+              <TableHead className="w-28 text-right">Volume</TableHead>
+              <TableHead className="w-20 text-center">Unit</TableHead>
+              <TableHead className="w-40 text-right">Unit Price</TableHead>
+              <TableHead className="w-44 text-right">Total Cost</TableHead>
+              {isAdmin && <TableHead className="w-20 text-center">Action</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 7 : 6} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  Memuat data...
+                <TableCell colSpan={isAdmin ? 7 : 6} className="h-32 text-center text-muted-foreground">
+                  Loading data...
                 </TableCell>
               </TableRow>
             ) : items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 7 : 6} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  {search ? `Tidak ada item yang cocok dengan "${search}".` : 'Belum ada data RAB untuk proyek ini. Klik ADD untuk membuat.'}
+                <TableCell colSpan={isAdmin ? 7 : 6} className="h-48 text-center">
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyTitle>Belum ada data RAB</EmptyTitle>
+                      <EmptyDescription>
+                        {search ? `Tidak ada item yang cocok dengan "${search}".` : 'Belum ada data RAB untuk proyek ini.'}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
               items.map((item, idx) => (
-                <TableRow key={item.id} className="border-b bg-muted/40 hover:bg-muted/80">
-                  <TableCell className="border-r text-center font-medium">{idx + 1}</TableCell>
-                  <TableCell className="border-r font-medium text-foreground">{item.work_item}</TableCell>
-                  <TableCell className="border-r text-right">{formatDecimal(item.volume)}</TableCell>
-                  <TableCell className="border-r text-center">{item.unit}</TableCell>
-                  <TableCell className="border-r text-right font-medium">
+                <TableRow key={item.id}>
+                  <TableCell className="text-center text-muted-foreground">{idx + 1}</TableCell>
+                  <TableCell className="font-medium text-foreground">{item.work_item}</TableCell>
+                  <TableCell className="text-right">{formatDecimal(item.volume)}</TableCell>
+                  <TableCell className="text-center">{item.unit}</TableCell>
+                  <TableCell className="text-right font-medium">
                     {item.unit_price === '0' ? (
-                      <span className="text-amber-600 font-normal">⚠ belum ada harga</span>
+                      <span className="text-amber-600 text-xs font-normal">Belum ada harga</span>
                     ) : (
                       formatRupiah(item.unit_price)
                     )}
                   </TableCell>
-                  <TableCell className="border-r text-right font-bold text-foreground">
+                  <TableCell className="text-right font-semibold text-foreground">
                     {formatRupiah(item.total_cost)}
                   </TableCell>
                   {isAdmin && (
@@ -248,10 +272,10 @@ function RabPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                        className="text-xs text-destructive hover:bg-destructive/10"
                         onClick={() => handleDelete(item.id)}
                       >
-                        Hapus
+                        Delete
                       </Button>
                     </TableCell>
                   )}
@@ -259,127 +283,125 @@ function RabPage() {
               ))
             )}
           </TableBody>
+          {items.length > 0 && (
+            <TableFooter>
+              <TableRow className="font-bold text-base">
+                <TableCell colSpan={5} className="text-right">
+                  TOTAL BIAYA KESELURUHAN (RAB):
+                </TableCell>
+                <TableCell className="text-right font-extrabold text-foreground">
+                  {formatRupiah(rabData?.total_rab || '0')}
+                </TableCell>
+                {isAdmin && <TableCell></TableCell>}
+              </TableRow>
+            </TableFooter>
+          )}
         </Table>
-
-        {/* Footer: TOTAL RAB */}
-        {items.length > 0 && (
-          <div className="flex items-center justify-between border-t bg-primary px-6 py-3 text-sm font-extrabold text-primary-foreground">
-            <span>TOTAL RAB</span>
-            <span>{formatRupiah(rabData?.total_rab ?? '0')}</span>
-          </div>
-        )}
       </div>
 
-      {/* Modal Add RAB (Mockup Hal. 10) */}
+      {/* Modal Add RAB Item */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-md rounded-2xl">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold tracking-wide">TAMBAH ITEM RAB</DialogTitle>
+            <DialogTitle>Add RAB Item</DialogTitle>
+            <DialogDescription>Tambahkan baris rencana anggaran biaya proyek.</DialogDescription>
           </DialogHeader>
 
           {errorMessage && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-600">
-              {errorMessage}
-            </div>
+            <Alert variant="destructive">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
           )}
 
-          <form onSubmit={handleCreate} className="space-y-4 text-xs font-semibold">
-            {boqItems.length > 0 && (
-              <div>
-                <Label className="text-xs">PILIH DARI ITEM BOQ / VOLUME</Label>
-                <select
-                  className="mt-1 h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-xs"
-                  value={selectedBoqId}
-                  onChange={(e) => handleSelectBoqItem(e.target.value)}
-                >
-                  <option value="">-- Pilih Item BOQ Proyek --</option>
-                  {boqItems.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.work_item} ({b.planned_volume} {b.unit})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+            <FieldGroup>
+              {boqItems.length > 0 && (
+                <Field>
+                  <FieldLabel htmlFor="rab-boq">Pilih dari BOQ (Opsional)</FieldLabel>
+                  <Select value={selectedBoqId} onValueChange={(val) => { if (val) handleSelectBoqItem(val) }}>
+                    <SelectTrigger id="rab-boq">
+                      <SelectValue placeholder="-- Pilih Item BOQ --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {boqItems.map((b) => (
+                          <SelectItem key={b.id} value={b.id}>
+                            {b.work_item} ({b.planned_volume} {b.unit})
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
 
-            {ahsps.length > 0 && (
-              <div>
-                <Label className="text-xs">ATAU PILIH DARI MASTER AHSP (HARGA SATUAN)</Label>
-                <select
-                  className="mt-1 h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-xs"
-                  onChange={(e) => handleSelectAhspDirect(e.target.value)}
-                  defaultValue=""
-                >
-                  <option value="" disabled>-- Pilih Master AHSP --</option>
-                  {ahsps.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.code} - {a.work_item} ({formatRupiah(a.unit_price_of_work)}/{a.unit})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div>
-              <Label className="text-xs">WORK ITEM</Label>
-              <Input
-                value={workItem}
-                onChange={(e) => setWorkItem(e.target.value)}
-                placeholder="Uraian pekerjaan..."
-                className="mt-1"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs">VOLUME</Label>
+              <Field>
+                <FieldLabel htmlFor="rab-item">Work Item</FieldLabel>
                 <Input
-                  value={volume}
-                  onChange={(e) => setVolume(e.target.value)}
-                  placeholder="0.00"
-                  className="mt-1"
+                  id="rab-item"
+                  value={workItem}
+                  onChange={(e) => setWorkItem(e.target.value)}
+                  placeholder="Uraian pekerjaan..."
                   required
                 />
+              </Field>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="rab-unit">Unit</FieldLabel>
+                  <Input
+                    id="rab-unit"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    placeholder="m3, ls, unit..."
+                    required
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="rab-vol">Volume</FieldLabel>
+                  <Input
+                    id="rab-vol"
+                    type="number"
+                    step="0.0001"
+                    value={volume}
+                    onChange={(e) => setVolume(e.target.value)}
+                    required
+                  />
+                </Field>
               </div>
-              <div>
-                <Label className="text-xs">UNIT</Label>
+
+              <Field>
+                <FieldLabel htmlFor="rab-price">Unit Price (Rp)</FieldLabel>
                 <Input
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  placeholder="m3, ls, unit..."
-                  className="mt-1"
+                  id="rab-price"
+                  value={unitPrice}
+                  onChange={(e) => setUnitPrice(e.target.value)}
+                  placeholder="Harga satuan..."
                   required
                 />
-              </div>
-            </div>
+              </Field>
 
-            <div>
-              <Label className="text-xs">UNIT PRICE (HARGA SATUAN)</Label>
-              <Input
-                value={unitPrice}
-                onChange={(e) => setUnitPrice(e.target.value)}
-                placeholder="Nominal Rupiah..."
-                className="mt-1"
-                required
-              />
-            </div>
+              {/* Live Subtotal Card */}
+              <Card className="bg-muted/40">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Estimasi Total:</span>
+                    <strong className="text-sm font-bold text-foreground">
+                      {formatRupiah(Math.round(parseFloat(volume || '0') * parseInt(unitPrice.replace(/\D/g, '') || '0', 10)))}
+                    </strong>
+                  </div>
+                </CardContent>
+              </Card>
+            </FieldGroup>
 
-            <div className="rounded-xl border bg-muted/40 p-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Perkiraan Biaya (Total Cost):</span>
-                <span className="text-base font-extrabold text-primary">{formatRupiah(previewTotal)}</span>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
-                Batal
+                Cancel
               </Button>
-              <Button type="submit" disabled={createMut.isPending} className="px-8">
-                {createMut.isPending ? 'Menyimpan...' : 'ADD'}
+              <Button type="submit" disabled={createMut.isPending}>
+                {createMut.isPending ? 'Saving...' : 'Save Item'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

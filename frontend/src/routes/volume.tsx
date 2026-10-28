@@ -10,11 +10,14 @@ import {
 } from '@/api/@tanstack/react-query.gen'
 import { PageHeader } from '@/components/page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent } from '@/components/ui/card'
 import { formatDecimal } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 
@@ -100,26 +103,26 @@ function VolumePage() {
 
   const handleSelectAhsp = (ahspId: string) => {
     setSelectedAhspId(ahspId)
-    const found = ahsps.find((a) => a.id === ahspId)
-    if (found) {
-      setWorkItem(found.work_item)
-      setUnit(found.unit)
+    const ahsp = ahsps.find((a) => a.id === ahspId)
+    if (ahsp) {
+      setWorkItem(ahsp.work_item)
+      setUnit(ahsp.unit)
     }
   }
 
-  // Live preview of quantity & total quantity
+  // Live calculation preview
   const preview = useMemo(() => {
-    const l = Number.parseFloat(length) || 0
-    const w = Number.parseFloat(width) || 0
-    const h = Number.parseFloat(height) || 0
-    const uw = Number.parseFloat(unitWeight) || 1
-    const pVol = Number.parseFloat(plannedVolume) || 0
+    const l = parseFloat(length || '0')
+    const w = parseFloat(width || '0')
+    const h = parseFloat(height || '0')
+    const uw = parseFloat(unitWeight || '1') || 1
+    const planned = parseFloat(plannedVolume || '0')
 
     let qty = 0
     if (l > 0 && w > 0 && h > 0) {
       qty = l * w * h
     } else {
-      qty = pVol
+      qty = planned
     }
     const totalQty = qty * uw
     return { qty, totalQty }
@@ -152,103 +155,116 @@ function VolumePage() {
       await queryClient.invalidateQueries()
       setIsAddOpen(false)
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Gagal menyimpan take-off volume.')
+      setErrorMessage(err?.message || 'Gagal menyimpan data volume.')
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus baris volume take-off ini?')) return
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Hapus baris take-off "${name}"?`)) return
     try {
       await deleteMut.mutateAsync({ path: { id } })
       await queryClient.invalidateQueries()
     } catch (err: any) {
-      alert(err?.message || 'Gagal menghapus baris volume.')
+      alert(err?.message || 'Gagal menghapus volume.')
     }
   }
 
   return (
-    <div>
-      <PageHeader title="VOLUME" onSearch={setSearch} onAdd={handleOpenAdd} />
+    <div className="flex flex-col gap-4">
+      <PageHeader title="Volume Take-off" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="Take-off" />
 
-      {/* Project Selector (Mockup Hal. 9) */}
-      <div className="mb-4 flex items-center gap-3 rounded-xl bg-white p-3 border shadow-xs">
-        <span className="text-xs font-bold text-foreground">PROJECT:</span>
-        <div className="w-80">
+      {/* Project Selector Bar */}
+      <div className="flex items-center gap-4 rounded-lg border bg-card p-3">
+        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Proyek:</span>
+        <div className="w-72">
           <Select
             value={activeProjectId}
             onValueChange={(val) => {
               if (val) setSelectedProjectId(val)
             }}
           >
-            <SelectTrigger className="h-9 text-xs font-semibold">
-              <SelectValue placeholder="Pilih Proyek..." />
+            <SelectTrigger>
+              <SelectValue placeholder="Pilih Proyek" />
             </SelectTrigger>
             <SelectContent>
-              {projects.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name} {p.section ? `(${p.section})` : ''}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                {projects.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className="overflow-x-auto border bg-white shadow-sm">
-        <Table className="text-xs">
-          <TableHeader className="bg-white">
-            <TableRow className="border-b hover:bg-transparent">
-              <TableHead className="w-10 border-r text-center font-bold">NO</TableHead>
-              <TableHead className="min-w-48 border-r text-center font-bold">WORK ITEM</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">VOLUME</TableHead>
-              <TableHead className="w-16 border-r text-center font-bold">UNIT</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">LENGTH (m)</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">WIDTH (m)</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">HEIGHT (m)</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">QUANTITY</TableHead>
-              <TableHead className="min-w-36 border-r text-center font-bold">UNIT WEIGHT (kg/m'; kg/m³)</TableHead>
-              <TableHead className="w-28 border-r text-center font-bold">TOTAL QUANTITY</TableHead>
-              {isAdmin && <TableHead className="w-16 text-center font-bold">AKSI</TableHead>}
+      <div className="rounded-md border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead rowSpan={2} className="w-10 text-center">No</TableHead>
+              <TableHead rowSpan={2}>Work Item</TableHead>
+              <TableHead rowSpan={2} className="w-24 text-right">Planned Vol</TableHead>
+              <TableHead rowSpan={2} className="w-16 text-center">Unit</TableHead>
+              <TableHead rowSpan={2} className="w-24 text-center">Date</TableHead>
+              <TableHead colSpan={3} className="text-center border-b">Dimensions (m)</TableHead>
+              <TableHead rowSpan={2} className="w-24 text-right">Quantity</TableHead>
+              <TableHead rowSpan={2} className="w-24 text-right">Unit Wt</TableHead>
+              <TableHead rowSpan={2} className="w-28 text-right">Total Qty</TableHead>
+              <TableHead rowSpan={2}>Description</TableHead>
+              {isAdmin && <TableHead rowSpan={2} className="w-16 text-center">Action</TableHead>}
+            </TableRow>
+            <TableRow>
+              <TableHead className="w-20 text-center text-xs">L</TableHead>
+              <TableHead className="w-20 text-center text-xs">W</TableHead>
+              <TableHead className="w-20 text-center text-xs">H</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 11 : 10} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  Memuat data...
+                <TableCell colSpan={isAdmin ? 13 : 12} className="h-32 text-center text-muted-foreground">
+                  Loading data...
                 </TableCell>
               </TableRow>
             ) : volumeRows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 11 : 10} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  {search ? `Tidak ada volume yang cocok dengan "${search}".` : 'Belum ada data take-off volume untuk proyek ini. Klik ADD untuk menambah.'}
+                <TableCell colSpan={isAdmin ? 13 : 12} className="h-48 text-center">
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyTitle>Tidak ada data take-off volume</EmptyTitle>
+                      <EmptyDescription>
+                        {search ? `Tidak ada data cocok dengan "${search}".` : 'Mulai tambahkan perhitungan volume take-off untuk proyek ini.'}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
-              volumeRows.map((row, idx) => (
-                <TableRow key={row.id} className="border-b bg-muted/40 hover:bg-muted/80">
-                  <TableCell className="border-r text-center font-medium">{idx + 1}</TableCell>
-                  <TableCell className="border-r font-medium text-foreground">
-                    {row.work_item}
-                    {row.description && <span className="block text-[10px] text-muted-foreground">{row.description}</span>}
-                  </TableCell>
-                  <TableCell className="border-r text-right">{formatDecimal(row.planned_volume)}</TableCell>
-                  <TableCell className="border-r text-center">{row.unit}</TableCell>
-                  <TableCell className="border-r text-right">{row.length ? formatDecimal(row.length) : '-'}</TableCell>
-                  <TableCell className="border-r text-right">{row.width ? formatDecimal(row.width) : '-'}</TableCell>
-                  <TableCell className="border-r text-right">{row.height ? formatDecimal(row.height) : '-'}</TableCell>
-                  <TableCell className="border-r text-right font-medium">{formatDecimal(row.quantity)}</TableCell>
-                  <TableCell className="border-r text-right">{formatDecimal(row.unit_weight)}</TableCell>
-                  <TableCell className="border-r text-right font-bold text-foreground">{formatDecimal(row.total_quantity)}</TableCell>
+              volumeRows.map((r, idx) => (
+                <TableRow key={r.id}>
+                  <TableCell className="text-center text-muted-foreground">{idx + 1}</TableCell>
+                  <TableCell className="font-medium text-foreground">{r.work_item}</TableCell>
+                  <TableCell className="text-right text-muted-foreground">{formatDecimal(r.planned_volume)}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">{r.unit}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">{r.date || '-'}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">{r.length ? formatDecimal(r.length) : '-'}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">{r.width ? formatDecimal(r.width) : '-'}</TableCell>
+                  <TableCell className="text-center text-muted-foreground">{r.height ? formatDecimal(r.height) : '-'}</TableCell>
+                  <TableCell className="text-right text-foreground font-medium">{formatDecimal(r.quantity)}</TableCell>
+                  <TableCell className="text-right text-muted-foreground">{formatDecimal(r.unit_weight)}</TableCell>
+                  <TableCell className="text-right font-bold text-foreground">{formatDecimal(r.total_quantity)}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs">{r.description || '-'}</TableCell>
                   {isAdmin && (
                     <TableCell className="text-center">
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => handleDelete(row.id)}
+                        className="text-xs text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDelete(r.id, r.work_item)}
                       >
-                        Hapus
+                        Delete
                       </Button>
                     </TableCell>
                   )}
@@ -259,154 +275,167 @@ function VolumePage() {
         </Table>
       </div>
 
-      {/* Modal Add Volume (Mockup Hal. 9) */}
+      {/* Modal Add Volume Take-off */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-xl rounded-2xl">
+        <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold tracking-wide">TAMBAH VOLUME TAKE-OFF</DialogTitle>
+            <DialogTitle>Add Volume Take-off</DialogTitle>
+            <DialogDescription>Input dimensi pengukuran untuk menghitung volume secara otomatis.</DialogDescription>
           </DialogHeader>
 
           {errorMessage && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-600">
-              {errorMessage}
-            </div>
+            <Alert variant="destructive">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
           )}
 
-          <form onSubmit={handleCreate} className="space-y-4 text-xs font-semibold">
-            {ahsps.length > 0 && (
-              <div>
-                <Label className="text-xs">PILIH DARI MASTER AHSP (OPSIONAL)</Label>
-                <select
-                  className="mt-1 h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-xs"
-                  value={selectedAhspId}
-                  onChange={(e) => handleSelectAhsp(e.target.value)}
-                >
-                  <option value="">-- Input Manual atau Pilih AHSP --</option>
-                  {ahsps.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.code} - {a.work_item} ({a.unit})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+            <FieldGroup>
+              {ahsps.length > 0 && (
+                <Field>
+                  <FieldLabel htmlFor="vol-ahsp">Master AHSP (Opsional)</FieldLabel>
+                  <Select value={selectedAhspId} onValueChange={(val) => { if (val) handleSelectAhsp(val) }}>
+                    <SelectTrigger id="vol-ahsp">
+                      <SelectValue placeholder="-- Pilih dari Master AHSP --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {ahsps.map((a) => (
+                          <SelectItem key={a.id} value={a.id}>
+                            {a.code} - {a.work_item}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
 
-            <div>
-              <Label className="text-xs">WORK ITEM</Label>
-              <Input
-                value={workItem}
-                onChange={(e) => setWorkItem(e.target.value)}
-                placeholder="Uraian pekerjaan..."
-                className="mt-1"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <Label className="text-xs">UNIT</Label>
-                <Input
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  placeholder="m3, kg, m'..."
-                  className="mt-1"
-                  required
-                />
-              </div>
-              <div>
-                <Label className="text-xs">VOLUME RENCANA</Label>
-                <Input
-                  value={plannedVolume}
-                  onChange={(e) => setPlannedVolume(e.target.value)}
-                  placeholder="0.00"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">DATE</Label>
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            {/* Dimensi Take-off */}
-            <div className="rounded-xl border bg-muted/30 p-3 space-y-3">
-              <span className="text-xs font-bold text-muted-foreground uppercase">Dimensi Take-off (Jika Ada)</span>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <Label className="text-xs">LENGTH (m)</Label>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <Field>
+                    <FieldLabel htmlFor="vol-workitem">Work Item</FieldLabel>
+                    <Input
+                      id="vol-workitem"
+                      value={workItem}
+                      onChange={(e) => setWorkItem(e.target.value)}
+                      placeholder="Nama Pekerjaan..."
+                      required
+                    />
+                  </Field>
+                </div>
+                <Field>
+                  <FieldLabel htmlFor="vol-unit">Unit</FieldLabel>
                   <Input
+                    id="vol-unit"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    placeholder="m3, m2, kg..."
+                    required
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="vol-planned">Planned Volume</FieldLabel>
+                  <Input
+                    id="vol-planned"
+                    type="number"
+                    step="0.0001"
+                    value={plannedVolume}
+                    onChange={(e) => setPlannedVolume(e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="vol-date">Date</FieldLabel>
+                  <Input
+                    id="vol-date"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3">
+                <Field>
+                  <FieldLabel htmlFor="vol-l">Length (m)</FieldLabel>
+                  <Input
+                    id="vol-l"
+                    type="number"
+                    step="0.0001"
                     value={length}
                     onChange={(e) => setLength(e.target.value)}
-                    placeholder="Panjang"
-                    className="mt-1 bg-white"
+                    placeholder="L"
                   />
-                </div>
-                <div>
-                  <Label className="text-xs">WIDTH (m)</Label>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="vol-w">Width (m)</FieldLabel>
                   <Input
+                    id="vol-w"
+                    type="number"
+                    step="0.0001"
                     value={width}
                     onChange={(e) => setWidth(e.target.value)}
-                    placeholder="Lebar"
-                    className="mt-1 bg-white"
+                    placeholder="W"
                   />
-                </div>
-                <div>
-                  <Label className="text-xs">HEIGHT (m)</Label>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="vol-h">Height (m)</FieldLabel>
                   <Input
+                    id="vol-h"
+                    type="number"
+                    step="0.0001"
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
-                    placeholder="Tinggi"
-                    className="mt-1 bg-white"
+                    placeholder="H"
                   />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs">UNIT WEIGHT (default 1)</Label>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="vol-uw">Unit Wt</FieldLabel>
                   <Input
+                    id="vol-uw"
+                    type="number"
+                    step="0.0001"
                     value={unitWeight}
                     onChange={(e) => setUnitWeight(e.target.value)}
-                    placeholder="1"
-                    className="mt-1 bg-white"
                   />
-                </div>
-                <div>
-                  <Label className="text-xs">DESCRIPTION / ZONA</Label>
-                  <Input
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="misal Kolom Lantai 2"
-                    className="mt-1 bg-white"
-                  />
-                </div>
+                </Field>
               </div>
 
-              <div className="flex items-center justify-between rounded-lg bg-white p-2 text-xs border">
-                <div>
-                  <span className="text-muted-foreground">Kalkulasi Quantity: </span>
-                  <span className="font-bold">{formatDecimal(preview.qty)}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Total Quantity: </span>
-                  <span className="font-extrabold text-primary">{formatDecimal(preview.totalQty)}</span>
-                </div>
-              </div>
-            </div>
+              <Field>
+                <FieldLabel htmlFor="vol-desc">Description / Note</FieldLabel>
+                <Input
+                  id="vol-desc"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Catatan pengukuran..."
+                />
+              </Field>
 
-            <div className="flex justify-end gap-2 pt-2">
+              {/* Calculated preview card */}
+              <Card className="bg-muted/40">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Formula: {length && width && height ? `${length} × ${width} × ${height}` : 'Planned Volume'} × {unitWeight || 1}</span>
+                    <div className="flex items-center gap-3">
+                      <span>Qty: <strong className="text-foreground">{formatDecimal(preview.qty)}</strong></span>
+                      <span>Total Qty: <strong className="text-primary font-bold">{formatDecimal(preview.totalQty)}</strong></span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </FieldGroup>
+
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
-                Batal
+                Cancel
               </Button>
-              <Button type="submit" disabled={createMut.isPending} className="px-8">
-                {createMut.isPending ? 'Menyimpan...' : 'ADD'}
+              <Button type="submit" disabled={createMut.isPending}>
+                {createMut.isPending ? 'Saving...' : 'Save'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

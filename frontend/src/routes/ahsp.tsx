@@ -10,13 +10,16 @@ import {
 import type { CreateAhspItemInput } from '@/api/types.gen'
 import { PageHeader } from '@/components/page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
 import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
+import { Plus, Trash2 } from 'lucide-react'
 
 export const Route = createFileRoute('/ahsp')({ component: AhspPage })
 
@@ -103,66 +106,58 @@ function AhspPage() {
     ])
   }
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id))
-  }
-
   const updateItem = (id: string, field: keyof LocalItem, value: any) => {
     setItems((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item
-        return { ...item, [field]: value }
-      }),
-    )
-  }
-
-  const handleSelectMaster = (id: string, masterId: string) => {
-    const found = masterPrices.find((m) => m.id === masterId)
-    if (!found) return
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item
-        return {
-          ...item,
-          unit_price_id: found.id,
-          code: found.code,
-          description: found.work_item,
-          unit: found.unit,
-          unit_price: found.unit_price,
+      prev.map((it) => {
+        if (it.id !== id) return it
+        const updated = { ...it, [field]: value }
+        // Auto-fill from master price if matching code or item selected
+        if (field === 'unit_price_id' && value) {
+          const master = masterPrices.find((m) => m.id === value)
+          if (master) {
+            updated.description = master.work_item
+            updated.code = master.code
+            updated.unit = master.unit
+            updated.unit_price = master.unit_price
+          }
         }
-      }),
+        return updated
+      })
     )
   }
 
-  // Live calculation of A, B, C, D, E, F
+  const removeItem = (id: string) => {
+    setItems((prev) => prev.filter((it) => it.id !== id))
+  }
+
+  // Calculations for A, B, C, D, E, F
   const calc = useMemo(() => {
     let labor = 0
     let material = 0
     let equipment = 0
 
-    items.forEach((item) => {
-      const coef = Number.parseFloat(item.coefficient) || 0
-      const price = Number.parseInt(item.unit_price, 10) || 0
+    items.forEach((it) => {
+      const coef = parseFloat(it.coefficient || '0')
+      const price = parseInt(it.unit_price || '0', 10)
       const cost = Math.round(coef * price)
-
-      if (item.category === 'LABOR') labor += cost
-      else if (item.category === 'MATERIALS') material += cost
-      else if (item.category === 'EQUIPMENT') equipment += cost
+      if (it.category === 'LABOR') labor += cost
+      else if (it.category === 'MATERIALS') material += cost
+      else if (it.category === 'EQUIPMENT') equipment += cost
     })
 
-    const totalCostD = labor + material + equipment
-    const pct = Number.parseFloat(overheadPct) || 0
-    const overheadE = Math.round((pct / 100) * totalCostD)
-    const unitPriceF = totalCostD + overheadE
+    const d = labor + material + equipment
+    const pct = parseFloat(overheadPct || '0')
+    const e = Math.round((pct / 100.0) * d)
+    const f = d + e
 
-    return { labor, material, equipment, totalCostD, overheadE, unitPriceF }
+    return { labor, material, equipment, d, e, f }
   }, [items, overheadPct])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage('')
     if (!code.trim() || !workItem.trim() || !unit.trim()) {
-      setErrorMessage('Code, Work Item, dan Unit wajib diisi.')
+      setErrorMessage('Code, item pekerjaan, dan unit wajib diisi.')
       return
     }
 
@@ -174,10 +169,15 @@ function AhspPage() {
           unit: unit.trim(),
           overhead_profit_pct: overheadPct,
           status,
-          items: items.map(({ id: _id, ...rest }) => ({
-            ...rest,
-            coefficient: rest.coefficient || '0',
-            unit_price: rest.unit_price || '0',
+          items: items.map((it, idx) => ({
+            unit_price_id: it.unit_price_id || undefined,
+            category: it.category,
+            sort: idx + 1,
+            description: it.description,
+            code: it.code,
+            unit: it.unit,
+            coefficient: it.coefficient,
+            unit_price: it.unit_price,
           })),
         },
       })
@@ -199,47 +199,54 @@ function AhspPage() {
   }
 
   return (
-    <div>
-      <PageHeader title="AHSP" onSearch={setSearch} onAdd={handleOpenAdd} />
+    <div className="flex flex-col gap-4">
+      <PageHeader title="AHSP" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="AHSP" />
 
-      <div className="overflow-x-auto border bg-white shadow-sm">
-        <Table className="text-xs">
-          <TableHeader className="bg-white">
-            <TableRow className="border-b hover:bg-transparent">
-              <TableHead className="w-12 border-r text-center font-bold">NO</TableHead>
-              <TableHead className="w-28 border-r text-center font-bold">CODE</TableHead>
-              <TableHead className="min-w-64 border-r text-center font-bold">ITEM</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">UNIT</TableHead>
-              <TableHead className="w-40 border-r text-center font-bold">COST (F)</TableHead>
-              <TableHead className="w-24 border-r text-center font-bold">STATUS</TableHead>
-              {isAdmin && <TableHead className="w-16 text-center font-bold">AKSI</TableHead>}
+      <div className="rounded-md border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12 text-center">No</TableHead>
+              <TableHead className="w-32">Code</TableHead>
+              <TableHead>Work Item</TableHead>
+              <TableHead className="w-24 text-center">Unit</TableHead>
+              <TableHead className="w-40 text-right">Unit Price of Work</TableHead>
+              <TableHead className="w-24 text-center">Status</TableHead>
+              {isAdmin && <TableHead className="w-20 text-center">Action</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 7 : 6} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  Memuat data...
+                <TableCell colSpan={isAdmin ? 7 : 6} className="h-32 text-center text-muted-foreground">
+                  Loading data...
                 </TableCell>
               </TableRow>
             ) : ahsps.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 7 : 6} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  {search ? `Tidak ada AHSP yang cocok dengan "${search}".` : 'Belum ada data AHSP.'}
+                <TableCell colSpan={isAdmin ? 7 : 6} className="h-48 text-center">
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyTitle>Belum ada data AHSP</EmptyTitle>
+                      <EmptyDescription>
+                        {search ? `Tidak ada AHSP yang cocok dengan "${search}".` : 'Mulai menyusun analisa harga satuan pekerjaan baru.'}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
               ahsps.map((a, idx) => (
-                <TableRow key={a.id} className="border-b bg-muted/40 hover:bg-muted/80">
-                  <TableCell className="border-r text-center font-medium">{idx + 1}</TableCell>
-                  <TableCell className="border-r font-mono font-semibold">{a.code}</TableCell>
-                  <TableCell className="border-r font-medium text-foreground">{a.work_item}</TableCell>
-                  <TableCell className="border-r text-center">{a.unit}</TableCell>
-                  <TableCell className="border-r text-right font-bold text-foreground">
+                <TableRow key={a.id}>
+                  <TableCell className="text-center text-muted-foreground">{idx + 1}</TableCell>
+                  <TableCell className="font-mono text-xs font-semibold">{a.code}</TableCell>
+                  <TableCell className="font-medium text-foreground">{a.work_item}</TableCell>
+                  <TableCell className="text-center">{a.unit}</TableCell>
+                  <TableCell className="text-right font-medium text-foreground">
                     {formatRupiah(a.unit_price_of_work)}
                   </TableCell>
-                  <TableCell className="border-r text-center">
-                    <Badge variant={a.status === 'final' ? 'default' : 'secondary'} className="text-[10px]">
+                  <TableCell className="text-center">
+                    <Badge variant={a.status === 'final' ? 'default' : 'secondary'} className="capitalize text-xs font-normal">
                       {a.status}
                     </Badge>
                   </TableCell>
@@ -248,10 +255,10 @@ function AhspPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                        className="text-xs text-destructive hover:bg-destructive/10"
                         onClick={() => handleDelete(a.id, a.code)}
                       >
-                        Hapus
+                        Delete
                       </Button>
                     </TableCell>
                   )}
@@ -262,77 +269,85 @@ function AhspPage() {
         </Table>
       </div>
 
-      {/* Modal Form AHSP Komponen A-F (Mockup Hal. 7) */}
+      {/* Modal Form AHSP Komponen A-F */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto rounded-2xl">
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold tracking-wide">ANALISA HARGA SATUAN PEKERJAAN (AHSP)</DialogTitle>
+            <DialogTitle>Analisa Harga Satuan Pekerjaan (AHSP)</DialogTitle>
+            <DialogDescription>Susun rincian koefisien komponen A (Tenaga), B (Bahan), dan C (Peralatan).</DialogDescription>
           </DialogHeader>
 
           {errorMessage && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-600">
-              {errorMessage}
-            </div>
+            <Alert variant="destructive">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
           )}
 
-          <form onSubmit={handleSave} className="space-y-4 text-xs">
+          <form onSubmit={handleSave} className="flex flex-col gap-4">
             {/* Header Form */}
-            <div className="grid grid-cols-4 gap-4 rounded-xl bg-muted/30 p-3">
-              <div>
-                <Label className="text-xs font-bold">CODE</Label>
-                <Input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="misal AHSP-BETON-01"
-                  className="mt-1 bg-white font-mono"
-                  required
-                />
+            <FieldGroup className="rounded-lg border bg-muted/40 p-4">
+              <div className="grid grid-cols-4 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="ahsp-code">Code</FieldLabel>
+                  <Input
+                    id="ahsp-code"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="e.g. AHSP-BETON-01"
+                    className="font-mono bg-card"
+                    required
+                  />
+                </Field>
+                <div className="col-span-2">
+                  <Field>
+                    <FieldLabel htmlFor="ahsp-item">Work Item</FieldLabel>
+                    <Input
+                      id="ahsp-item"
+                      value={workItem}
+                      onChange={(e) => setWorkItem(e.target.value)}
+                      placeholder="Uraian Pekerjaan..."
+                      className="bg-card"
+                      required
+                    />
+                  </Field>
+                </div>
+                <Field>
+                  <FieldLabel htmlFor="ahsp-unit">Unit</FieldLabel>
+                  <Input
+                    id="ahsp-unit"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    placeholder="m3, m2, kg..."
+                    className="bg-card"
+                    required
+                  />
+                </Field>
               </div>
-              <div className="col-span-2">
-                <Label className="text-xs font-bold">WORK ITEM</Label>
-                <Input
-                  value={workItem}
-                  onChange={(e) => setWorkItem(e.target.value)}
-                  placeholder="Uraian Pekerjaan..."
-                  className="mt-1 bg-white font-medium"
-                  required
-                />
-              </div>
-              <div>
-                <Label className="text-xs font-bold">UNIT</Label>
-                <Input
-                  value={unit}
-                  onChange={(e) => setUnit(e.target.value)}
-                  placeholder="m3, m2, m', kg..."
-                  className="mt-1 bg-white"
-                  required
-                />
-              </div>
-            </div>
+            </FieldGroup>
 
             {/* Components Table A-F */}
-            <div className="overflow-x-auto border">
-              <Table className="text-xs">
-                <TableHeader className="bg-white">
-                  <TableRow className="border-b">
-                    <TableHead className="w-10 border-r text-center font-bold">NO</TableHead>
-                    <TableHead className="min-w-44 border-r text-center font-bold">DESCRIPTION</TableHead>
-                    <TableHead className="w-24 border-r text-center font-bold">CODE</TableHead>
-                    <TableHead className="w-16 border-r text-center font-bold">UNIT</TableHead>
-                    <TableHead className="w-24 border-r text-center font-bold">COEFFICIENT</TableHead>
-                    <TableHead className="w-28 border-r text-center font-bold">UNIT PRICE</TableHead>
-                    <TableHead className="w-28 border-r text-center font-bold">COST</TableHead>
-                    <TableHead className="w-12 text-center font-bold"></TableHead>
+            <div className="rounded-md border bg-card overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10 text-center">No</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="w-24">Code</TableHead>
+                    <TableHead className="w-16 text-center">Unit</TableHead>
+                    <TableHead className="w-24 text-right">Coefficient</TableHead>
+                    <TableHead className="w-28 text-right">Unit Price</TableHead>
+                    <TableHead className="w-32 text-right">Cost</TableHead>
+                    <TableHead className="w-10 text-center"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {/* Section A: LABOR */}
-                  <TableRow className="bg-primary/10 font-bold">
-                    <TableCell className="border-r text-center">A</TableCell>
-                    <TableCell colSpan={6}>LABOR (TENAGA KERJA)</TableCell>
-                    <TableCell className="text-center">
-                      <Button type="button" size="sm" variant="outline" className="h-6 text-[10px]" onClick={() => addItem('LABOR')}>
-                        + Item
+                  <TableRow className="bg-muted/60 font-semibold">
+                    <TableCell className="text-center font-bold">A</TableCell>
+                    <TableCell colSpan={6} className="text-foreground">LABOR (Tenaga Kerja)</TableCell>
+                    <TableCell className="text-center p-1">
+                      <Button type="button" size="icon" variant="ghost" onClick={() => addItem('LABOR')}>
+                        <Plus data-icon="inline-start" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -344,22 +359,21 @@ function AhspPage() {
                       masterPrices={masterPrices}
                       onUpdate={updateItem}
                       onRemove={removeItem}
-                      onSelectMaster={handleSelectMaster}
                     />
                   ))}
-                  <TableRow className="bg-muted/70 font-semibold">
-                    <TableCell colSpan={6} className="border-r text-right">TOTAL LABOR COST</TableCell>
-                    <TableCell className="border-r text-right">{formatRupiah(calc.labor)}</TableCell>
+                  <TableRow className="border-t font-medium text-xs">
+                    <TableCell colSpan={6} className="text-right text-muted-foreground">Jumlah Tenaga Kerja (A):</TableCell>
+                    <TableCell className="text-right font-semibold text-foreground">{formatRupiah(calc.labor)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
 
                   {/* Section B: MATERIALS */}
-                  <TableRow className="bg-primary/10 font-bold">
-                    <TableCell className="border-r text-center">B</TableCell>
-                    <TableCell colSpan={6}>MATERIALS (BAHAN / MATERIAL)</TableCell>
-                    <TableCell className="text-center">
-                      <Button type="button" size="sm" variant="outline" className="h-6 text-[10px]" onClick={() => addItem('MATERIALS')}>
-                        + Item
+                  <TableRow className="bg-muted/60 font-semibold border-t">
+                    <TableCell className="text-center font-bold">B</TableCell>
+                    <TableCell colSpan={6} className="text-foreground">MATERIALS (Bahan)</TableCell>
+                    <TableCell className="text-center p-1">
+                      <Button type="button" size="icon" variant="ghost" onClick={() => addItem('MATERIALS')}>
+                        <Plus data-icon="inline-start" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -371,22 +385,21 @@ function AhspPage() {
                       masterPrices={masterPrices}
                       onUpdate={updateItem}
                       onRemove={removeItem}
-                      onSelectMaster={handleSelectMaster}
                     />
                   ))}
-                  <TableRow className="bg-muted/70 font-semibold">
-                    <TableCell colSpan={6} className="border-r text-right">TOTAL MATERIAL COST</TableCell>
-                    <TableCell className="border-r text-right">{formatRupiah(calc.material)}</TableCell>
+                  <TableRow className="border-t font-medium text-xs">
+                    <TableCell colSpan={6} className="text-right text-muted-foreground">Jumlah Bahan (B):</TableCell>
+                    <TableCell className="text-right font-semibold text-foreground">{formatRupiah(calc.material)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
 
                   {/* Section C: EQUIPMENT */}
-                  <TableRow className="bg-primary/10 font-bold">
-                    <TableCell className="border-r text-center">C</TableCell>
-                    <TableCell colSpan={6}>EQUIPMENT (PERALATAN)</TableCell>
-                    <TableCell className="text-center">
-                      <Button type="button" size="sm" variant="outline" className="h-6 text-[10px]" onClick={() => addItem('EQUIPMENT')}>
-                        + Item
+                  <TableRow className="bg-muted/60 font-semibold border-t">
+                    <TableCell className="text-center font-bold">C</TableCell>
+                    <TableCell colSpan={6} className="text-foreground">EQUIPMENT (Peralatan)</TableCell>
+                    <TableCell className="text-center p-1">
+                      <Button type="button" size="icon" variant="ghost" onClick={() => addItem('EQUIPMENT')}>
+                        <Plus data-icon="inline-start" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -398,69 +411,89 @@ function AhspPage() {
                       masterPrices={masterPrices}
                       onUpdate={updateItem}
                       onRemove={removeItem}
-                      onSelectMaster={handleSelectMaster}
                     />
                   ))}
-                  <TableRow className="bg-muted/70 font-semibold">
-                    <TableCell colSpan={6} className="border-r text-right">TOTAL EQUIPMENT COST</TableCell>
-                    <TableCell className="border-r text-right">{formatRupiah(calc.equipment)}</TableCell>
+                  <TableRow className="border-t font-medium text-xs">
+                    <TableCell colSpan={6} className="text-right text-muted-foreground">Jumlah Peralatan (C):</TableCell>
+                    <TableCell className="text-right font-semibold text-foreground">{formatRupiah(calc.equipment)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
 
-                  {/* D: TOTAL COST */}
-                  <TableRow className="bg-muted font-bold text-foreground">
-                    <TableCell className="border-r text-center">D</TableCell>
-                    <TableCell colSpan={5} className="border-r">TOTAL COST (A + B + C)</TableCell>
-                    <TableCell className="border-r text-right">{formatRupiah(calc.totalCostD)}</TableCell>
+                  {/* Summary D, E, F */}
+                  <TableRow className="border-t-2 font-semibold">
+                    <TableCell className="text-center">D</TableCell>
+                    <TableCell colSpan={5}>Jumlah Biaya Langsung (A + B + C)</TableCell>
+                    <TableCell className="text-right font-bold text-foreground">{formatRupiah(calc.d)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
 
-                  {/* E: OVERHEAD + PROFIT */}
-                  <TableRow className="bg-white">
-                    <TableCell className="border-r text-center font-bold">E</TableCell>
-                    <TableCell colSpan={4} className="border-r">
+                  <TableRow className="font-medium text-sm">
+                    <TableCell className="text-center">E</TableCell>
+                    <TableCell colSpan={3}>
                       <div className="flex items-center gap-2">
-                        <span>OVERHEAD + PROFIT</span>
+                        <span>Biaya Umum & Keuntungan:</span>
                         <Input
                           type="number"
-                          step="0.1"
+                          step="0.01"
                           value={overheadPct}
                           onChange={(e) => setOverheadPct(e.target.value)}
-                          className="h-6 w-16 text-center font-bold text-xs"
+                          className="h-7 w-20 text-center font-semibold text-xs"
                         />
                         <span>%</span>
                       </div>
                     </TableCell>
-                    <TableCell className="border-r text-center">{overheadPct}%</TableCell>
-                    <TableCell className="border-r text-right font-medium">{formatRupiah(calc.overheadE)}</TableCell>
+                    <TableCell colSpan={2} className="text-right text-muted-foreground">
+                      {overheadPct}% × D
+                    </TableCell>
+                    <TableCell className="text-right font-semibold text-foreground">{formatRupiah(calc.e)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
 
-                  {/* F: UNIT PRICE OF WORK */}
-                  <TableRow className="bg-primary text-primary-foreground font-extrabold text-sm">
-                    <TableCell className="border-r text-center">F</TableCell>
-                    <TableCell colSpan={5} className="border-r">UNIT PRICE OF WORK (D + E)</TableCell>
-                    <TableCell className="border-r text-right">{formatRupiah(calc.unitPriceF)}</TableCell>
+                  <TableRow className="border-t-2 bg-muted/40 font-bold text-base">
+                    <TableCell className="text-center">F</TableCell>
+                    <TableCell colSpan={5} className="text-foreground">
+                      Harga Satuan Pekerjaan (D + E)
+                    </TableCell>
+                    <TableCell className="text-right text-foreground font-extrabold">{formatRupiah(calc.f)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
             </div>
 
-            {/* Total Display & Actions */}
-            <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
+            {/* Status and Action Buttons */}
+            <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-4">
-                <span className="font-bold">TOTAL COST:</span>
-                <span className="text-base font-extrabold text-primary">{formatRupiah(calc.unitPriceF)}</span>
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input
+                    type="radio"
+                    name="ahsp-status"
+                    checked={status === 'draft'}
+                    onChange={() => setStatus('draft')}
+                    className="size-4"
+                  />
+                  Draft
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input
+                    type="radio"
+                    name="ahsp-status"
+                    checked={status === 'final'}
+                    onChange={() => setStatus('final')}
+                    className="size-4"
+                  />
+                  Final
+                </label>
               </div>
-              <div className="flex gap-2">
+
+              <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
-                  Batal
+                  Cancel
                 </Button>
-                <Button type="submit" disabled={createMut.isPending} className="px-8">
-                  {createMut.isPending ? 'Menyimpan...' : 'ADD'}
+                <Button type="submit" disabled={createMut.isPending}>
+                  {createMut.isPending ? 'Saving...' : 'Save AHSP'}
                 </Button>
-              </div>
+              </DialogFooter>
             </div>
           </form>
         </DialogContent>
@@ -475,90 +508,96 @@ function ComponentRow({
   masterPrices,
   onUpdate,
   onRemove,
-  onSelectMaster,
 }: {
   item: LocalItem
   no: number
   masterPrices: any[]
   onUpdate: (id: string, field: keyof LocalItem, val: any) => void
   onRemove: (id: string) => void
-  onSelectMaster: (id: string, masterId: string) => void
 }) {
-  const coef = Number.parseFloat(item.coefficient) || 0
-  const price = Number.parseInt(item.unit_price, 10) || 0
+  const coef = parseFloat(item.coefficient || '0')
+  const price = parseInt(item.unit_price || '0', 10)
   const cost = Math.round(coef * price)
 
-  const relevantMasters = masterPrices.filter((m) => m.category === item.category)
+  // Filter master prices by category
+  const filteredPrices = masterPrices.filter((m) => m.category === item.category)
 
   return (
-    <TableRow className="border-b bg-white hover:bg-muted/30">
-      <TableCell className="border-r text-center font-medium">{no}</TableCell>
-      <TableCell className="border-r p-1">
-        <div className="space-y-1">
-          <Input
-            value={item.description}
-            onChange={(e) => onUpdate(item.id, 'description', e.target.value)}
-            placeholder="Deskripsi komponen..."
-            className="h-7 text-xs"
-          />
-          {relevantMasters.length > 0 && (
+    <TableRow className="text-xs">
+      <TableCell className="text-center text-muted-foreground">{no}</TableCell>
+      <TableCell className="p-1">
+        <div className="flex gap-1.5">
+          {filteredPrices.length > 0 && (
             <select
-              className="h-6 w-full rounded border border-gray-200 bg-muted/30 text-[10px] text-muted-foreground"
-              onChange={(e) => onSelectMaster(item.id, e.target.value)}
-              defaultValue=""
+              value={item.unit_price_id || ''}
+              onChange={(e) => onUpdate(item.id, 'unit_price_id', e.target.value)}
+              className="h-8 max-w-[140px] rounded-md border border-input bg-card px-1.5 text-xs text-foreground"
             >
-              <option value="" disabled>-- Pilih dari Master Harga --</option>
-              {relevantMasters.map((m) => (
+              <option value="">-- Pilih Master --</option>
+              {filteredPrices.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.code} - {m.work_item} ({formatRupiah(m.unit_price)}/{m.unit})
+                  {m.code} - {m.work_item}
                 </option>
               ))}
             </select>
           )}
+          <Input
+            value={item.description}
+            onChange={(e) => onUpdate(item.id, 'description', e.target.value)}
+            placeholder="Deskripsi..."
+            className="h-8 text-xs bg-card"
+            required
+          />
         </div>
       </TableCell>
-      <TableCell className="border-r p-1">
+      <TableCell className="p-1">
         <Input
           value={item.code || ''}
           onChange={(e) => onUpdate(item.id, 'code', e.target.value)}
-          placeholder="Code"
-          className="h-7 font-mono text-xs"
+          placeholder="Kode..."
+          className="h-8 text-xs font-mono bg-card"
         />
       </TableCell>
-      <TableCell className="border-r p-1">
+      <TableCell className="p-1 text-center">
         <Input
           value={item.unit}
           onChange={(e) => onUpdate(item.id, 'unit', e.target.value)}
-          placeholder="Unit"
-          className="h-7 text-xs"
+          placeholder="OH/m3"
+          className="h-8 text-xs text-center bg-card"
+          required
         />
       </TableCell>
-      <TableCell className="border-r p-1">
+      <TableCell className="p-1 text-right">
         <Input
+          type="number"
+          step="0.0001"
           value={item.coefficient}
           onChange={(e) => onUpdate(item.id, 'coefficient', e.target.value)}
-          placeholder="0.00"
-          className="h-7 text-right text-xs"
+          className="h-8 text-xs text-right font-mono bg-card"
+          required
         />
       </TableCell>
-      <TableCell className="border-r p-1">
+      <TableCell className="p-1 text-right">
         <Input
+          type="number"
           value={item.unit_price}
           onChange={(e) => onUpdate(item.id, 'unit_price', e.target.value)}
-          placeholder="Harga"
-          className="h-7 text-right text-xs"
+          className="h-8 text-xs text-right font-mono bg-card"
+          required
         />
       </TableCell>
-      <TableCell className="border-r text-right font-medium">{formatRupiah(cost)}</TableCell>
-      <TableCell className="text-center p-1">
+      <TableCell className="text-right font-medium text-foreground">
+        {formatRupiah(cost)}
+      </TableCell>
+      <TableCell className="p-1 text-center">
         <Button
           type="button"
-          size="sm"
+          size="icon"
           variant="ghost"
-          className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+          className="text-muted-foreground hover:text-destructive"
           onClick={() => onRemove(item.id)}
         >
-          ×
+          <Trash2 data-icon="inline-start" />
         </Button>
       </TableCell>
     </TableRow>

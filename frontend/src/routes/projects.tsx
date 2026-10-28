@@ -5,13 +5,17 @@ import { listProjectsOptions, createProjectMutation, deleteProjectMutation, getC
 import type { Project } from '@/api/types.gen'
 import { PageHeader } from '@/components/page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
+import { Check } from 'lucide-react'
 
 export const Route = createFileRoute('/projects')({ component: ProjectsPage })
 
@@ -102,40 +106,47 @@ function ProjectsPage() {
   const projects = data?.data ?? []
 
   return (
-    <div>
-      <PageHeader title="PROJECT" onSearch={setSearch} onAdd={handleOpenAdd} />
+    <div className="flex flex-col gap-4">
+      <PageHeader title="Projects" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="Project" />
 
-      <div className="overflow-x-auto border bg-white shadow-sm">
-        <Table className="text-xs">
-          <TableHeader className="bg-white">
-            <TableRow className="border-b hover:bg-transparent">
-              <TableHead rowSpan={2} className="w-12 border-r text-center font-bold">NO</TableHead>
-              <TableHead rowSpan={2} className="min-w-48 border-r text-center font-bold">PROJECT</TableHead>
-              <TableHead rowSpan={2} className="min-w-28 border-r text-center font-bold">SECTION</TableHead>
-              <TableHead rowSpan={2} className="min-w-28 border-r text-center font-bold">PLANT</TableHead>
-              <TableHead rowSpan={2} className="min-w-32 border-r text-center font-bold">IMPLEMENTATION PLAN</TableHead>
-              <TableHead rowSpan={2} className="min-w-36 border-r text-center font-bold">BUDGET</TableHead>
-              <TableHead colSpan={3} className="border-b border-r text-center font-bold">PROGRESS</TableHead>
-              <TableHead rowSpan={2} className="min-w-40 border-r text-center font-bold">INFORMATION</TableHead>
-              {isAdmin && <TableHead rowSpan={2} className="w-20 text-center font-bold">AKSI</TableHead>}
+      <div className="rounded-md border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead rowSpan={2} className="w-12 text-center">No</TableHead>
+              <TableHead rowSpan={2}>Project</TableHead>
+              <TableHead rowSpan={2}>Section</TableHead>
+              <TableHead rowSpan={2}>Plant</TableHead>
+              <TableHead rowSpan={2}>Plan Date</TableHead>
+              <TableHead rowSpan={2} className="text-right">Budget</TableHead>
+              <TableHead colSpan={3} className="text-center border-b">Progress</TableHead>
+              <TableHead rowSpan={2}>Information</TableHead>
+              {isAdmin && <TableHead rowSpan={2} className="w-20 text-center">Action</TableHead>}
             </TableRow>
-            <TableRow className="border-b hover:bg-transparent">
-              <TableHead className="w-16 border-r text-center font-bold">SPB</TableHead>
-              <TableHead className="w-16 border-r text-center font-bold">RAB</TableHead>
-              <TableHead className="w-16 border-r text-center font-bold">XXX</TableHead>
+            <TableRow>
+              <TableHead className="w-16 text-center text-xs">SPB</TableHead>
+              <TableHead className="w-16 text-center text-xs">RAB</TableHead>
+              <TableHead className="w-16 text-center text-xs">XXX</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 11 : 10} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  Memuat data...
+                <TableCell colSpan={isAdmin ? 11 : 10} className="h-32 text-center text-muted-foreground">
+                  Loading data...
                 </TableCell>
               </TableRow>
             ) : projects.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 11 : 10} className="h-40 bg-muted/30 text-center text-muted-foreground">
-                  {search ? `Tidak ada proyek yang cocok dengan "${search}".` : 'Belum ada data proyek. Klik ADD untuk membuat.'}
+                <TableCell colSpan={isAdmin ? 11 : 10} className="h-48 text-center">
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyTitle>Belum ada proyek</EmptyTitle>
+                      <EmptyDescription>
+                        {search ? `Tidak ada proyek yang cocok dengan "${search}".` : 'Mulai dengan menambahkan proyek baru.'}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
@@ -143,33 +154,51 @@ function ProjectsPage() {
                 <TableRow
                   key={p.id}
                   onClick={() => setSelectedProject(p)}
-                  className="cursor-pointer border-b bg-muted/40 transition-colors hover:bg-muted/80"
+                  className="cursor-pointer"
                 >
-                  <TableCell className="border-r text-center font-medium">{(page - 1) * 25 + idx + 1}</TableCell>
-                  <TableCell className="border-r font-semibold text-foreground">{p.name}</TableCell>
-                  <TableCell className="border-r">{p.section || '-'}</TableCell>
-                  <TableCell className="border-r">{p.plant || '-'}</TableCell>
-                  <TableCell className="border-r text-center">{p.implementation_plan || '-'}</TableCell>
-                  <TableCell className="border-r text-right font-medium">{formatRupiah(p.budget)}</TableCell>
-                  <TableCell className="border-r text-center">
-                    {p.progress_spb === 'done' ? <Badge className="bg-emerald-600 text-[10px]">✓</Badge> : '-'}
+                  <TableCell className="text-center text-muted-foreground">{(page - 1) * 25 + idx + 1}</TableCell>
+                  <TableCell className="font-medium text-foreground">{p.name}</TableCell>
+                  <TableCell>{p.section || '-'}</TableCell>
+                  <TableCell>{p.plant || '-'}</TableCell>
+                  <TableCell>{p.implementation_plan || '-'}</TableCell>
+                  <TableCell className="text-right font-medium">{formatRupiah(p.budget)}</TableCell>
+                  <TableCell className="text-center">
+                    {p.progress_spb === 'done' ? (
+                      <Badge variant="secondary" className="size-5 p-0 justify-center">
+                        <Check className="size-3" />
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
-                  <TableCell className="border-r text-center">
-                    {p.progress_rab === 'done' ? <Badge className="bg-emerald-600 text-[10px]">✓</Badge> : '-'}
+                  <TableCell className="text-center">
+                    {p.progress_rab === 'done' ? (
+                      <Badge variant="secondary" className="size-5 p-0 justify-center">
+                        <Check className="size-3" />
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
-                  <TableCell className="border-r text-center">
-                    {p.progress_xxx === 'done' ? <Badge className="bg-emerald-600 text-[10px]">✓</Badge> : '-'}
+                  <TableCell className="text-center">
+                    {p.progress_xxx === 'done' ? (
+                      <Badge variant="secondary" className="size-5 p-0 justify-center">
+                        <Check className="size-3" />
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
-                  <TableCell className="border-r">{p.information || '-'}</TableCell>
+                  <TableCell className="max-w-xs truncate text-muted-foreground">{p.information || '-'}</TableCell>
                   {isAdmin && (
                     <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                        className="text-xs text-destructive hover:bg-destructive/10"
                         onClick={(e) => handleDelete(p.id, e)}
                       >
-                        Hapus
+                        Delete
                       </Button>
                     </TableCell>
                   )}
@@ -180,129 +209,129 @@ function ProjectsPage() {
         </Table>
       </div>
 
-      {/* Modal Add Project (Mockup Hal. 3) */}
+      {/* Modal Add Project */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-xl rounded-2xl">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold tracking-wide">TAMBAH PROYEK</DialogTitle>
+            <DialogTitle>Add New Project</DialogTitle>
+            <DialogDescription>Masukkan rincian proyek baru untuk monitoring.</DialogDescription>
           </DialogHeader>
 
           {formError && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-600">
-              {formError}
-            </div>
+            <Alert variant="destructive">
+              <AlertDescription>{formError}</AlertDescription>
+            </Alert>
           )}
 
-          <form onSubmit={handleCreate} className="space-y-4 text-xs font-semibold">
-            <div>
-              <Label className="text-xs">PROJECT</Label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nama Proyek..."
-                className="mt-1"
-                required
-              />
-            </div>
+          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="proj-name">Project Name</FieldLabel>
+                <Input
+                  id="proj-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nama Proyek..."
+                  required
+                />
+              </Field>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs">SECTION</Label>
-                <Input
-                  value={section}
-                  onChange={(e) => setSection(e.target.value)}
-                  placeholder="Unit / Bagian..."
-                  className="mt-1"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="proj-section">Section</FieldLabel>
+                  <Input
+                    id="proj-section"
+                    value={section}
+                    onChange={(e) => setSection(e.target.value)}
+                    placeholder="Unit / Bagian..."
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="proj-plant">Plant</FieldLabel>
+                  <Input
+                    id="proj-plant"
+                    value={plant}
+                    onChange={(e) => setPlant(e.target.value)}
+                    placeholder="Lokasi Plant / Pabrik..."
+                  />
+                </Field>
               </div>
-              <div>
-                <Label className="text-xs">PLANT</Label>
-                <Input
-                  value={plant}
-                  onChange={(e) => setPlant(e.target.value)}
-                  placeholder="Lokasi Plant / Pabrik..."
-                  className="mt-1"
-                />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs">DATE</Label>
-                <Input
-                  type="date"
-                  value={planDate}
-                  onChange={(e) => setPlanDate(e.target.value)}
-                  className="mt-1"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="proj-plan">Plan Date</FieldLabel>
+                  <Input
+                    id="proj-plan"
+                    type="date"
+                    value={planDate}
+                    onChange={(e) => setPlanDate(e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="proj-budget">Budget (Rp)</FieldLabel>
+                  <Input
+                    id="proj-budget"
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                    placeholder="Contoh: 150000000"
+                  />
+                </Field>
               </div>
-              <div>
-                <Label className="text-xs">BUDGET</Label>
-                <Input
-                  value={budget}
-                  onChange={(e) => setBudget(e.target.value)}
-                  placeholder="Nominal Rupiah..."
-                  className="mt-1"
-                />
-              </div>
-            </div>
 
-            <div>
-              <Label className="text-xs">PROGRESS</Label>
-              <div className="mt-2 flex items-center gap-6">
-                <label className="flex items-center gap-2 cursor-pointer font-normal">
+              <Field>
+                <FieldLabel htmlFor="proj-info">Information</FieldLabel>
+                <Input
+                  id="proj-info"
+                  value={information}
+                  onChange={(e) => setInformation(e.target.value)}
+                  placeholder="Keterangan tambahan..."
+                />
+              </Field>
+
+              <div className="flex gap-6 pt-2">
+                <label className="flex items-center gap-2 text-sm font-medium">
                   <input
                     type="checkbox"
                     checked={spb}
                     onChange={(e) => setSpb(e.target.checked)}
-                    className="size-4 rounded text-primary"
+                    className="size-4 rounded border-input"
                   />
-                  <span>SPB</span>
+                  Progress SPB
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer font-normal">
+                <label className="flex items-center gap-2 text-sm font-medium">
                   <input
                     type="checkbox"
                     checked={rab}
                     onChange={(e) => setRab(e.target.checked)}
-                    className="size-4 rounded text-primary"
+                    className="size-4 rounded border-input"
                   />
-                  <span>RAB</span>
+                  Progress RAB
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer font-normal">
+                <label className="flex items-center gap-2 text-sm font-medium">
                   <input
                     type="checkbox"
                     checked={xxx}
                     onChange={(e) => setXxx(e.target.checked)}
-                    className="size-4 rounded text-primary"
+                    className="size-4 rounded border-input"
                   />
-                  <span>XXX</span>
+                  Progress XXX
                 </label>
               </div>
-            </div>
+            </FieldGroup>
 
-            <div>
-              <Label className="text-xs">INFORMATION</Label>
-              <Input
-                value={information}
-                onChange={(e) => setInformation(e.target.value)}
-                placeholder="Keterangan..."
-                className="mt-1"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4">
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
-                Batal
+                Cancel
               </Button>
-              <Button type="submit" disabled={createMut.isPending} className="px-8">
-                {createMut.isPending ? 'Menyimpan...' : 'ADD'}
+              <Button type="submit" disabled={createMut.isPending}>
+                {createMut.isPending ? 'Saving...' : 'Save Project'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Project Detail Dialog */}
+      {/* Project Detail Modal */}
       {selectedProject && (
         <ProjectDetailDialog
           project={selectedProject}
@@ -336,53 +365,64 @@ function ProjectDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-2xl rounded-2xl">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-lg font-bold">
-            <span className="bg-primary px-3 py-1 text-white">{project.name}</span>
-            <span className="text-sm font-normal text-muted-foreground">{project.section} · {project.plant}</span>
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <span>{project.name}</span>
+            <Badge variant="outline" className="font-normal">
+              {project.section || 'General'} · {project.plant || 'Site'}
+            </Badge>
           </DialogTitle>
+          <DialogDescription>Ringkasan estimasi biaya dan navigasi modul terkait.</DialogDescription>
         </DialogHeader>
 
-        {/* Cost Estimate Summary Card (PRD §6.8) */}
-        <div className="rounded-xl border bg-muted/40 p-4">
-          <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Cost Estimate Summary
-          </h3>
-          <div className="grid grid-cols-3 gap-3 text-xs">
-            <div className="rounded-lg bg-white p-3 shadow-xs">
-              <div className="text-muted-foreground">BUDGET</div>
-              <div className="mt-1 text-base font-bold text-foreground">{formatRupiah(cost?.budget ?? project.budget)}</div>
-            </div>
-            <div className="rounded-lg bg-white p-3 shadow-xs">
-              <div className="text-muted-foreground">RAB (rencana)</div>
-              <div className="mt-1 text-base font-bold text-foreground">{formatRupiah(cost?.rab ?? '0')}</div>
-            </div>
-            <div className="rounded-lg bg-white p-3 shadow-xs">
-              <div className="text-muted-foreground">SPB (terbayar)</div>
-              <div className="mt-1 text-base font-bold text-foreground">{formatRupiah(cost?.spb ?? '0')}</div>
-            </div>
+        {/* Cost Estimate Summary Card */}
+        <div className="flex flex-col gap-4 py-2">
+          <div className="grid grid-cols-3 gap-3">
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-xs text-muted-foreground">BUDGET</div>
+                <div className="mt-1 text-lg font-bold">{formatRupiah(cost?.budget ?? project.budget)}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-xs text-muted-foreground">RAB (RENCANA)</div>
+                <div className="mt-1 text-lg font-bold">{formatRupiah(cost?.rab ?? '0')}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-xs text-muted-foreground">SPB (TERBAYAR)</div>
+                <div className="mt-1 text-lg font-bold">{formatRupiah(cost?.spb ?? '0')}</div>
+              </CardContent>
+            </Card>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-lg bg-white p-3 shadow-xs">
-              <div className="text-muted-foreground">VARIANCE (Budget - RAB)</div>
-              <div className="mt-1 text-sm font-bold text-foreground">{formatRupiah(cost?.variance ?? '0')}</div>
-            </div>
-            <div className="rounded-lg bg-white p-3 shadow-xs">
-              <div className="text-muted-foreground">SISA (Budget - SPB)</div>
-              <div className="mt-1 text-sm font-bold text-foreground">{formatRupiah(cost?.sisa ?? '0')}</div>
-            </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-xs text-muted-foreground">VARIANCE (Budget - RAB)</div>
+                <div className="mt-1 text-base font-semibold">{formatRupiah(cost?.variance ?? '0')}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-xs text-muted-foreground">SISA ANGGARAN (Budget - SPB)</div>
+                <div className="mt-1 text-base font-semibold">{formatRupiah(cost?.sisa ?? '0')}</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
+        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
           <div className="flex gap-2">
             <Button
               size="sm"
               variant="outline"
               onClick={() => onNavigate(`/schedule?projectId=${project.id}`)}
             >
-              Jadwal
+              Schedule
             </Button>
             <Button
               size="sm"
@@ -393,16 +433,16 @@ function ProjectDetailDialog({
             </Button>
             <Button
               size="sm"
-              className="bg-primary text-white"
+              variant="default"
               onClick={() => onNavigate(`/rab?projectId=${project.id}`)}
             >
-              RAB Proyek
+              RAB
             </Button>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            Tutup
+            Close
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
