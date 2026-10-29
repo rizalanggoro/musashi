@@ -663,6 +663,8 @@ definitions:
         type: string
       role:
         $ref: '#/definitions/UserRole'
+      token:
+        type: string
     required:
     - email
     - id

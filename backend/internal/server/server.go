@@ -1,6 +1,7 @@
 package server
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
@@ -34,13 +35,32 @@ func New(db *gorm.DB, cfg config.Config) *fiber.App {
 	})
 
 	app.Use(requestid.New(), recover.New(), logger.New())
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{cfg.AllowedOrigins},
+
+	var allowedOrigins []string
+	for _, o := range strings.Split(cfg.AllowedOrigins, ",") {
+		o = strings.TrimSpace(o)
+		if o != "" {
+			allowedOrigins = append(allowedOrigins, o)
+		}
+	}
+	if len(allowedOrigins) == 0 {
+		allowedOrigins = []string{"http://localhost:5173"}
+	}
+
+	corsCfg := cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Accept", "Content-Type", "X-CSRF-Token"},
+		AllowHeaders:     []string{"Accept", "Content-Type", "X-CSRF-Token", "Authorization"},
 		AllowCredentials: true,
 		MaxAge:           300,
-	}))
+	}
+	if cfg.AllowedOrigins == "*" {
+		corsCfg.AllowOriginsFunc = func(origin string) bool {
+			return true
+		}
+	} else {
+		corsCfg.AllowOrigins = allowedOrigins
+	}
+	app.Use(cors.New(corsCfg))
 
 	// Root health check
 	app.Get("/health", health(db))

@@ -7,13 +7,24 @@ import { AuthProvider } from './lib/auth'
 import { client } from './api/client.gen'
 import './index.css'
 
+const clientConfig: Parameters<typeof client.setConfig>[0] = {
+  credentials: 'include',
+}
+
 if (import.meta.env.VITE_API_BASE_URL) {
   const rawBase = import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '')
-  const baseUrl = rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`
-  client.setConfig({
-    baseUrl,
-  })
+  clientConfig.baseUrl = rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`
 }
+
+client.setConfig(clientConfig)
+
+client.interceptors.request.use((request) => {
+  const token = localStorage.getItem('musashi_token')
+  if (token && !request.headers.has('Authorization')) {
+    request.headers.set('Authorization', `Bearer ${token}`)
+  }
+  return request
+})
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },

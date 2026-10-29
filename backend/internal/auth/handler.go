@@ -59,6 +59,7 @@ func (h *Handler) Login(c fiber.Ctx) error {
 		Email: user.Email,
 		Name:  user.Name,
 		Role:  user.Role,
+		Token: token,
 	})
 }
 

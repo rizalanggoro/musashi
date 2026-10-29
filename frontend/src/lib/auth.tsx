@@ -26,19 +26,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMut = useMutation(logoutMutation())
 
   const handleLogin = async (email: string, pass: string) => {
-    await loginMut.mutateAsync({
+    const res = await loginMut.mutateAsync({
       body: {
         email,
         password: pass,
       },
     })
+    if (res?.token) {
+      localStorage.setItem('musashi_token', res.token)
+    }
     await queryClient.invalidateQueries()
   }
 
   const handleLogout = async () => {
-    await logoutMut.mutateAsync({})
-    queryClient.removeQueries({ queryKey: getMeOptions().queryKey })
-    await queryClient.invalidateQueries()
+    try {
+      await logoutMut.mutateAsync({})
+    } finally {
+      localStorage.removeItem('musashi_token')
+      queryClient.removeQueries({ queryKey: getMeOptions().queryKey })
+      await queryClient.invalidateQueries()
+    }
   }
 
   const isAdmin = user?.role === 'admin'

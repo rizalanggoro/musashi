@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v3"
 
 	"musashi/backend/internal/auth"
@@ -17,10 +19,16 @@ func GetCurrentUser(c fiber.Ctx) *auth.SessionPayload {
 	return user
 }
 
-// AuthMiddleware creates a Fiber middleware that validates session cookies via auth.Service.
+// AuthMiddleware creates a Fiber middleware that validates session cookies or Bearer token via auth.Service.
 func AuthMiddleware(svc auth.Service) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		token := c.Cookies(auth.CookieName)
+		if token == "" {
+			authHeader := c.Get(fiber.HeaderAuthorization)
+			if strings.HasPrefix(authHeader, "Bearer ") {
+				token = strings.TrimPrefix(authHeader, "Bearer ")
+			}
+		}
 		if token == "" {
 			return httperr.Unauthorized(c, "Authentication required")
 		}

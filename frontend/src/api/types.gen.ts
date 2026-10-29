@@ -289,6 +289,7 @@ export type User = {
     id: string;
     name: string;
     role: UserRole;
+    token?: string;
 };
 
 export type UserRole = 'admin' | 'staff';

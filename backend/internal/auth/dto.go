@@ -22,6 +22,7 @@ type User struct {
 	Email string          `json:"email"`
 	Name  string          `json:"name"`
 	Role  domain.UserRole `json:"role"`
+	Token string          `json:"token,omitempty"`
 }
 
 type UserResponse = User

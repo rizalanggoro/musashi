@@ -2627,6 +2627,9 @@ const docTemplate = `{
                 },
                 "role": {
                     "$ref": "#/definitions/UserRole"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         },
