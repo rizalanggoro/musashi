@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AhspRouteImport } from './routes/ahsp'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BoqRouteImport } from './routes/boq'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as RabRouteImport } from './routes/rab'
 import { Route as ScheduleRouteImport } from './routes/schedule'
@@ -28,9 +30,19 @@ const AhspRoute = AhspRouteImport.update({
   path: '/ahsp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BoqRoute = BoqRouteImport.update({
   id: '/boq',
   path: '/boq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -62,7 +74,9 @@ const VolumeRoute = VolumeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ahsp': typeof AhspRoute
+  '/auth': typeof AuthRoute
   '/boq': typeof BoqRoute
+  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/rab': typeof RabRoute
   '/schedule': typeof ScheduleRoute
@@ -72,7 +86,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ahsp': typeof AhspRoute
+  '/auth': typeof AuthRoute
   '/boq': typeof BoqRoute
+  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/rab': typeof RabRoute
   '/schedule': typeof ScheduleRoute
@@ -83,7 +99,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ahsp': typeof AhspRoute
+  '/auth': typeof AuthRoute
   '/boq': typeof BoqRoute
+  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/rab': typeof RabRoute
   '/schedule': typeof ScheduleRoute
@@ -95,7 +113,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ahsp'
+    | '/auth'
     | '/boq'
+    | '/login'
     | '/projects'
     | '/rab'
     | '/schedule'
@@ -105,7 +125,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ahsp'
+    | '/auth'
     | '/boq'
+    | '/login'
     | '/projects'
     | '/rab'
     | '/schedule'
@@ -115,7 +137,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ahsp'
+    | '/auth'
     | '/boq'
+    | '/login'
     | '/projects'
     | '/rab'
     | '/schedule'
@@ -126,7 +150,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AhspRoute: typeof AhspRoute
+  AuthRoute: typeof AuthRoute
   BoqRoute: typeof BoqRoute
+  LoginRoute: typeof LoginRoute
   ProjectsRoute: typeof ProjectsRoute
   RabRoute: typeof RabRoute
   ScheduleRoute: typeof ScheduleRoute
@@ -150,11 +176,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AhspRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/boq': {
       id: '/boq'
       path: '/boq'
       fullPath: '/boq'
       preLoaderRoute: typeof BoqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -198,7 +238,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AhspRoute: AhspRoute,
+  AuthRoute: AuthRoute,
   BoqRoute: BoqRoute,
+  LoginRoute: LoginRoute,
   ProjectsRoute: ProjectsRoute,
   RabRoute: RabRoute,
   ScheduleRoute: ScheduleRoute,

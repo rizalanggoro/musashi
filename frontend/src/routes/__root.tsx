@@ -1,4 +1,5 @@
-import { createRootRoute, Link, Outlet, useLocation } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { createRootRoute, Link, Outlet, useLocation, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getHealthOptions } from '@/api/@tanstack/react-query.gen'
 import { useAuth } from '@/lib/auth'
@@ -28,7 +29,6 @@ import {
   FileSpreadsheet,
   Box,
   Receipt,
-  LogIn,
   LogOut,
 } from 'lucide-react'
 
@@ -57,8 +57,40 @@ export const Route = createRootRoute({
 })
 
 function Shell() {
-  const { user, openLoginModal, logout } = useAuth()
+  const { user, isLoading, logout } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
+
+  const isAuthPage = location.pathname === '/auth' || location.pathname === '/login'
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user && !isAuthPage) {
+        navigate({ to: '/auth', replace: true })
+      } else if (user && isAuthPage) {
+        navigate({ to: '/projects', replace: true })
+      }
+    }
+  }, [user, isLoading, isAuthPage, navigate])
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-xs text-muted-foreground">Memuat sesi...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isAuthPage) {
+    return <Outlet />
+  }
+
+  if (!user) {
+    return null
+  }
 
   return (
     <TooltipProvider>
@@ -109,7 +141,7 @@ function Shell() {
             <div className="flex items-center gap-3">
               <HealthBadge />
 
-              {user ? (
+              {user && (
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-muted-foreground">
                     {user.name} <span className="text-[10px] uppercase font-semibold">({user.role})</span>
@@ -119,11 +151,6 @@ function Shell() {
                     Keluar
                   </Button>
                 </div>
-              ) : (
-                <Button size="sm" variant="default" onClick={openLoginModal}>
-                  <LogIn data-icon="inline-start" />
-                  Masuk
-                </Button>
               )}
             </div>
           </header>
