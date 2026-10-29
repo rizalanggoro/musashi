@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { listProjectsOptions, createProjectMutation, deleteProjectMutation, getCostEstimateOptions } from '@/api/@tanstack/react-query.gen'
+import { createProjectMutation, deleteProjectMutation, getCostEstimateOptions, listProjectsOptions } from '@/api/@tanstack/react-query.gen'
 import type { Project } from '@/api/types.gen'
 import { PageHeader } from '@/components/page-header'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatRupiah } from '@/lib/utils'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAuth } from '@/lib/auth'
+import { formatRupiah } from '@/lib/utils'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/projects/')({ component: ProjectsPage })
 
@@ -193,7 +193,6 @@ function ProjectsPage() {
                   {isAdmin && (
                     <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                       <Button
-                        size="sm"
                         variant="ghost"
                         className="text-xs text-destructive hover:bg-destructive/10"
                         onClick={(e) => handleDelete(p.id, e)}

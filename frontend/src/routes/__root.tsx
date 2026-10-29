@@ -3,7 +3,6 @@ import { createRootRoute, Link, Outlet, useLocation, useNavigate } from '@tansta
 import { useQuery } from '@tanstack/react-query'
 import { getHealthOptions } from '@/api/@tanstack/react-query.gen'
 import { useAuth } from '@/lib/auth'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -12,6 +11,7 @@ import {
   Sidebar,
   SidebarHeader,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
@@ -30,6 +30,7 @@ import {
   Box,
   Receipt,
   LogOut,
+  User as UserIcon,
 } from 'lucide-react'
 
 const nav = [
@@ -128,6 +129,32 @@ function Shell() {
               </SidebarGroup>
             ))}
           </SidebarContent>
+
+          <SidebarFooter className="border-t p-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <div className="flex items-center gap-2.5 px-2 py-1.5">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                    <UserIcon className="size-4" />
+                  </div>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="truncate text-xs font-medium text-foreground">{user.name}</span>
+                    <span className="truncate text-[10px] uppercase font-semibold text-muted-foreground">{user.role}</span>
+                  </div>
+                </div>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => logout()}
+                  tooltip="Keluar"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive focus:text-destructive"
+                >
+                  <LogOut />
+                  <span>Keluar</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
         </Sidebar>
 
         <SidebarInset>
@@ -140,18 +167,6 @@ function Shell() {
 
             <div className="flex items-center gap-3">
               <HealthBadge />
-
-              {user && (
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-muted-foreground">
-                    {user.name} <span className="text-[10px] uppercase font-semibold">({user.role})</span>
-                  </span>
-                  <Button size="sm" variant="outline" onClick={() => logout()}>
-                    <LogOut data-icon="inline-start" />
-                    Keluar
-                  </Button>
-                </div>
-              )}
             </div>
           </header>
 
