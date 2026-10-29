@@ -27,12 +27,12 @@ type CreateUnitPriceInput struct {
 }
 
 type UpdateUnitPriceInput struct {
-	Code        *string `json:"code"`
-	Category    *string `json:"category"`
-	WorkItem    *string `json:"work_item"`
-	Unit        *string `json:"unit"`
-	UnitPrice   *string `json:"unit_price"`
-	Information *string `json:"information"`
+	Code        *string `json:"code,omitempty"`
+	Category    *string `json:"category,omitempty"`
+	WorkItem    *string `json:"work_item,omitempty"`
+	Unit        *string `json:"unit,omitempty"`
+	UnitPrice   *string `json:"unit_price,omitempty"`
+	Information *string `json:"information,omitempty"`
 }
 
 func toDTO(u *domain.UnitPrice) UnitPriceDTO {

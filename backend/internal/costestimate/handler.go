@@ -18,6 +18,17 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// GetSummary godoc
+// @id          getCostEstimate
+// @Summary     Get project cost estimate summary
+// @Tags        cost-estimate
+// @Produce     json
+// @Param       id   path      string  true  "Project ID"
+// @Success     200  {object}  CostEstimateDTO
+// @Failure     400  {object}  httperr.ErrorResponse
+// @Failure     404  {object}  httperr.ErrorResponse
+// @Failure     500  {object}  httperr.ErrorResponse
+// @Router      /projects/{id}/cost-estimate [get]
 func (h *Handler) GetSummary(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {

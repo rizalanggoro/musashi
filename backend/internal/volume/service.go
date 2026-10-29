@@ -131,8 +131,8 @@ func (s *service) Create(projectID uint, input CreateVolumeInput) (*VolumeRowDTO
 	qty, totalQty := calcQuantities(lVal, wVal, hVal, boqItem.PlannedVolume, uWeight)
 
 	var dateVal *time.Time
-	if input.Date != "" {
-		if t, err := time.Parse("2006-01-02", input.Date); err == nil {
+	if input.Date != nil && *input.Date != "" {
+		if t, err := time.Parse("2006-01-02", *input.Date); err == nil {
 			dateVal = &t
 		}
 	}

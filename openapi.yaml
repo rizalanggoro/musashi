@@ -1,1366 +1,1826 @@
-openapi: 3.1.0
+basePath: /api/v1
+definitions:
+  AhspDTO:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      overhead_profit_pct:
+        type: string
+      status:
+        type: string
+      total_cost:
+        type: string
+      total_equipment:
+        type: string
+      total_labor:
+        type: string
+      total_material:
+        type: string
+      unit:
+        type: string
+      unit_price_of_work:
+        type: string
+      work_item:
+        type: string
+    required:
+    - code
+    - id
+    - overhead_profit_pct
+    - status
+    - total_cost
+    - total_equipment
+    - total_labor
+    - total_material
+    - unit
+    - unit_price_of_work
+    - work_item
+    type: object
+  AhspDetailDTO:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/AhspItemDTO'
+        type: array
+      overhead_profit_pct:
+        type: string
+      status:
+        type: string
+      total_cost:
+        type: string
+      total_equipment:
+        type: string
+      total_labor:
+        type: string
+      total_material:
+        type: string
+      unit:
+        type: string
+      unit_price_of_work:
+        type: string
+      work_item:
+        type: string
+    required:
+    - code
+    - id
+    - items
+    - overhead_profit_pct
+    - status
+    - total_cost
+    - total_equipment
+    - total_labor
+    - total_material
+    - unit
+    - unit_price_of_work
+    - work_item
+    type: object
+  AhspItemDTO:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      coefficient:
+        type: string
+      cost:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      sort:
+        type: integer
+      unit:
+        type: string
+      unit_price:
+        type: string
+      unit_price_id:
+        type: string
+    required:
+    - category
+    - code
+    - coefficient
+    - cost
+    - description
+    - id
+    - sort
+    - unit
+    - unit_price
+    - unit_price_id
+    type: object
+  BoqItemDTO:
+    properties:
+      ahsp_id:
+        type: string
+      id:
+        type: string
+      planned_volume:
+        type: string
+      project_id:
+        type: string
+      unit:
+        type: string
+      work_item:
+        type: string
+    required:
+    - ahsp_id
+    - id
+    - planned_volume
+    - project_id
+    - unit
+    - work_item
+    type: object
+  BoqProjectSummaryDTO:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      plant:
+        type: string
+      rab_status:
+        type: string
+      section:
+        type: string
+      volume_status:
+        type: string
+    required:
+    - id
+    - name
+    - plant
+    - rab_status
+    - section
+    - volume_status
+    type: object
+  CostEstimateDTO:
+    properties:
+      budget:
+        type: string
+      project_id:
+        type: string
+      rab:
+        type: string
+      sisa:
+        type: string
+      spb:
+        type: string
+      variance:
+        type: string
+    required:
+    - budget
+    - project_id
+    - rab
+    - sisa
+    - spb
+    - variance
+    type: object
+  CreateAhspInput:
+    properties:
+      code:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/CreateAhspItemInput'
+        type: array
+      overhead_profit_pct:
+        type: string
+      status:
+        type: string
+      unit:
+        type: string
+      work_item:
+        type: string
+    required:
+    - code
+    - items
+    - overhead_profit_pct
+    - status
+    - unit
+    - work_item
+    type: object
+  CreateAhspItemInput:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      coefficient:
+        type: string
+      description:
+        type: string
+      sort:
+        type: integer
+      unit:
+        type: string
+      unit_price:
+        type: string
+      unit_price_id:
+        type: string
+    required:
+    - category
+    - code
+    - coefficient
+    - description
+    - sort
+    - unit
+    - unit_price
+    type: object
+  CreateProjectInput:
+    properties:
+      budget:
+        type: string
+      implementation_plan:
+        type: string
+      information:
+        type: string
+      name:
+        type: string
+      plant:
+        type: string
+      progress_rab:
+        type: string
+      progress_spb:
+        type: string
+      progress_xxx:
+        type: string
+      section:
+        type: string
+    required:
+    - budget
+    - information
+    - name
+    - plant
+    - progress_rab
+    - progress_spb
+    - progress_xxx
+    - section
+    type: object
+  CreateRabItemInput:
+    properties:
+      boq_item_id:
+        type: string
+      unit:
+        type: string
+      unit_price:
+        type: string
+      volume:
+        type: string
+      work_item:
+        type: string
+    required:
+    - unit
+    - unit_price
+    - volume
+    - work_item
+    type: object
+  CreateScheduleInput:
+    properties:
+      code:
+        type: string
+      end_date:
+        type: string
+      progress:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      weight:
+        type: string
+      work_item:
+        type: string
+    required:
+    - code
+    - end_date
+    - progress
+    - start_date
+    - status
+    - weight
+    - work_item
+    type: object
+  CreateUnitPriceInput:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      information:
+        type: string
+      unit:
+        type: string
+      unit_price:
+        type: string
+      work_item:
+        type: string
+    required:
+    - category
+    - code
+    - information
+    - unit
+    - unit_price
+    - work_item
+    type: object
+  CreateVolumeInput:
+    properties:
+      ahsp_id:
+        type: string
+      boq_item_id:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      height:
+        type: string
+      length:
+        type: string
+      planned_volume:
+        type: string
+      unit:
+        type: string
+      unit_weight:
+        type: string
+      width:
+        type: string
+      work_item:
+        type: string
+    required:
+    - description
+    - planned_volume
+    - unit
+    - unit_weight
+    - work_item
+    type: object
+  ErrorDetail:
+    properties:
+      code:
+        type: string
+      fields:
+        additionalProperties:
+          type: string
+        type: object
+      message:
+        type: string
+    required:
+    - code
+    - message
+    type: object
+  ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/ErrorDetail'
+    required:
+    - error
+    type: object
+  HealthResponse:
+    properties:
+      database:
+        example: up
+        type: string
+      status:
+        example: ok
+        type: string
+      time:
+        example: "2026-10-29T12:00:00Z"
+        type: string
+    required:
+    - database
+    - status
+    type: object
+  LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  PaginationMeta:
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+    required:
+    - page
+    - per_page
+    - total
+    type: object
+  Project:
+    properties:
+      budget:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      implementation_plan:
+        type: string
+      information:
+        type: string
+      name:
+        type: string
+      plant:
+        type: string
+      progress_rab:
+        type: string
+      progress_spb:
+        type: string
+      progress_xxx:
+        type: string
+      section:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - budget
+    - created_at
+    - id
+    - implementation_plan
+    - information
+    - name
+    - plant
+    - progress_rab
+    - progress_spb
+    - progress_xxx
+    - section
+    - status
+    - updated_at
+    type: object
+  ProjectListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/Project'
+        type: array
+      meta:
+        $ref: '#/definitions/PaginationMeta'
+    required:
+    - data
+    - meta
+    type: object
+  RabItemDTO:
+    properties:
+      boq_item_id:
+        type: string
+      id:
+        type: string
+      project_id:
+        type: string
+      total_cost:
+        type: string
+      unit:
+        type: string
+      unit_price:
+        type: string
+      volume:
+        type: string
+      work_item:
+        type: string
+    required:
+    - boq_item_id
+    - id
+    - project_id
+    - total_cost
+    - unit
+    - unit_price
+    - volume
+    - work_item
+    type: object
+  RabResponseDTO:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/RabItemDTO'
+        type: array
+      project_id:
+        type: string
+      total_rab:
+        type: string
+    required:
+    - items
+    - project_id
+    - total_rab
+    type: object
+  ScheduleDTO:
+    properties:
+      code:
+        type: string
+      duration:
+        type: integer
+      end_date:
+        type: string
+      id:
+        type: string
+      progress:
+        type: string
+      project_id:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      weight:
+        type: string
+      work_item:
+        type: string
+    required:
+    - code
+    - duration
+    - end_date
+    - id
+    - progress
+    - project_id
+    - start_date
+    - status
+    - weight
+    - work_item
+    type: object
+  UnitPriceDTO:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      id:
+        type: string
+      information:
+        type: string
+      unit:
+        type: string
+      unit_price:
+        type: string
+      work_item:
+        type: string
+    required:
+    - category
+    - code
+    - id
+    - information
+    - unit
+    - unit_price
+    - work_item
+    type: object
+  UpdateProjectInput:
+    properties:
+      budget:
+        type: string
+      implementation_plan:
+        type: string
+      information:
+        type: string
+      name:
+        type: string
+      plant:
+        type: string
+      progress_rab:
+        type: string
+      progress_spb:
+        type: string
+      progress_xxx:
+        type: string
+      section:
+        type: string
+      status:
+        type: string
+    type: object
+  UpdateRabItemInput:
+    properties:
+      unit:
+        type: string
+      unit_price:
+        type: string
+      volume:
+        type: string
+      work_item:
+        type: string
+    type: object
+  UpdateScheduleInput:
+    properties:
+      code:
+        type: string
+      end_date:
+        type: string
+      progress:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      weight:
+        type: string
+      work_item:
+        type: string
+    type: object
+  UpdateUnitPriceInput:
+    properties:
+      category:
+        type: string
+      code:
+        type: string
+      information:
+        type: string
+      unit:
+        type: string
+      unit_price:
+        type: string
+      work_item:
+        type: string
+    type: object
+  UpdateVolumeInput:
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      height:
+        type: string
+      length:
+        type: string
+      unit_weight:
+        type: string
+      width:
+        type: string
+    type: object
+  User:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/UserRole'
+    required:
+    - email
+    - id
+    - name
+    - role
+    type: object
+  UserRole:
+    enum:
+    - admin
+    - staff
+    type: string
+    x-enum-varnames:
+    - RoleAdmin
+    - RoleStaff
+  VolumeRowDTO:
+    properties:
+      boq_item_id:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      height:
+        type: string
+      id:
+        type: string
+      length:
+        type: string
+      planned_volume:
+        type: string
+      quantity:
+        type: string
+      total_quantity:
+        type: string
+      unit:
+        type: string
+      unit_weight:
+        type: string
+      width:
+        type: string
+      work_item:
+        type: string
+    required:
+    - boq_item_id
+    - date
+    - description
+    - height
+    - id
+    - length
+    - planned_volume
+    - quantity
+    - total_quantity
+    - unit
+    - unit_weight
+    - width
+    - work_item
+    type: object
 info:
+  contact: {}
+  description: Project monitoring & cost estimate API.
   title: MUSASHI API
   version: 0.1.0
-  description: |
-    Project monitoring & cost estimate API.
-    Kontrak ini adalah sumber kebenaran untuk client TypeScript (heyapi) dan backend Go.
-servers:
-  - url: /api/v1
 paths:
-  /health:
-    get:
-      operationId: getHealth
-      summary: Service health
-      tags: [system]
-      responses:
-        "200":
-          description: Service and database are reachable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Health"
-        "503":
-          description: Database unreachable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Health"
-
-  /auth/login:
-    post:
-      operationId: login
-      summary: Login
-      tags: [auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LoginRequest"
-      responses:
-        "200":
-          description: Logged in successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /auth/logout:
-    post:
-      operationId: logout
-      summary: Logout
-      tags: [auth]
-      responses:
-        "200":
-          description: Logged out
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-
-  /auth/me:
-    get:
-      operationId: getMe
-      summary: Get current authenticated user
-      tags: [auth]
-      responses:
-        "200":
-          description: Current user profile
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          description: Unauthenticated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /projects:
-    get:
-      operationId: listProjects
-      summary: List projects
-      tags: [projects]
-      parameters:
-        - name: q
-          in: query
-          schema:
-            type: string
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
-        - name: per_page
-          in: query
-          schema:
-            type: integer
-            default: 25
-      responses:
-        "200":
-          description: Project list
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProjectListResponse"
-    post:
-      operationId: createProject
-      summary: Create new project
-      tags: [projects]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateProjectRequest"
-      responses:
-        "201":
-          description: Project created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Project"
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /projects/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    get:
-      operationId: getProject
-      summary: Get project by ID
-      tags: [projects]
-      responses:
-        "200":
-          description: Project details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Project"
-        "404":
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    put:
-      operationId: updateProject
-      summary: Update project
-      tags: [projects]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateProjectRequest"
-      responses:
-        "200":
-          description: Project updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Project"
-        "404":
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    delete:
-      operationId: deleteProject
-      summary: Delete project (soft delete)
-      tags: [projects]
-      responses:
-        "204":
-          description: Deleted successfully
-        "404":
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /projects/{id}/schedules:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    get:
-      operationId: listSchedules
-      summary: List project schedules
-      tags: [schedules]
-      responses:
-        "200":
-          description: List of schedules
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Schedule"
-    post:
-      operationId: createSchedule
-      summary: Create schedule item
-      tags: [schedules]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateScheduleRequest"
-      responses:
-        "201":
-          description: Schedule created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Schedule"
-
-  /schedules/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    put:
-      operationId: updateSchedule
-      summary: Update schedule item
-      tags: [schedules]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateScheduleRequest"
-      responses:
-        "200":
-          description: Schedule updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Schedule"
-    delete:
-      operationId: deleteSchedule
-      summary: Delete schedule item
-      tags: [schedules]
-      responses:
-        "204":
-          description: Deleted successfully
-
-  /unit-prices:
-    get:
-      operationId: listUnitPrices
-      summary: List unit prices
-      tags: [unit-prices]
-      parameters:
-        - name: q
-          in: query
-          schema:
-            type: string
-        - name: category
-          in: query
-          schema:
-            type: string
-            enum: [LABOR, MATERIALS, EQUIPMENT, OTHER]
-      responses:
-        "200":
-          description: Unit price list
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UnitPrice"
-    post:
-      operationId: createUnitPrice
-      summary: Create unit price
-      tags: [unit-prices]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateUnitPriceRequest"
-      responses:
-        "201":
-          description: Unit price created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnitPrice"
-        "409":
-          description: Code already exists
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /unit-prices/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    put:
-      operationId: updateUnitPrice
-      summary: Update unit price
-      tags: [unit-prices]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateUnitPriceRequest"
-      responses:
-        "200":
-          description: Unit price updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnitPrice"
-    delete:
-      operationId: deleteUnitPrice
-      summary: Delete unit price
-      tags: [unit-prices]
-      responses:
-        "204":
-          description: Deleted successfully
-        "409":
-          description: Conflict (used in AHSP)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
   /ahsps:
     get:
       operationId: listAhsps
-      summary: List AHSPs
-      tags: [ahsp]
       parameters:
-        - name: q
-          in: query
-          schema:
-            type: string
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: AHSP list
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Ahsp"
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/AhspDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: List AHSP
+      tags:
+      - ahsp
     post:
+      consumes:
+      - application/json
       operationId: createAhsp
-      summary: Create AHSP
-      tags: [ahsp]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateAhspRequest"
-      responses:
-        "201":
-          description: AHSP created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AhspDetail"
-
-  /ahsps/{id}:
-    parameters:
-      - name: id
-        in: path
+      parameters:
+      - description: AHSP input
+        in: body
+        name: body
         required: true
         schema:
-          type: string
-          format: uuid
-    get:
-      operationId: getAhsp
-      summary: Get AHSP detail with items
-      tags: [ahsp]
+          $ref: '#/definitions/CreateAhspInput'
+      produces:
+      - application/json
       responses:
-        "200":
-          description: AHSP detail
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AhspDetail"
-        "404":
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    put:
-      operationId: updateAhsp
-      summary: Update AHSP
-      tags: [ahsp]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateAhspRequest"
-      responses:
-        "200":
-          description: AHSP updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AhspDetail"
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/AhspDetailDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create AHSP
+      tags:
+      - ahsp
+  /ahsps/{id}:
     delete:
       operationId: deleteAhsp
-      summary: Delete AHSP
-      tags: [ahsp]
+      parameters:
+      - description: AHSP ID
+        in: path
+        name: id
+        required: true
+        type: string
       responses:
         "204":
-          description: Deleted successfully
-
-  /boq:
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete AHSP
+      tags:
+      - ahsp
+    get:
+      operationId: getAhsp
+      parameters:
+      - description: AHSP ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AhspDetailDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get AHSP by ID
+      tags:
+      - ahsp
+    put:
+      consumes:
+      - application/json
+      operationId: updateAhsp
+      parameters:
+      - description: AHSP ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: AHSP update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAhspInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AhspDetailDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update AHSP
+      tags:
+      - ahsp
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      operationId: login
+      parameters:
+      - description: Login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      summary: Logout
+      tags:
+      - auth
+  /auth/me:
+    get:
+      operationId: getMe
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get current authenticated user
+      tags:
+      - auth
+  /boq/summary:
     get:
       operationId: listBoqProjects
-      summary: List projects with BOQ status
-      tags: [boq]
       parameters:
-        - name: q
-          in: query
-          schema:
-            type: string
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: List of projects with volume/RAB status
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BoqProjectSummary"
-
-  /projects/{id}/boq:
-    parameters:
-      - name: id
-        in: path
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/BoqProjectSummaryDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: List projects with BOQ status
+      tags:
+      - boq
+  /health:
+    get:
+      description: Service and database are reachable
+      operationId: getHealth
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/HealthResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/HealthResponse'
+      summary: Service health
+      tags:
+      - system
+  /projects:
+    get:
+      operationId: listProjects
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 25
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ProjectListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: List projects
+      tags:
+      - projects
+    post:
+      consumes:
+      - application/json
+      operationId: createProject
+      parameters:
+      - description: Project input
+        in: body
+        name: body
         required: true
         schema:
-          type: string
-          format: uuid
+          $ref: '#/definitions/CreateProjectInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create project
+      tags:
+      - projects
+  /projects/{id}:
+    delete:
+      operationId: deleteProject
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete project
+      tags:
+      - projects
+    get:
+      operationId: getProject
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get project by ID
+      tags:
+      - projects
+    put:
+      consumes:
+      - application/json
+      operationId: updateProject
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Project update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateProjectInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Project'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update project
+      tags:
+      - projects
+  /projects/{id}/boq:
     get:
       operationId: getProjectBoq
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/BoqItemDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
       summary: Get project BOQ items
-      tags: [boq]
-      responses:
-        "200":
-          description: List of BOQ items
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BoqItem"
-
-  /projects/{id}/volumes:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    get:
-      operationId: listVolumes
-      summary: List project volume take-offs
-      tags: [volume]
-      parameters:
-        - name: q
-          in: query
-          schema:
-            type: string
-      responses:
-        "200":
-          description: List of volume rows
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/VolumeRow"
-    post:
-      operationId: createVolume
-      summary: Add volume take-off row
-      tags: [volume]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateVolumeRequest"
-      responses:
-        "201":
-          description: Created volume row
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/VolumeRow"
-
-  /volumes/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    put:
-      operationId: updateVolume
-      summary: Update volume take-off row
-      tags: [volume]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateVolumeRequest"
-      responses:
-        "200":
-          description: Updated volume row
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/VolumeRow"
-    delete:
-      operationId: deleteVolume
-      summary: Delete volume take-off row
-      tags: [volume]
-      responses:
-        "204":
-          description: Deleted successfully
-
-  /projects/{id}/rab:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    get:
-      operationId: getProjectRab
-      summary: Get project RAB
-      tags: [rab]
-      parameters:
-        - name: q
-          in: query
-          schema:
-            type: string
-      responses:
-        "200":
-          description: RAB detail and items
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RabResponse"
-    post:
-      operationId: createRabItem
-      summary: Add RAB item
-      tags: [rab]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateRabItemRequest"
-      responses:
-        "201":
-          description: Added RAB item
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RabItem"
-
-  /rab-items/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    put:
-      operationId: updateRabItem
-      summary: Update RAB item
-      tags: [rab]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateRabItemRequest"
-      responses:
-        "200":
-          description: Updated RAB item
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RabItem"
-    delete:
-      operationId: deleteRabItem
-      summary: Delete RAB item
-      tags: [rab]
-      responses:
-        "204":
-          description: Deleted successfully
-
+      tags:
+      - boq
   /projects/{id}/cost-estimate:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
     get:
       operationId: getCostEstimate
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CostEstimateDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
       summary: Get project cost estimate summary
-      tags: [cost-estimate]
-      responses:
-        "200":
-          description: Cost estimate numbers
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CostEstimateSummary"
-
-  /projects/{id}/exports/volume.xlsx:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    get:
-      operationId: exportVolumeExcel
-      summary: Export project volume take-off as Excel
-      tags: [export]
-      responses:
-        "200":
-          description: Excel file
-          content:
-            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
-              schema:
-                type: string
-                format: binary
-
-  /projects/{id}/exports/rab.xlsx:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    get:
-      operationId: exportRabExcel
-      summary: Export project RAB as Excel
-      tags: [export]
-      responses:
-        "200":
-          description: Excel file
-          content:
-            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
-              schema:
-                type: string
-                format: binary
-
+      tags:
+      - cost-estimate
   /projects/{id}/exports/rab.pdf:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
     get:
       operationId: exportRabPdf
-      summary: Export project RAB as PDF
-      tags: [export]
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/pdf
       responses:
         "200":
-          description: PDF file
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
-
-components:
-  schemas:
-    Health:
-      type: object
-      required: [status, database, time]
-      properties:
-        status:
-          type: string
-          enum: [ok, degraded]
-        database:
-          type: string
-          enum: [up, down]
-        time:
-          type: string
-          format: date-time
-
-    Error:
-      type: object
-      required: [error]
-      properties:
-        error:
-          type: object
-          required: [code, message]
-          properties:
-            code:
-              type: string
-            message:
-              type: string
-            fields:
-              type: object
-              additionalProperties:
-                type: string
-
-    User:
-      type: object
-      required: [id, email, name, role]
-      properties:
-        id:
-          type: string
-          format: uuid
-        email:
-          type: string
-        name:
-          type: string
-        role:
-          type: string
-          enum: [admin, staff]
-
-    LoginRequest:
-      type: object
-      required: [email, password]
-      properties:
-        email:
-          type: string
-        password:
-          type: string
-
-    Project:
-      type: object
-      required: [id, name, section, plant, budget, status, progress_spb, progress_rab, progress_xxx]
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        section:
-          type: string
-        plant:
-          type: string
-        implementation_plan:
-          type: string
-          format: date
-          nullable: true
-        budget:
-          type: string
-          description: Money formatted string e.g. "1000000000"
-        information:
-          type: string
-        status:
-          type: string
-          enum: [planning, on_going, completed, cancelled]
-        progress_spb:
-          type: string
-          enum: [pending, done]
-        progress_rab:
-          type: string
-          enum: [pending, done]
-        progress_xxx:
-          type: string
-          enum: [pending, done]
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-
-    ProjectListResponse:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/Project"
-        meta:
-          type: object
-          required: [page, per_page, total]
-          properties:
-            page:
-              type: integer
-            per_page:
-              type: integer
-            total:
-              type: integer
-
-    CreateProjectRequest:
-      type: object
-      required: [name]
-      properties:
-        name:
-          type: string
-        section:
-          type: string
-        plant:
-          type: string
-        implementation_plan:
-          type: string
-          format: date
-        budget:
-          type: string
-          default: "0"
-        information:
-          type: string
-        progress_spb:
-          type: string
-          enum: [pending, done]
-          default: pending
-        progress_rab:
-          type: string
-          enum: [pending, done]
-          default: pending
-        progress_xxx:
-          type: string
-          enum: [pending, done]
-          default: pending
-
-    UpdateProjectRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        section:
-          type: string
-        plant:
-          type: string
-        implementation_plan:
-          type: string
-          format: date
-        budget:
-          type: string
-        information:
-          type: string
-        status:
-          type: string
-          enum: [planning, on_going, completed, cancelled]
-        progress_spb:
-          type: string
-          enum: [pending, done]
-        progress_rab:
-          type: string
-          enum: [pending, done]
-        progress_xxx:
-          type: string
-          enum: [pending, done]
-
-    Schedule:
-      type: object
-      required: [id, project_id, work_item, start_date, end_date, duration, weight, progress, status]
-      properties:
-        id:
-          type: string
-          format: uuid
-        project_id:
-          type: string
-          format: uuid
-        code:
-          type: string
-        work_item:
-          type: string
-        start_date:
-          type: string
-          format: date
-        end_date:
-          type: string
-          format: date
-        duration:
-          type: integer
-        weight:
-          type: string
-        progress:
-          type: string
-        status:
-          type: string
-          enum: [planning, on_going, done, late]
-
-    CreateScheduleRequest:
-      type: object
-      required: [work_item, start_date, end_date]
-      properties:
-        code:
-          type: string
-        work_item:
-          type: string
-        start_date:
-          type: string
-          format: date
-        end_date:
-          type: string
-          format: date
-        weight:
-          type: string
-          default: "0"
-        progress:
-          type: string
-          default: "0"
-        status:
-          type: string
-          enum: [planning, on_going, done, late]
-          default: planning
-
-    UpdateScheduleRequest:
-      type: object
-      properties:
-        code:
-          type: string
-        work_item:
-          type: string
-        start_date:
-          type: string
-          format: date
-        end_date:
-          type: string
-          format: date
-        weight:
-          type: string
-        progress:
-          type: string
-        status:
-          type: string
-          enum: [planning, on_going, done, late]
-
-    UnitPrice:
-      type: object
-      required: [id, code, category, work_item, unit, unit_price]
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-        category:
-          type: string
-          enum: [LABOR, MATERIALS, EQUIPMENT, OTHER]
-        work_item:
-          type: string
-        unit:
-          type: string
-        unit_price:
-          type: string
-        information:
-          type: string
-
-    CreateUnitPriceRequest:
-      type: object
-      required: [code, category, work_item, unit, unit_price]
-      properties:
-        code:
-          type: string
-        category:
-          type: string
-          enum: [LABOR, MATERIALS, EQUIPMENT, OTHER]
-        work_item:
-          type: string
-        unit:
-          type: string
-        unit_price:
-          type: string
-        information:
-          type: string
-
-    UpdateUnitPriceRequest:
-      type: object
-      properties:
-        code:
-          type: string
-        category:
-          type: string
-          enum: [LABOR, MATERIALS, EQUIPMENT, OTHER]
-        work_item:
-          type: string
-        unit:
-          type: string
-        unit_price:
-          type: string
-        information:
-          type: string
-
-    Ahsp:
-      type: object
-      required: [id, code, work_item, unit, unit_price_of_work, status]
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-        work_item:
-          type: string
-        unit:
-          type: string
-        overhead_profit_pct:
-          type: string
-        total_labor:
-          type: string
-        total_material:
-          type: string
-        total_equipment:
-          type: string
-        total_cost:
-          type: string
-        unit_price_of_work:
-          type: string
-        status:
-          type: string
-          enum: [draft, final]
-
-    AhspItem:
-      type: object
-      required: [id, category, sort, description, code, unit, coefficient, unit_price, cost]
-      properties:
-        id:
-          type: string
-          format: uuid
-        unit_price_id:
-          type: string
-          format: uuid
-          nullable: true
-        category:
-          type: string
-          enum: [LABOR, MATERIALS, EQUIPMENT]
-        sort:
-          type: integer
-        description:
-          type: string
-        code:
-          type: string
-        unit:
-          type: string
-        coefficient:
-          type: string
-        unit_price:
-          type: string
-        cost:
-          type: string
-
-    AhspDetail:
-      allOf:
-        - $ref: "#/components/schemas/Ahsp"
-        - type: object
-          required: [items]
-          properties:
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Export project RAB as PDF
+      tags:
+      - export
+  /projects/{id}/exports/rab.xlsx:
+    get:
+      operationId: exportRabExcel
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Export project RAB as Excel
+      tags:
+      - export
+  /projects/{id}/exports/volume.xlsx:
+    get:
+      operationId: exportVolumeExcel
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Export project volume take-off as Excel
+      tags:
+      - export
+  /projects/{id}/rab:
+    get:
+      operationId: getProjectRab
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RabResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get project RAB
+      tags:
+      - rab
+    post:
+      consumes:
+      - application/json
+      operationId: createRabItem
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: RAB item input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateRabItemInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/RabItemDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create RAB item
+      tags:
+      - rab
+  /projects/{id}/schedules:
+    get:
+      operationId: listSchedules
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
             items:
-              type: array
-              items:
-                $ref: "#/components/schemas/AhspItem"
-
-    CreateAhspItemInput:
-      type: object
-      required: [category, description, unit, coefficient, unit_price]
-      properties:
-        unit_price_id:
-          type: string
-          format: uuid
-          nullable: true
-        category:
-          type: string
-          enum: [LABOR, MATERIALS, EQUIPMENT]
-        sort:
-          type: integer
-          default: 0
-        description:
-          type: string
-        code:
-          type: string
-          default: ""
-        unit:
-          type: string
-        coefficient:
-          type: string
-        unit_price:
-          type: string
-
-    CreateAhspRequest:
-      type: object
-      required: [code, work_item, unit, items]
-      properties:
-        code:
-          type: string
-        work_item:
-          type: string
-        unit:
-          type: string
-        overhead_profit_pct:
-          type: string
-          default: "10.00"
-        status:
-          type: string
-          enum: [draft, final]
-          default: draft
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/CreateAhspItemInput"
-
-    BoqProjectSummary:
-      type: object
-      required: [id, name, volume_status, rab_status]
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        section:
-          type: string
-        plant:
-          type: string
-        volume_status:
-          type: string
-          enum: [empty, partial, complete]
-        rab_status:
-          type: string
-          enum: [empty, partial, complete]
-
-    BoqItem:
-      type: object
-      required: [id, project_id, work_item, unit, planned_volume]
-      properties:
-        id:
-          type: string
-          format: uuid
-        project_id:
-          type: string
-          format: uuid
-        ahsp_id:
-          type: string
-          format: uuid
-          nullable: true
-        work_item:
-          type: string
-        unit:
-          type: string
-        planned_volume:
-          type: string
-
-    VolumeRow:
-      type: object
-      required: [id, boq_item_id, work_item, unit, planned_volume, quantity, unit_weight, total_quantity]
-      properties:
-        id:
-          type: string
-          format: uuid
-        boq_item_id:
-          type: string
-          format: uuid
-        work_item:
-          type: string
-        unit:
-          type: string
-        planned_volume:
-          type: string
-        date:
-          type: string
-          format: date
-          nullable: true
-        length:
-          type: string
-          nullable: true
-        width:
-          type: string
-          nullable: true
-        height:
-          type: string
-          nullable: true
-        quantity:
-          type: string
-        unit_weight:
-          type: string
-        total_quantity:
-          type: string
-        description:
-          type: string
-
-    CreateVolumeRequest:
-      type: object
-      required: [work_item, unit]
-      properties:
-        boq_item_id:
-          type: string
-          format: uuid
-          nullable: true
-        ahsp_id:
-          type: string
-          format: uuid
-          nullable: true
-        work_item:
-          type: string
-        unit:
-          type: string
-        planned_volume:
-          type: string
-          default: "0"
-        date:
-          type: string
-          format: date
-        length:
-          type: string
-        width:
-          type: string
-        height:
-          type: string
-        unit_weight:
-          type: string
-          default: "1"
-        description:
-          type: string
-
-    UpdateVolumeRequest:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        length:
-          type: string
-        width:
-          type: string
-        height:
-          type: string
-        unit_weight:
-          type: string
-        description:
-          type: string
-
-    RabItem:
-      type: object
-      required: [id, project_id, work_item, unit, volume, unit_price, total_cost]
-      properties:
-        id:
-          type: string
-          format: uuid
-        project_id:
-          type: string
-          format: uuid
-        boq_item_id:
-          type: string
-          format: uuid
-          nullable: true
-        work_item:
-          type: string
-        unit:
-          type: string
-        volume:
-          type: string
-        unit_price:
-          type: string
-        total_cost:
-          type: string
-
-    RabResponse:
-      type: object
-      required: [project_id, items, total_rab]
-      properties:
-        project_id:
-          type: string
-          format: uuid
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/RabItem"
-        total_rab:
-          type: string
-
-    CreateRabItemRequest:
-      type: object
-      required: [work_item, unit, volume, unit_price]
-      properties:
-        boq_item_id:
-          type: string
-          format: uuid
-          nullable: true
-        work_item:
-          type: string
-        unit:
-          type: string
-        volume:
-          type: string
-        unit_price:
-          type: string
-
-    UpdateRabItemRequest:
-      type: object
-      properties:
-        work_item:
-          type: string
-        unit:
-          type: string
-        volume:
-          type: string
-        unit_price:
-          type: string
-
-    CostEstimateSummary:
-      type: object
-      required: [project_id, budget, rab, spb, variance, sisa]
-      properties:
-        project_id:
-          type: string
-          format: uuid
-        budget:
-          type: string
-        rab:
-          type: string
-        spb:
-          type: string
-        variance:
-          type: string
-        sisa:
-          type: string
+              $ref: '#/definitions/ScheduleDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: List project schedules
+      tags:
+      - schedules
+    post:
+      consumes:
+      - application/json
+      operationId: createSchedule
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Schedule input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateScheduleInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ScheduleDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create schedule item
+      tags:
+      - schedules
+  /projects/{id}/volumes:
+    get:
+      operationId: listVolumes
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/VolumeRowDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: List project volume rows
+      tags:
+      - volume
+    post:
+      consumes:
+      - application/json
+      operationId: createVolume
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Volume input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateVolumeInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/VolumeRowDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create volume entry
+      tags:
+      - volume
+  /rab/{id}:
+    delete:
+      operationId: deleteRabItem
+      parameters:
+      - description: RAB item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete RAB item
+      tags:
+      - rab
+    put:
+      consumes:
+      - application/json
+      operationId: updateRabItem
+      parameters:
+      - description: RAB item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: RAB item update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateRabItemInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/RabItemDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update RAB item
+      tags:
+      - rab
+  /schedules/{id}:
+    delete:
+      operationId: deleteSchedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete schedule item
+      tags:
+      - schedules
+    put:
+      consumes:
+      - application/json
+      operationId: updateSchedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Schedule update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateScheduleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ScheduleDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update schedule item
+      tags:
+      - schedules
+  /unit-prices:
+    get:
+      operationId: listUnitPrices
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - description: Filter by category (LABOR, MATERIALS, EQUIPMENT, OTHER)
+        in: query
+        name: category
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/UnitPriceDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: List unit prices
+      tags:
+      - unit-prices
+    post:
+      consumes:
+      - application/json
+      operationId: createUnitPrice
+      parameters:
+      - description: Unit price input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUnitPriceInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/UnitPriceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create unit price
+      tags:
+      - unit-prices
+  /unit-prices/{id}:
+    delete:
+      operationId: deleteUnitPrice
+      parameters:
+      - description: Unit Price ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete unit price
+      tags:
+      - unit-prices
+    put:
+      consumes:
+      - application/json
+      operationId: updateUnitPrice
+      parameters:
+      - description: Unit Price ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Unit price update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUnitPriceInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UnitPriceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update unit price
+      tags:
+      - unit-prices
+  /volumes/{id}:
+    delete:
+      operationId: deleteVolume
+      parameters:
+      - description: Volume row ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete volume entry
+      tags:
+      - volume
+    put:
+      consumes:
+      - application/json
+      operationId: updateVolume
+      parameters:
+      - description: Volume row ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Volume update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateVolumeInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/VolumeRowDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update volume entry
+      tags:
+      - volume
+swagger: "2.0"

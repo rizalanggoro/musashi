@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "api": "openapi-ts"
+    "api": "openapi-ts",
+    "api:all": "cd ../backend && swag init -g cmd/api/main.go -o ./docs --parseDependency --parseInternal --useStructName --requiredByDefault && cd ../frontend && bun run api"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

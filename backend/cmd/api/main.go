@@ -1,3 +1,7 @@
+// @title           MUSASHI API
+// @version         0.1.0
+// @description     Project monitoring & cost estimate API.
+// @BasePath        /api/v1
 package main
 
 import (

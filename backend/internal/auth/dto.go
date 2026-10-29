@@ -17,9 +17,11 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
-type UserResponse struct {
+type User struct {
 	ID    string          `json:"id"`
 	Email string          `json:"email"`
 	Name  string          `json:"name"`
 	Role  domain.UserRole `json:"role"`
 }
+
+type UserResponse = User

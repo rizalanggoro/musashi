@@ -17,6 +17,17 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// Login godoc
+// @id          login
+// @Summary     Login
+// @Tags        auth
+// @Accept      json
+// @Produce     json
+// @Param       body body LoginInput true "Login credentials"
+// @Success     200 {object} User
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     401 {object} httperr.ErrorResponse
+// @Router      /auth/login [post]
 func (h *Handler) Login(c fiber.Ctx) error {
 	var input LoginInput
 	if err := c.Bind().Body(&input); err != nil {
@@ -51,6 +62,13 @@ func (h *Handler) Login(c fiber.Ctx) error {
 	})
 }
 
+// Logout godoc
+// @id          logout
+// @Summary     Logout
+// @Tags        auth
+// @Produce     json
+// @Success     200 {object} map[string]bool
+// @Router      /auth/logout [post]
 func (h *Handler) Logout(c fiber.Ctx) error {
 	c.Cookie(&fiber.Cookie{
 		Name:     CookieName,
@@ -63,6 +81,14 @@ func (h *Handler) Logout(c fiber.Ctx) error {
 	return c.JSON(fiber.Map{"ok": true})
 }
 
+// Me godoc
+// @id          getMe
+// @Summary     Get current authenticated user
+// @Tags        auth
+// @Produce     json
+// @Success     200 {object} User
+// @Failure     401 {object} httperr.ErrorResponse
+// @Router      /auth/me [get]
 func (h *Handler) Me(c fiber.Ctx) error {
 	user, ok := c.Locals("user").(*SessionPayload)
 	if !ok || user == nil {

@@ -20,6 +20,17 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// List godoc
+// @id          listProjects
+// @Summary     List projects
+// @Tags        projects
+// @Produce     json
+// @Param       q query string false "Search query"
+// @Param       page query int false "Page number" default(1)
+// @Param       per_page query int false "Items per page" default(25)
+// @Success     200 {object} ProjectListResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects [get]
 func (h *Handler) List(c fiber.Ctx) error {
 	q := strings.TrimSpace(c.Query("q"))
 	page, _ := strconv.Atoi(c.Query("page", "1"))
@@ -47,6 +58,18 @@ func (h *Handler) List(c fiber.Ctx) error {
 	})
 }
 
+// Create godoc
+// @id          createProject
+// @Summary     Create project
+// @Tags        projects
+// @Accept      json
+// @Produce     json
+// @Param       body body CreateProjectInput true "Project input"
+// @Success     201 {object} Project
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     409 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects [post]
 func (h *Handler) Create(c fiber.Ctx) error {
 	var input CreateProjectInput
 	if err := c.Bind().Body(&input); err != nil {
@@ -67,6 +90,17 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(dto)
 }
 
+// Get godoc
+// @id          getProject
+// @Summary     Get project by ID
+// @Tags        projects
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Success     200 {object} Project
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id} [get]
 func (h *Handler) Get(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -84,6 +118,20 @@ func (h *Handler) Get(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Update godoc
+// @id          updateProject
+// @Summary     Update project
+// @Tags        projects
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Param       body body UpdateProjectInput true "Project update data"
+// @Success     200 {object} Project
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     409 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id} [put]
 func (h *Handler) Update(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -109,6 +157,16 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Delete godoc
+// @id          deleteProject
+// @Summary     Delete project
+// @Tags        projects
+// @Param       id path string true "Project ID"
+// @Success     204 "No Content"
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id} [delete]
 func (h *Handler) Delete(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {

@@ -18,6 +18,16 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// List godoc
+// @id          listUnitPrices
+// @Summary     List unit prices
+// @Tags        unit-prices
+// @Produce     json
+// @Param       q query string false "Search query"
+// @Param       category query string false "Filter by category (LABOR, MATERIALS, EQUIPMENT, OTHER)"
+// @Success     200 {array} UnitPriceDTO
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /unit-prices [get]
 func (h *Handler) List(c fiber.Ctx) error {
 	q := c.Query("q")
 	category := c.Query("category")
@@ -30,6 +40,18 @@ func (h *Handler) List(c fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// Create godoc
+// @id          createUnitPrice
+// @Summary     Create unit price
+// @Tags        unit-prices
+// @Accept      json
+// @Produce     json
+// @Param       body body CreateUnitPriceInput true "Unit price input"
+// @Success     201 {object} UnitPriceDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     409 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /unit-prices [post]
 func (h *Handler) Create(c fiber.Ctx) error {
 	var input CreateUnitPriceInput
 	if err := c.Bind().Body(&input); err != nil {
@@ -50,6 +72,20 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(dto)
 }
 
+// Update godoc
+// @id          updateUnitPrice
+// @Summary     Update unit price
+// @Tags        unit-prices
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Unit Price ID"
+// @Param       body body UpdateUnitPriceInput true "Unit price update data"
+// @Success     200 {object} UnitPriceDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     409 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /unit-prices/{id} [put]
 func (h *Handler) Update(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -75,6 +111,16 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Delete godoc
+// @id          deleteUnitPrice
+// @Summary     Delete unit price
+// @Tags        unit-prices
+// @Param       id path string true "Unit Price ID"
+// @Success     204 "No Content"
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     409 {object} httperr.ErrorResponse
+// @Router      /unit-prices/{id} [delete]
 func (h *Handler) Delete(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {

@@ -125,6 +125,21 @@ func New(db *gorm.DB, cfg config.Config) *fiber.App {
 	return app
 }
 
+type HealthResponse struct {
+	Status   string `json:"status" validate:"required" example:"ok"`
+	Database string `json:"database" validate:"required" example:"up"`
+	Time     string `json:"time,omitempty" example:"2026-10-29T12:00:00Z"`
+}
+
+// health godoc
+// @id          getHealth
+// @Summary     Service health
+// @Description Service and database are reachable
+// @Tags        system
+// @Produce     json
+// @Success     200 {object} HealthResponse
+// @Failure     503 {object} HealthResponse
+// @Router      /health [get]
 func health(db *gorm.DB) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		if db == nil {

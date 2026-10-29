@@ -83,8 +83,8 @@ func (s *service) Create(input CreateProjectInput) (*ProjectDTO, error) {
 	}
 
 	var planDate *time.Time
-	if input.ImplementationPlan != "" {
-		t, err := time.Parse("2006-01-02", input.ImplementationPlan)
+	if input.ImplementationPlan != nil && *input.ImplementationPlan != "" {
+		t, err := time.Parse("2006-01-02", *input.ImplementationPlan)
 		if err == nil {
 			planDate = &t
 		}

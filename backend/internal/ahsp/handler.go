@@ -18,6 +18,15 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// List godoc
+// @id          listAhsps
+// @Summary     List AHSP
+// @Tags        ahsp
+// @Produce     json
+// @Param       q query string false "Search query"
+// @Success     200 {array} AhspDTO
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /ahsps [get]
 func (h *Handler) List(c fiber.Ctx) error {
 	q := c.Query("q")
 	data, err := h.svc.List(q)
@@ -27,6 +36,17 @@ func (h *Handler) List(c fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// Get godoc
+// @id          getAhsp
+// @Summary     Get AHSP by ID
+// @Tags        ahsp
+// @Produce     json
+// @Param       id path string true "AHSP ID"
+// @Success     200 {object} AhspDetailDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /ahsps/{id} [get]
 func (h *Handler) Get(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -44,6 +64,18 @@ func (h *Handler) Get(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Create godoc
+// @id          createAhsp
+// @Summary     Create AHSP
+// @Tags        ahsp
+// @Accept      json
+// @Produce     json
+// @Param       body body CreateAhspInput true "AHSP input"
+// @Success     201 {object} AhspDetailDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     409 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /ahsps [post]
 func (h *Handler) Create(c fiber.Ctx) error {
 	var input CreateAhspInput
 	if err := c.Bind().Body(&input); err != nil {
@@ -64,6 +96,20 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(dto)
 }
 
+// Update godoc
+// @id          updateAhsp
+// @Summary     Update AHSP
+// @Tags        ahsp
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "AHSP ID"
+// @Param       body body CreateAhspInput true "AHSP update data"
+// @Success     200 {object} AhspDetailDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     409 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /ahsps/{id} [put]
 func (h *Handler) Update(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -92,6 +138,16 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Delete godoc
+// @id          deleteAhsp
+// @Summary     Delete AHSP
+// @Tags        ahsp
+// @Param       id path string true "AHSP ID"
+// @Success     204 "No Content"
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /ahsps/{id} [delete]
 func (h *Handler) Delete(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {

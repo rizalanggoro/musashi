@@ -18,6 +18,16 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// ListByProject godoc
+// @id          listSchedules
+// @Summary     List project schedules
+// @Tags        schedules
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Success     200 {array} ScheduleDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id}/schedules [get]
 func (h *Handler) ListByProject(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -32,6 +42,18 @@ func (h *Handler) ListByProject(c fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// Create godoc
+// @id          createSchedule
+// @Summary     Create schedule item
+// @Tags        schedules
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Param       body body CreateScheduleInput true "Schedule input"
+// @Success     201 {object} ScheduleDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id}/schedules [post]
 func (h *Handler) Create(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -54,6 +76,19 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(dto)
 }
 
+// Update godoc
+// @id          updateSchedule
+// @Summary     Update schedule item
+// @Tags        schedules
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Schedule ID"
+// @Param       body body UpdateScheduleInput true "Schedule update data"
+// @Success     200 {object} ScheduleDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /schedules/{id} [put]
 func (h *Handler) Update(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -76,6 +111,16 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Delete godoc
+// @id          deleteSchedule
+// @Summary     Delete schedule item
+// @Tags        schedules
+// @Param       id path string true "Schedule ID"
+// @Success     204 "No Content"
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /schedules/{id} [delete]
 func (h *Handler) Delete(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {

@@ -18,6 +18,17 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// List godoc
+// @id          listVolumes
+// @Summary     List project volume rows
+// @Tags        volume
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Param       q query string false "Search query"
+// @Success     200 {array} VolumeRowDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id}/volumes [get]
 func (h *Handler) List(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -33,6 +44,18 @@ func (h *Handler) List(c fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// Create godoc
+// @id          createVolume
+// @Summary     Create volume entry
+// @Tags        volume
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Param       body body CreateVolumeInput true "Volume input"
+// @Success     201 {object} VolumeRowDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id}/volumes [post]
 func (h *Handler) Create(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -58,6 +81,19 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(dto)
 }
 
+// Update godoc
+// @id          updateVolume
+// @Summary     Update volume entry
+// @Tags        volume
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Volume row ID"
+// @Param       body body UpdateVolumeInput true "Volume update data"
+// @Success     200 {object} VolumeRowDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /volumes/{id} [put]
 func (h *Handler) Update(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -83,6 +119,16 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Delete godoc
+// @id          deleteVolume
+// @Summary     Delete volume entry
+// @Tags        volume
+// @Param       id path string true "Volume row ID"
+// @Success     204 "No Content"
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /volumes/{id} [delete]
 func (h *Handler) Delete(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {

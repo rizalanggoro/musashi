@@ -41,7 +41,7 @@ type AhspDetailDTO struct {
 }
 
 type CreateAhspItemInput struct {
-	UnitPriceID *string `json:"unit_price_id"`
+	UnitPriceID *string `json:"unit_price_id,omitempty"`
 	Category    string  `json:"category"`
 	Sort        int     `json:"sort"`
 	Description string  `json:"description"`

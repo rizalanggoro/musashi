@@ -16,6 +16,15 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// ListSummary godoc
+// @id          listBoqProjects
+// @Summary     List projects with BOQ status
+// @Tags        boq
+// @Produce     json
+// @Param       q query string false "Search query"
+// @Success     200 {array} BoqProjectSummaryDTO
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /boq/summary [get]
 func (h *Handler) ListSummary(c fiber.Ctx) error {
 	q := c.Query("q")
 	data, err := h.svc.ListSummary(q)
@@ -25,6 +34,16 @@ func (h *Handler) ListSummary(c fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// GetProjectBoq godoc
+// @id          getProjectBoq
+// @Summary     Get project BOQ items
+// @Tags        boq
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Success     200 {array} BoqItemDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id}/boq [get]
 func (h *Handler) GetProjectBoq(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {

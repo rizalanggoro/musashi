@@ -4,7 +4,7 @@ import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOption
 
 import { client } from '../client.gen';
 import { createAhsp, createProject, createRabItem, createSchedule, createUnitPrice, createVolume, deleteAhsp, deleteProject, deleteRabItem, deleteSchedule, deleteUnitPrice, deleteVolume, exportRabExcel, exportRabPdf, exportVolumeExcel, getAhsp, getCostEstimate, getHealth, getMe, getProject, getProjectBoq, getProjectRab, listAhsps, listBoqProjects, listProjects, listSchedules, listUnitPrices, listVolumes, login, logout, type Options, updateAhsp, updateProject, updateRabItem, updateSchedule, updateUnitPrice, updateVolume } from '../sdk.gen';
-import type { CreateAhspData, CreateAhspResponse, CreateProjectData, CreateProjectError, CreateProjectResponse, CreateRabItemData, CreateRabItemResponse, CreateScheduleData, CreateScheduleResponse, CreateUnitPriceData, CreateUnitPriceError, CreateUnitPriceResponse, CreateVolumeData, CreateVolumeResponse, DeleteAhspData, DeleteAhspResponse, DeleteProjectData, DeleteProjectError, DeleteProjectResponse, DeleteRabItemData, DeleteRabItemResponse, DeleteScheduleData, DeleteScheduleResponse, DeleteUnitPriceData, DeleteUnitPriceError, DeleteUnitPriceResponse, DeleteVolumeData, DeleteVolumeResponse, ExportRabExcelData, ExportRabExcelResponse, ExportRabPdfData, ExportRabPdfResponse, ExportVolumeExcelData, ExportVolumeExcelResponse, GetAhspData, GetAhspError, GetAhspResponse, GetCostEstimateData, GetCostEstimateResponse, GetHealthData, GetHealthError, GetHealthResponse, GetMeData, GetMeError, GetMeResponse, GetProjectBoqData, GetProjectBoqResponse, GetProjectData, GetProjectError, GetProjectRabData, GetProjectRabResponse, GetProjectResponse, ListAhspsData, ListAhspsResponse, ListBoqProjectsData, ListBoqProjectsResponse, ListProjectsData, ListProjectsResponse, ListSchedulesData, ListSchedulesResponse, ListUnitPricesData, ListUnitPricesResponse, ListVolumesData, ListVolumesResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutResponse, UpdateAhspData, UpdateAhspResponse, UpdateProjectData, UpdateProjectError, UpdateProjectResponse, UpdateRabItemData, UpdateRabItemResponse, UpdateScheduleData, UpdateScheduleResponse, UpdateUnitPriceData, UpdateUnitPriceResponse, UpdateVolumeData, UpdateVolumeResponse } from '../types.gen';
+import type { CreateAhspData, CreateAhspError, CreateAhspResponse, CreateProjectData, CreateProjectError, CreateProjectResponse, CreateRabItemData, CreateRabItemError, CreateRabItemResponse, CreateScheduleData, CreateScheduleError, CreateScheduleResponse, CreateUnitPriceData, CreateUnitPriceError, CreateUnitPriceResponse, CreateVolumeData, CreateVolumeError, CreateVolumeResponse, DeleteAhspData, DeleteAhspError, DeleteProjectData, DeleteProjectError, DeleteRabItemData, DeleteRabItemError, DeleteScheduleData, DeleteScheduleError, DeleteUnitPriceData, DeleteUnitPriceError, DeleteVolumeData, DeleteVolumeError, ExportRabExcelData, ExportRabExcelError, ExportRabPdfData, ExportRabPdfError, ExportVolumeExcelData, ExportVolumeExcelError, GetAhspData, GetAhspError, GetAhspResponse, GetCostEstimateData, GetCostEstimateError, GetCostEstimateResponse, GetHealthData, GetHealthError, GetHealthResponse, GetMeData, GetMeError, GetMeResponse, GetProjectBoqData, GetProjectBoqError, GetProjectBoqResponse, GetProjectData, GetProjectError, GetProjectRabData, GetProjectRabError, GetProjectRabResponse, GetProjectResponse, ListAhspsData, ListAhspsError, ListAhspsResponse, ListBoqProjectsData, ListBoqProjectsError, ListBoqProjectsResponse, ListProjectsData, ListProjectsError, ListProjectsResponse, ListSchedulesData, ListSchedulesError, ListSchedulesResponse, ListUnitPricesData, ListUnitPricesError, ListUnitPricesResponse, ListVolumesData, ListVolumesError, ListVolumesResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutResponse, UpdateAhspData, UpdateAhspError, UpdateAhspResponse, UpdateProjectData, UpdateProjectError, UpdateProjectResponse, UpdateRabItemData, UpdateRabItemError, UpdateRabItemResponse, UpdateScheduleData, UpdateScheduleError, UpdateScheduleResponse, UpdateUnitPriceData, UpdateUnitPriceError, UpdateUnitPriceResponse, UpdateVolumeData, UpdateVolumeError, UpdateVolumeResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -39,14 +39,14 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
     return [params];
 };
 
-export const getHealthQueryKey = (options?: Options<GetHealthData>) => createQueryKey('getHealth', options);
+export const listAhspsQueryKey = (options?: Options<ListAhspsData>) => createQueryKey('listAhsps', options);
 
 /**
- * Service health
+ * List AHSP
  */
-export const getHealthOptions = (options?: Options<GetHealthData>) => queryOptions<GetHealthResponse, GetHealthError, GetHealthResponse, ReturnType<typeof getHealthQueryKey>>({
+export const listAhspsOptions = (options?: Options<ListAhspsData>) => queryOptions<ListAhspsResponse, ListAhspsError, ListAhspsResponse, ReturnType<typeof listAhspsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getHealth({
+        const { data } = await listAhsps({
             ...options,
             ...queryKey[0],
             signal,
@@ -54,8 +54,77 @@ export const getHealthOptions = (options?: Options<GetHealthData>) => queryOptio
         });
         return data;
     },
-    queryKey: getHealthQueryKey(options)
+    queryKey: listAhspsQueryKey(options)
 });
+
+/**
+ * Create AHSP
+ */
+export const createAhspMutation = (options?: Partial<Options<CreateAhspData>>): UseMutationOptions<CreateAhspResponse, CreateAhspError, Options<CreateAhspData>> => {
+    const mutationOptions: UseMutationOptions<CreateAhspResponse, CreateAhspError, Options<CreateAhspData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createAhsp({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete AHSP
+ */
+export const deleteAhspMutation = (options?: Partial<Options<DeleteAhspData>>): UseMutationOptions<unknown, DeleteAhspError, Options<DeleteAhspData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteAhspError, Options<DeleteAhspData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteAhsp({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getAhspQueryKey = (options: Options<GetAhspData>) => createQueryKey('getAhsp', options);
+
+/**
+ * Get AHSP by ID
+ */
+export const getAhspOptions = (options: Options<GetAhspData>) => queryOptions<GetAhspResponse, GetAhspError, GetAhspResponse, ReturnType<typeof getAhspQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getAhsp({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getAhspQueryKey(options)
+});
+
+/**
+ * Update AHSP
+ */
+export const updateAhspMutation = (options?: Partial<Options<UpdateAhspData>>): UseMutationOptions<UpdateAhspResponse, UpdateAhspError, Options<UpdateAhspData>> => {
+    const mutationOptions: UseMutationOptions<UpdateAhspResponse, UpdateAhspError, Options<UpdateAhspData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateAhsp({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Login
@@ -109,12 +178,50 @@ export const getMeOptions = (options?: Options<GetMeData>) => queryOptions<GetMe
     queryKey: getMeQueryKey(options)
 });
 
+export const listBoqProjectsQueryKey = (options?: Options<ListBoqProjectsData>) => createQueryKey('listBoqProjects', options);
+
+/**
+ * List projects with BOQ status
+ */
+export const listBoqProjectsOptions = (options?: Options<ListBoqProjectsData>) => queryOptions<ListBoqProjectsResponse, ListBoqProjectsError, ListBoqProjectsResponse, ReturnType<typeof listBoqProjectsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listBoqProjects({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listBoqProjectsQueryKey(options)
+});
+
+export const getHealthQueryKey = (options?: Options<GetHealthData>) => createQueryKey('getHealth', options);
+
+/**
+ * Service health
+ *
+ * Service and database are reachable
+ */
+export const getHealthOptions = (options?: Options<GetHealthData>) => queryOptions<GetHealthResponse, GetHealthError, GetHealthResponse, ReturnType<typeof getHealthQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getHealth({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getHealthQueryKey(options)
+});
+
 export const listProjectsQueryKey = (options?: Options<ListProjectsData>) => createQueryKey('listProjects', options);
 
 /**
  * List projects
  */
-export const listProjectsOptions = (options?: Options<ListProjectsData>) => queryOptions<ListProjectsResponse, DefaultError, ListProjectsResponse, ReturnType<typeof listProjectsQueryKey>>({
+export const listProjectsOptions = (options?: Options<ListProjectsData>) => queryOptions<ListProjectsResponse, ListProjectsError, ListProjectsResponse, ReturnType<typeof listProjectsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await listProjects({
             ...options,
@@ -162,7 +269,7 @@ export const listProjectsInfiniteQueryKey = (options?: Options<ListProjectsData>
  * List projects
  */
 export const listProjectsInfiniteOptions = (options?: Options<ListProjectsData>) => {
-    const opts = infiniteQueryOptions<ListProjectsResponse, DefaultError, InfiniteData<ListProjectsResponse>, QueryKey<Options<ListProjectsData>>, number | Pick<QueryKey<Options<ListProjectsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    const opts = infiniteQueryOptions<ListProjectsResponse, ListProjectsError, InfiniteData<ListProjectsResponse>, QueryKey<Options<ListProjectsData>>, number | Pick<QueryKey<Options<ListProjectsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
     // @ts-ignore
     {
         queryFn: async ({ pageParam, queryKey, signal }) => {
@@ -187,7 +294,7 @@ export const listProjectsInfiniteOptions = (options?: Options<ListProjectsData>)
 };
 
 /**
- * Create new project
+ * Create project
  */
 export const createProjectMutation = (options?: Partial<Options<CreateProjectData>>): UseMutationOptions<CreateProjectResponse, CreateProjectError, Options<CreateProjectData>> => {
     const mutationOptions: UseMutationOptions<CreateProjectResponse, CreateProjectError, Options<CreateProjectData>> = {
@@ -204,10 +311,10 @@ export const createProjectMutation = (options?: Partial<Options<CreateProjectDat
 };
 
 /**
- * Delete project (soft delete)
+ * Delete project
  */
-export const deleteProjectMutation = (options?: Partial<Options<DeleteProjectData>>): UseMutationOptions<DeleteProjectResponse, DeleteProjectError, Options<DeleteProjectData>> => {
-    const mutationOptions: UseMutationOptions<DeleteProjectResponse, DeleteProjectError, Options<DeleteProjectData>> = {
+export const deleteProjectMutation = (options?: Partial<Options<DeleteProjectData>>): UseMutationOptions<unknown, DeleteProjectError, Options<DeleteProjectData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteProjectError, Options<DeleteProjectData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await deleteProject({
                 ...options,
@@ -255,12 +362,137 @@ export const updateProjectMutation = (options?: Partial<Options<UpdateProjectDat
     return mutationOptions;
 };
 
+export const getProjectBoqQueryKey = (options: Options<GetProjectBoqData>) => createQueryKey('getProjectBoq', options);
+
+/**
+ * Get project BOQ items
+ */
+export const getProjectBoqOptions = (options: Options<GetProjectBoqData>) => queryOptions<GetProjectBoqResponse, GetProjectBoqError, GetProjectBoqResponse, ReturnType<typeof getProjectBoqQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getProjectBoq({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getProjectBoqQueryKey(options)
+});
+
+export const getCostEstimateQueryKey = (options: Options<GetCostEstimateData>) => createQueryKey('getCostEstimate', options);
+
+/**
+ * Get project cost estimate summary
+ */
+export const getCostEstimateOptions = (options: Options<GetCostEstimateData>) => queryOptions<GetCostEstimateResponse, GetCostEstimateError, GetCostEstimateResponse, ReturnType<typeof getCostEstimateQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getCostEstimate({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getCostEstimateQueryKey(options)
+});
+
+export const exportRabPdfQueryKey = (options: Options<ExportRabPdfData>) => createQueryKey('exportRabPdf', options);
+
+/**
+ * Export project RAB as PDF
+ */
+export const exportRabPdfOptions = (options: Options<ExportRabPdfData>) => queryOptions<unknown, ExportRabPdfError, unknown, ReturnType<typeof exportRabPdfQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportRabPdf({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportRabPdfQueryKey(options)
+});
+
+export const exportRabExcelQueryKey = (options: Options<ExportRabExcelData>) => createQueryKey('exportRabExcel', options);
+
+/**
+ * Export project RAB as Excel
+ */
+export const exportRabExcelOptions = (options: Options<ExportRabExcelData>) => queryOptions<unknown, ExportRabExcelError, unknown, ReturnType<typeof exportRabExcelQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportRabExcel({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportRabExcelQueryKey(options)
+});
+
+export const exportVolumeExcelQueryKey = (options: Options<ExportVolumeExcelData>) => createQueryKey('exportVolumeExcel', options);
+
+/**
+ * Export project volume take-off as Excel
+ */
+export const exportVolumeExcelOptions = (options: Options<ExportVolumeExcelData>) => queryOptions<unknown, ExportVolumeExcelError, unknown, ReturnType<typeof exportVolumeExcelQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportVolumeExcel({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportVolumeExcelQueryKey(options)
+});
+
+export const getProjectRabQueryKey = (options: Options<GetProjectRabData>) => createQueryKey('getProjectRab', options);
+
+/**
+ * Get project RAB
+ */
+export const getProjectRabOptions = (options: Options<GetProjectRabData>) => queryOptions<GetProjectRabResponse, GetProjectRabError, GetProjectRabResponse, ReturnType<typeof getProjectRabQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getProjectRab({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getProjectRabQueryKey(options)
+});
+
+/**
+ * Create RAB item
+ */
+export const createRabItemMutation = (options?: Partial<Options<CreateRabItemData>>): UseMutationOptions<CreateRabItemResponse, CreateRabItemError, Options<CreateRabItemData>> => {
+    const mutationOptions: UseMutationOptions<CreateRabItemResponse, CreateRabItemError, Options<CreateRabItemData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createRabItem({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const listSchedulesQueryKey = (options: Options<ListSchedulesData>) => createQueryKey('listSchedules', options);
 
 /**
  * List project schedules
  */
-export const listSchedulesOptions = (options: Options<ListSchedulesData>) => queryOptions<ListSchedulesResponse, DefaultError, ListSchedulesResponse, ReturnType<typeof listSchedulesQueryKey>>({
+export const listSchedulesOptions = (options: Options<ListSchedulesData>) => queryOptions<ListSchedulesResponse, ListSchedulesError, ListSchedulesResponse, ReturnType<typeof listSchedulesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await listSchedules({
             ...options,
@@ -276,10 +508,79 @@ export const listSchedulesOptions = (options: Options<ListSchedulesData>) => que
 /**
  * Create schedule item
  */
-export const createScheduleMutation = (options?: Partial<Options<CreateScheduleData>>): UseMutationOptions<CreateScheduleResponse, DefaultError, Options<CreateScheduleData>> => {
-    const mutationOptions: UseMutationOptions<CreateScheduleResponse, DefaultError, Options<CreateScheduleData>> = {
+export const createScheduleMutation = (options?: Partial<Options<CreateScheduleData>>): UseMutationOptions<CreateScheduleResponse, CreateScheduleError, Options<CreateScheduleData>> => {
+    const mutationOptions: UseMutationOptions<CreateScheduleResponse, CreateScheduleError, Options<CreateScheduleData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await createSchedule({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listVolumesQueryKey = (options: Options<ListVolumesData>) => createQueryKey('listVolumes', options);
+
+/**
+ * List project volume rows
+ */
+export const listVolumesOptions = (options: Options<ListVolumesData>) => queryOptions<ListVolumesResponse, ListVolumesError, ListVolumesResponse, ReturnType<typeof listVolumesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listVolumes({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listVolumesQueryKey(options)
+});
+
+/**
+ * Create volume entry
+ */
+export const createVolumeMutation = (options?: Partial<Options<CreateVolumeData>>): UseMutationOptions<CreateVolumeResponse, CreateVolumeError, Options<CreateVolumeData>> => {
+    const mutationOptions: UseMutationOptions<CreateVolumeResponse, CreateVolumeError, Options<CreateVolumeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createVolume({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete RAB item
+ */
+export const deleteRabItemMutation = (options?: Partial<Options<DeleteRabItemData>>): UseMutationOptions<unknown, DeleteRabItemError, Options<DeleteRabItemData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteRabItemError, Options<DeleteRabItemData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteRabItem({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update RAB item
+ */
+export const updateRabItemMutation = (options?: Partial<Options<UpdateRabItemData>>): UseMutationOptions<UpdateRabItemResponse, UpdateRabItemError, Options<UpdateRabItemData>> => {
+    const mutationOptions: UseMutationOptions<UpdateRabItemResponse, UpdateRabItemError, Options<UpdateRabItemData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateRabItem({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -293,8 +594,8 @@ export const createScheduleMutation = (options?: Partial<Options<CreateScheduleD
 /**
  * Delete schedule item
  */
-export const deleteScheduleMutation = (options?: Partial<Options<DeleteScheduleData>>): UseMutationOptions<DeleteScheduleResponse, DefaultError, Options<DeleteScheduleData>> => {
-    const mutationOptions: UseMutationOptions<DeleteScheduleResponse, DefaultError, Options<DeleteScheduleData>> = {
+export const deleteScheduleMutation = (options?: Partial<Options<DeleteScheduleData>>): UseMutationOptions<unknown, DeleteScheduleError, Options<DeleteScheduleData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteScheduleError, Options<DeleteScheduleData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await deleteSchedule({
                 ...options,
@@ -310,8 +611,8 @@ export const deleteScheduleMutation = (options?: Partial<Options<DeleteScheduleD
 /**
  * Update schedule item
  */
-export const updateScheduleMutation = (options?: Partial<Options<UpdateScheduleData>>): UseMutationOptions<UpdateScheduleResponse, DefaultError, Options<UpdateScheduleData>> => {
-    const mutationOptions: UseMutationOptions<UpdateScheduleResponse, DefaultError, Options<UpdateScheduleData>> = {
+export const updateScheduleMutation = (options?: Partial<Options<UpdateScheduleData>>): UseMutationOptions<UpdateScheduleResponse, UpdateScheduleError, Options<UpdateScheduleData>> => {
+    const mutationOptions: UseMutationOptions<UpdateScheduleResponse, UpdateScheduleError, Options<UpdateScheduleData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await updateSchedule({
                 ...options,
@@ -329,7 +630,7 @@ export const listUnitPricesQueryKey = (options?: Options<ListUnitPricesData>) =>
 /**
  * List unit prices
  */
-export const listUnitPricesOptions = (options?: Options<ListUnitPricesData>) => queryOptions<ListUnitPricesResponse, DefaultError, ListUnitPricesResponse, ReturnType<typeof listUnitPricesQueryKey>>({
+export const listUnitPricesOptions = (options?: Options<ListUnitPricesData>) => queryOptions<ListUnitPricesResponse, ListUnitPricesError, ListUnitPricesResponse, ReturnType<typeof listUnitPricesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await listUnitPrices({
             ...options,
@@ -362,8 +663,8 @@ export const createUnitPriceMutation = (options?: Partial<Options<CreateUnitPric
 /**
  * Delete unit price
  */
-export const deleteUnitPriceMutation = (options?: Partial<Options<DeleteUnitPriceData>>): UseMutationOptions<DeleteUnitPriceResponse, DeleteUnitPriceError, Options<DeleteUnitPriceData>> => {
-    const mutationOptions: UseMutationOptions<DeleteUnitPriceResponse, DeleteUnitPriceError, Options<DeleteUnitPriceData>> = {
+export const deleteUnitPriceMutation = (options?: Partial<Options<DeleteUnitPriceData>>): UseMutationOptions<unknown, DeleteUnitPriceError, Options<DeleteUnitPriceData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteUnitPriceError, Options<DeleteUnitPriceData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await deleteUnitPrice({
                 ...options,
@@ -379,8 +680,8 @@ export const deleteUnitPriceMutation = (options?: Partial<Options<DeleteUnitPric
 /**
  * Update unit price
  */
-export const updateUnitPriceMutation = (options?: Partial<Options<UpdateUnitPriceData>>): UseMutationOptions<UpdateUnitPriceResponse, DefaultError, Options<UpdateUnitPriceData>> => {
-    const mutationOptions: UseMutationOptions<UpdateUnitPriceResponse, DefaultError, Options<UpdateUnitPriceData>> = {
+export const updateUnitPriceMutation = (options?: Partial<Options<UpdateUnitPriceData>>): UseMutationOptions<UpdateUnitPriceResponse, UpdateUnitPriceError, Options<UpdateUnitPriceData>> => {
+    const mutationOptions: UseMutationOptions<UpdateUnitPriceResponse, UpdateUnitPriceError, Options<UpdateUnitPriceData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await updateUnitPrice({
                 ...options,
@@ -393,169 +694,11 @@ export const updateUnitPriceMutation = (options?: Partial<Options<UpdateUnitPric
     return mutationOptions;
 };
 
-export const listAhspsQueryKey = (options?: Options<ListAhspsData>) => createQueryKey('listAhsps', options);
-
 /**
- * List AHSPs
+ * Delete volume entry
  */
-export const listAhspsOptions = (options?: Options<ListAhspsData>) => queryOptions<ListAhspsResponse, DefaultError, ListAhspsResponse, ReturnType<typeof listAhspsQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await listAhsps({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: listAhspsQueryKey(options)
-});
-
-/**
- * Create AHSP
- */
-export const createAhspMutation = (options?: Partial<Options<CreateAhspData>>): UseMutationOptions<CreateAhspResponse, DefaultError, Options<CreateAhspData>> => {
-    const mutationOptions: UseMutationOptions<CreateAhspResponse, DefaultError, Options<CreateAhspData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createAhsp({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Delete AHSP
- */
-export const deleteAhspMutation = (options?: Partial<Options<DeleteAhspData>>): UseMutationOptions<DeleteAhspResponse, DefaultError, Options<DeleteAhspData>> => {
-    const mutationOptions: UseMutationOptions<DeleteAhspResponse, DefaultError, Options<DeleteAhspData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteAhsp({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const getAhspQueryKey = (options: Options<GetAhspData>) => createQueryKey('getAhsp', options);
-
-/**
- * Get AHSP detail with items
- */
-export const getAhspOptions = (options: Options<GetAhspData>) => queryOptions<GetAhspResponse, GetAhspError, GetAhspResponse, ReturnType<typeof getAhspQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getAhsp({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getAhspQueryKey(options)
-});
-
-/**
- * Update AHSP
- */
-export const updateAhspMutation = (options?: Partial<Options<UpdateAhspData>>): UseMutationOptions<UpdateAhspResponse, DefaultError, Options<UpdateAhspData>> => {
-    const mutationOptions: UseMutationOptions<UpdateAhspResponse, DefaultError, Options<UpdateAhspData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await updateAhsp({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const listBoqProjectsQueryKey = (options?: Options<ListBoqProjectsData>) => createQueryKey('listBoqProjects', options);
-
-/**
- * List projects with BOQ status
- */
-export const listBoqProjectsOptions = (options?: Options<ListBoqProjectsData>) => queryOptions<ListBoqProjectsResponse, DefaultError, ListBoqProjectsResponse, ReturnType<typeof listBoqProjectsQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await listBoqProjects({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: listBoqProjectsQueryKey(options)
-});
-
-export const getProjectBoqQueryKey = (options: Options<GetProjectBoqData>) => createQueryKey('getProjectBoq', options);
-
-/**
- * Get project BOQ items
- */
-export const getProjectBoqOptions = (options: Options<GetProjectBoqData>) => queryOptions<GetProjectBoqResponse, DefaultError, GetProjectBoqResponse, ReturnType<typeof getProjectBoqQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getProjectBoq({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getProjectBoqQueryKey(options)
-});
-
-export const listVolumesQueryKey = (options: Options<ListVolumesData>) => createQueryKey('listVolumes', options);
-
-/**
- * List project volume take-offs
- */
-export const listVolumesOptions = (options: Options<ListVolumesData>) => queryOptions<ListVolumesResponse, DefaultError, ListVolumesResponse, ReturnType<typeof listVolumesQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await listVolumes({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: listVolumesQueryKey(options)
-});
-
-/**
- * Add volume take-off row
- */
-export const createVolumeMutation = (options?: Partial<Options<CreateVolumeData>>): UseMutationOptions<CreateVolumeResponse, DefaultError, Options<CreateVolumeData>> => {
-    const mutationOptions: UseMutationOptions<CreateVolumeResponse, DefaultError, Options<CreateVolumeData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createVolume({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Delete volume take-off row
- */
-export const deleteVolumeMutation = (options?: Partial<Options<DeleteVolumeData>>): UseMutationOptions<DeleteVolumeResponse, DefaultError, Options<DeleteVolumeData>> => {
-    const mutationOptions: UseMutationOptions<DeleteVolumeResponse, DefaultError, Options<DeleteVolumeData>> = {
+export const deleteVolumeMutation = (options?: Partial<Options<DeleteVolumeData>>): UseMutationOptions<unknown, DeleteVolumeError, Options<DeleteVolumeData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteVolumeError, Options<DeleteVolumeData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await deleteVolume({
                 ...options,
@@ -569,10 +712,10 @@ export const deleteVolumeMutation = (options?: Partial<Options<DeleteVolumeData>
 };
 
 /**
- * Update volume take-off row
+ * Update volume entry
  */
-export const updateVolumeMutation = (options?: Partial<Options<UpdateVolumeData>>): UseMutationOptions<UpdateVolumeResponse, DefaultError, Options<UpdateVolumeData>> => {
-    const mutationOptions: UseMutationOptions<UpdateVolumeResponse, DefaultError, Options<UpdateVolumeData>> = {
+export const updateVolumeMutation = (options?: Partial<Options<UpdateVolumeData>>): UseMutationOptions<UpdateVolumeResponse, UpdateVolumeError, Options<UpdateVolumeData>> => {
+    const mutationOptions: UseMutationOptions<UpdateVolumeResponse, UpdateVolumeError, Options<UpdateVolumeData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await updateVolume({
                 ...options,
@@ -584,144 +727,3 @@ export const updateVolumeMutation = (options?: Partial<Options<UpdateVolumeData>
     };
     return mutationOptions;
 };
-
-export const getProjectRabQueryKey = (options: Options<GetProjectRabData>) => createQueryKey('getProjectRab', options);
-
-/**
- * Get project RAB
- */
-export const getProjectRabOptions = (options: Options<GetProjectRabData>) => queryOptions<GetProjectRabResponse, DefaultError, GetProjectRabResponse, ReturnType<typeof getProjectRabQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getProjectRab({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getProjectRabQueryKey(options)
-});
-
-/**
- * Add RAB item
- */
-export const createRabItemMutation = (options?: Partial<Options<CreateRabItemData>>): UseMutationOptions<CreateRabItemResponse, DefaultError, Options<CreateRabItemData>> => {
-    const mutationOptions: UseMutationOptions<CreateRabItemResponse, DefaultError, Options<CreateRabItemData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createRabItem({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Delete RAB item
- */
-export const deleteRabItemMutation = (options?: Partial<Options<DeleteRabItemData>>): UseMutationOptions<DeleteRabItemResponse, DefaultError, Options<DeleteRabItemData>> => {
-    const mutationOptions: UseMutationOptions<DeleteRabItemResponse, DefaultError, Options<DeleteRabItemData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteRabItem({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Update RAB item
- */
-export const updateRabItemMutation = (options?: Partial<Options<UpdateRabItemData>>): UseMutationOptions<UpdateRabItemResponse, DefaultError, Options<UpdateRabItemData>> => {
-    const mutationOptions: UseMutationOptions<UpdateRabItemResponse, DefaultError, Options<UpdateRabItemData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await updateRabItem({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const getCostEstimateQueryKey = (options: Options<GetCostEstimateData>) => createQueryKey('getCostEstimate', options);
-
-/**
- * Get project cost estimate summary
- */
-export const getCostEstimateOptions = (options: Options<GetCostEstimateData>) => queryOptions<GetCostEstimateResponse, DefaultError, GetCostEstimateResponse, ReturnType<typeof getCostEstimateQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getCostEstimate({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getCostEstimateQueryKey(options)
-});
-
-export const exportVolumeExcelQueryKey = (options: Options<ExportVolumeExcelData>) => createQueryKey('exportVolumeExcel', options);
-
-/**
- * Export project volume take-off as Excel
- */
-export const exportVolumeExcelOptions = (options: Options<ExportVolumeExcelData>) => queryOptions<ExportVolumeExcelResponse, DefaultError, ExportVolumeExcelResponse, ReturnType<typeof exportVolumeExcelQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await exportVolumeExcel({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: exportVolumeExcelQueryKey(options)
-});
-
-export const exportRabExcelQueryKey = (options: Options<ExportRabExcelData>) => createQueryKey('exportRabExcel', options);
-
-/**
- * Export project RAB as Excel
- */
-export const exportRabExcelOptions = (options: Options<ExportRabExcelData>) => queryOptions<ExportRabExcelResponse, DefaultError, ExportRabExcelResponse, ReturnType<typeof exportRabExcelQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await exportRabExcel({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: exportRabExcelQueryKey(options)
-});
-
-export const exportRabPdfQueryKey = (options: Options<ExportRabPdfData>) => createQueryKey('exportRabPdf', options);
-
-/**
- * Export project RAB as PDF
- */
-export const exportRabPdfOptions = (options: Options<ExportRabPdfData>) => queryOptions<ExportRabPdfResponse, DefaultError, ExportRabPdfResponse, ReturnType<typeof exportRabPdfQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await exportRabPdf({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: exportRabPdfQueryKey(options)
-});

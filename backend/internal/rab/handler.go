@@ -18,6 +18,17 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// GetProjectRab godoc
+// @id          getProjectRab
+// @Summary     Get project RAB
+// @Tags        rab
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Param       q query string false "Search query"
+// @Success     200 {object} RabResponseDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id}/rab [get]
 func (h *Handler) GetProjectRab(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -33,6 +44,18 @@ func (h *Handler) GetProjectRab(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Create godoc
+// @id          createRabItem
+// @Summary     Create RAB item
+// @Tags        rab
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Project ID"
+// @Param       body body CreateRabItemInput true "RAB item input"
+// @Success     201 {object} RabItemDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /projects/{id}/rab [post]
 func (h *Handler) Create(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -55,6 +78,19 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(dto)
 }
 
+// Update godoc
+// @id          updateRabItem
+// @Summary     Update RAB item
+// @Tags        rab
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "RAB item ID"
+// @Param       body body UpdateRabItemInput true "RAB item update data"
+// @Success     200 {object} RabItemDTO
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /rab/{id} [put]
 func (h *Handler) Update(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -77,6 +113,16 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	return c.JSON(dto)
 }
 
+// Delete godoc
+// @id          deleteRabItem
+// @Summary     Delete RAB item
+// @Tags        rab
+// @Param       id path string true "RAB item ID"
+// @Success     204 "No Content"
+// @Failure     400 {object} httperr.ErrorResponse
+// @Failure     404 {object} httperr.ErrorResponse
+// @Failure     500 {object} httperr.ErrorResponse
+// @Router      /rab/{id} [delete]
 func (h *Handler) Delete(c fiber.Ctx) error {
 	id, err := utils.ParseID(c.Params("id"))
 	if err != nil {

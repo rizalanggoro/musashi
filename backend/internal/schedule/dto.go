@@ -31,13 +31,13 @@ type CreateScheduleInput struct {
 }
 
 type UpdateScheduleInput struct {
-	Code      *string `json:"code"`
-	WorkItem  *string `json:"work_item"`
-	StartDate *string `json:"start_date"`
-	EndDate   *string `json:"end_date"`
-	Weight    *string `json:"weight"`
-	Progress  *string `json:"progress"`
-	Status    *string `json:"status"`
+	Code      *string `json:"code,omitempty"`
+	WorkItem  *string `json:"work_item,omitempty"`
+	StartDate *string `json:"start_date,omitempty"`
+	EndDate   *string `json:"end_date,omitempty"`
+	Weight    *string `json:"weight,omitempty"`
+	Progress  *string `json:"progress,omitempty"`
+	Status    *string `json:"status,omitempty"`
 }
 
 func toDTO(s *domain.Schedule) ScheduleDTO {

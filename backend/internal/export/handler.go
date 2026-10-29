@@ -19,6 +19,17 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
+// VolumeExcel godoc
+// @id          exportVolumeExcel
+// @Summary     Export project volume take-off as Excel
+// @Tags        export
+// @Produce     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @Param       id   path      string  true  "Project ID"
+// @Success     200  {file}    binary
+// @Failure     400  {object}  httperr.ErrorResponse
+// @Failure     404  {object}  httperr.ErrorResponse
+// @Failure     500  {object}  httperr.ErrorResponse
+// @Router      /projects/{id}/exports/volume.xlsx [get]
 func (h *Handler) VolumeExcel(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -38,6 +49,17 @@ func (h *Handler) VolumeExcel(c fiber.Ctx) error {
 	return c.Send(data)
 }
 
+// RabExcel godoc
+// @id          exportRabExcel
+// @Summary     Export project RAB as Excel
+// @Tags        export
+// @Produce     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @Param       id   path      string  true  "Project ID"
+// @Success     200  {file}    binary
+// @Failure     400  {object}  httperr.ErrorResponse
+// @Failure     404  {object}  httperr.ErrorResponse
+// @Failure     500  {object}  httperr.ErrorResponse
+// @Router      /projects/{id}/exports/rab.xlsx [get]
 func (h *Handler) RabExcel(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
@@ -57,6 +79,17 @@ func (h *Handler) RabExcel(c fiber.Ctx) error {
 	return c.Send(data)
 }
 
+// RabPdf godoc
+// @id          exportRabPdf
+// @Summary     Export project RAB as PDF
+// @Tags        export
+// @Produce     application/pdf
+// @Param       id   path      string  true  "Project ID"
+// @Success     200  {file}    binary
+// @Failure     400  {object}  httperr.ErrorResponse
+// @Failure     404  {object}  httperr.ErrorResponse
+// @Failure     500  {object}  httperr.ErrorResponse
+// @Router      /projects/{id}/exports/rab.pdf [get]
 func (h *Handler) RabPdf(c fiber.Ctx) error {
 	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {

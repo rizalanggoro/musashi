@@ -26,7 +26,7 @@ type RabResponseDTO struct {
 }
 
 type CreateRabItemInput struct {
-	BoqItemID *string `json:"boq_item_id"`
+	BoqItemID *string `json:"boq_item_id,omitempty"`
 	WorkItem  string  `json:"work_item"`
 	Unit      string  `json:"unit"`
 	Volume    string  `json:"volume"`
@@ -34,10 +34,10 @@ type CreateRabItemInput struct {
 }
 
 type UpdateRabItemInput struct {
-	WorkItem  *string `json:"work_item"`
-	Unit      *string `json:"unit"`
-	Volume    *string `json:"volume"`
-	UnitPrice *string `json:"unit_price"`
+	WorkItem  *string `json:"work_item,omitempty"`
+	Unit      *string `json:"unit,omitempty"`
+	Volume    *string `json:"volume,omitempty"`
+	UnitPrice *string `json:"unit_price,omitempty"`
 }
 
 func toDTO(item *domain.RabItem) RabItemDTO {

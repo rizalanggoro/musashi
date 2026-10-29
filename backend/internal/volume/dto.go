@@ -24,26 +24,26 @@ type VolumeRowDTO struct {
 }
 
 type CreateVolumeInput struct {
-	BoqItemID     *string `json:"boq_item_id"`
-	AhspID        *string `json:"ahsp_id"`
+	BoqItemID     *string `json:"boq_item_id,omitempty"`
+	AhspID        *string `json:"ahsp_id,omitempty"`
 	WorkItem      string  `json:"work_item"`
 	Unit          string  `json:"unit"`
 	PlannedVolume string  `json:"planned_volume"`
-	Date          string  `json:"date"`
-	Length        *string `json:"length"`
-	Width         *string `json:"width"`
-	Height        *string `json:"height"`
+	Date          *string `json:"date,omitempty"`
+	Length        *string `json:"length,omitempty"`
+	Width         *string `json:"width,omitempty"`
+	Height        *string `json:"height,omitempty"`
 	UnitWeight    string  `json:"unit_weight"`
 	Description   string  `json:"description"`
 }
 
 type UpdateVolumeInput struct {
-	Date        *string `json:"date"`
-	Length      *string `json:"length"`
-	Width       *string `json:"width"`
-	Height      *string `json:"height"`
-	UnitWeight  *string `json:"unit_weight"`
-	Description *string `json:"description"`
+	Date        *string `json:"date,omitempty"`
+	Length      *string `json:"length,omitempty"`
+	Width       *string `json:"width,omitempty"`
+	Height      *string `json:"height,omitempty"`
+	UnitWeight  *string `json:"unit_weight,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 type VolumeRowQueryResult struct {

@@ -135,12 +135,13 @@ func TestProjectService(t *testing.T) {
 		}
 
 		// Success
+		plan := "2026-06-01"
 		created, err := svc.Create(CreateProjectInput{
 			Name:               "New Project",
 			Section:            "Sipil",
 			Plant:              "Plant 1",
 			Budget:             "1000000",
-			ImplementationPlan: "2026-06-01",
+			ImplementationPlan: &plan,
 		})
 		if err != nil || created.Name != "New Project" {
 			t.Fatalf("unexpected error creating project: %v", err)
