@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type BoqProjectSummaryDTO struct {
@@ -26,14 +27,14 @@ type BoqItemDTO struct {
 
 func toItemDTO(item *domain.BoqItem) BoqItemDTO {
 	d := BoqItemDTO{
-		ID:            item.ID.String(),
-		ProjectID:     item.ProjectID.String(),
+		ID:            utils.FormatID(item.ID),
+		ProjectID:     utils.FormatID(item.ProjectID),
 		WorkItem:      item.WorkItem,
 		Unit:          item.Unit,
 		PlannedVolume: fmt.Sprintf("%.4f", item.PlannedVolume),
 	}
 	if item.AhspID != nil {
-		s := item.AhspID.String()
+		s := utils.FormatID(*item.AhspID)
 		d.AhspID = &s
 	}
 	return d

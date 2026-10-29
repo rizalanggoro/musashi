@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { LogIn, Construction } from 'lucide-react'
 
-export const Route = createFileRoute('/auth')({
+export const Route = createFileRoute('/auth/')({
   component: AuthPage,
 })
 

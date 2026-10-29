@@ -3,14 +3,13 @@ package boq
 import (
 	"strings"
 
-	"github.com/google/uuid"
-
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type Service interface {
 	ListSummary(q string) ([]BoqProjectSummaryDTO, error)
-	GetProjectBoq(projectID uuid.UUID) ([]BoqItemDTO, error)
+	GetProjectBoq(projectID uint) ([]BoqItemDTO, error)
 }
 
 type service struct {
@@ -61,7 +60,7 @@ func (s *service) ListSummary(q string) ([]BoqProjectSummaryDTO, error) {
 		volStatus, rabStatus := calculateStatuses(p, counts)
 
 		results[i] = BoqProjectSummaryDTO{
-			ID:           p.ID.String(),
+			ID:           utils.FormatID(p.ID),
 			Name:         p.Name,
 			Section:      p.Section,
 			Plant:        p.Plant,
@@ -73,15 +72,15 @@ func (s *service) ListSummary(q string) ([]BoqProjectSummaryDTO, error) {
 	return results, nil
 }
 
-func (s *service) GetProjectBoq(projectID uuid.UUID) ([]BoqItemDTO, error) {
+func (s *service) GetProjectBoq(projectID uint) ([]BoqItemDTO, error) {
 	items, err := s.repo.GetBoqItems(projectID)
 	if err != nil {
 		return nil, err
 	}
 
-	dto := make([]BoqItemDTO, len(items))
-	for i, item := range items {
-		dto[i] = toItemDTO(&item)
+	data := make([]BoqItemDTO, len(items))
+	for i := range items {
+		data[i] = toItemDTO(&items[i])
 	}
-	return dto, nil
+	return data, nil
 }

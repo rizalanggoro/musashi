@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 var (
@@ -18,10 +18,10 @@ var (
 )
 
 type Service interface {
-	GetProjectRab(projectID uuid.UUID, q string) (*RabResponseDTO, error)
-	Create(projectID uuid.UUID, input CreateRabItemInput) (*RabItemDTO, error)
-	Update(id uuid.UUID, input UpdateRabItemInput) (*RabItemDTO, error)
-	Delete(id uuid.UUID) error
+	GetProjectRab(projectID uint, q string) (*RabResponseDTO, error)
+	Create(projectID uint, input CreateRabItemInput) (*RabItemDTO, error)
+	Update(id uint, input UpdateRabItemInput) (*RabItemDTO, error)
+	Delete(id uint) error
 }
 
 type service struct {
@@ -39,7 +39,7 @@ func roundHalfUp(val float64) int64 {
 	return int64(math.Floor(val + 0.5))
 }
 
-func (s *service) GetProjectRab(projectID uuid.UUID, q string) (*RabResponseDTO, error) {
+func (s *service) GetProjectRab(projectID uint, q string) (*RabResponseDTO, error) {
 	items, err := s.repo.ListByProjectID(projectID, strings.TrimSpace(q))
 	if err != nil {
 		return nil, err
@@ -53,13 +53,13 @@ func (s *service) GetProjectRab(projectID uuid.UUID, q string) (*RabResponseDTO,
 	}
 
 	return &RabResponseDTO{
-		ProjectID: projectID.String(),
+		ProjectID: utils.FormatID(projectID),
 		Items:     itemsDTO,
 		TotalRab:  strconv.FormatInt(totalRab, 10),
 	}, nil
 }
 
-func (s *service) Create(projectID uuid.UUID, input CreateRabItemInput) (*RabItemDTO, error) {
+func (s *service) Create(projectID uint, input CreateRabItemInput) (*RabItemDTO, error) {
 	if strings.TrimSpace(input.WorkItem) == "" || strings.TrimSpace(input.Unit) == "" {
 		return nil, ErrRequiredRabField
 	}
@@ -68,9 +68,9 @@ func (s *service) Create(projectID uuid.UUID, input CreateRabItemInput) (*RabIte
 	price, _ := strconv.ParseInt(input.UnitPrice, 10, 64)
 	totalCost := roundHalfUp(vol * float64(price))
 
-	var boqID *uuid.UUID
+	var boqID *uint
 	if input.BoqItemID != nil && *input.BoqItemID != "" {
-		if parsed, err := uuid.Parse(*input.BoqItemID); err == nil {
+		if parsed, err := utils.ParseID(*input.BoqItemID); err == nil {
 			boqID = &parsed
 		}
 	}
@@ -93,7 +93,7 @@ func (s *service) Create(projectID uuid.UUID, input CreateRabItemInput) (*RabIte
 	return &dto, nil
 }
 
-func (s *service) Update(id uuid.UUID, input UpdateRabItemInput) (*RabItemDTO, error) {
+func (s *service) Update(id uint, input UpdateRabItemInput) (*RabItemDTO, error) {
 	item, err := s.repo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -126,7 +126,7 @@ func (s *service) Update(id uuid.UUID, input UpdateRabItemInput) (*RabItemDTO, e
 	return &dto, nil
 }
 
-func (s *service) Delete(id uuid.UUID) error {
+func (s *service) Delete(id uint) error {
 	deleted, err := s.repo.Delete(id)
 	if err != nil {
 		return err

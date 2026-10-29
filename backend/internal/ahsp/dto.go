@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type AhspDTO struct {
@@ -61,7 +62,7 @@ type CreateAhspInput struct {
 
 func toAhspDTO(a *domain.Ahsp) AhspDTO {
 	return AhspDTO{
-		ID:                a.ID.String(),
+		ID:                utils.FormatID(a.ID),
 		Code:              a.Code,
 		WorkItem:          a.WorkItem,
 		Unit:              a.Unit,
@@ -77,7 +78,7 @@ func toAhspDTO(a *domain.Ahsp) AhspDTO {
 
 func toItemDTO(item *domain.AhspItem) AhspItemDTO {
 	dto := AhspItemDTO{
-		ID:          item.ID.String(),
+		ID:          utils.FormatID(item.ID),
 		Category:    string(item.Category),
 		Sort:        item.Sort,
 		Description: item.Description,
@@ -88,7 +89,7 @@ func toItemDTO(item *domain.AhspItem) AhspItemDTO {
 		Cost:        strconv.FormatInt(item.Cost, 10),
 	}
 	if item.UnitPriceID != nil {
-		s := item.UnitPriceID.String()
+		s := utils.FormatID(*item.UnitPriceID)
 		dto.UnitPriceID = &s
 	}
 	return dto

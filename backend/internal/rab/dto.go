@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type RabItemDTO struct {
@@ -41,8 +42,8 @@ type UpdateRabItemInput struct {
 
 func toDTO(item *domain.RabItem) RabItemDTO {
 	dto := RabItemDTO{
-		ID:        item.ID.String(),
-		ProjectID: item.ProjectID.String(),
+		ID:        utils.FormatID(item.ID),
+		ProjectID: utils.FormatID(item.ProjectID),
 		WorkItem:  item.WorkItem,
 		Unit:      item.Unit,
 		Volume:    fmt.Sprintf("%.4f", item.Volume),
@@ -50,7 +51,7 @@ func toDTO(item *domain.RabItem) RabItemDTO {
 		TotalCost: strconv.FormatInt(item.TotalCost, 10),
 	}
 	if item.BoqItemID != nil {
-		s := item.BoqItemID.String()
+		s := utils.FormatID(*item.BoqItemID)
 		dto.BoqItemID = &s
 	}
 	return dto

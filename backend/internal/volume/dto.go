@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type VolumeRowDTO struct {
@@ -54,8 +55,8 @@ type VolumeRowQueryResult struct {
 
 func toRowDTO(v *domain.Volume, b *domain.BoqItem) VolumeRowDTO {
 	dto := VolumeRowDTO{
-		ID:            v.ID.String(),
-		BoqItemID:     v.BoqItemID.String(),
+		ID:            utils.FormatID(v.ID),
+		BoqItemID:     utils.FormatID(v.BoqItemID),
 		WorkItem:      b.WorkItem,
 		Unit:          b.Unit,
 		PlannedVolume: fmt.Sprintf("%.4f", b.PlannedVolume),

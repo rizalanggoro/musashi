@@ -10,117 +10,117 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AhspRouteImport } from './routes/ahsp'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as BoqRouteImport } from './routes/boq'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ProjectsRouteImport } from './routes/projects'
-import { Route as RabRouteImport } from './routes/rab'
-import { Route as ScheduleRouteImport } from './routes/schedule'
-import { Route as UnitPricesRouteImport } from './routes/unit-prices'
-import { Route as VolumeRouteImport } from './routes/volume'
+import { Route as AhspIndexRouteImport } from './routes/ahsp/index'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as BoqIndexRouteImport } from './routes/boq/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
+import { Route as RabIndexRouteImport } from './routes/rab/index'
+import { Route as ScheduleIndexRouteImport } from './routes/schedule/index'
+import { Route as UnitPricesIndexRouteImport } from './routes/unit-prices/index'
+import { Route as VolumeIndexRouteImport } from './routes/volume/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AhspRoute = AhspRouteImport.update({
-  id: '/ahsp',
-  path: '/ahsp',
+const AhspIndexRoute = AhspIndexRouteImport.update({
+  id: '/ahsp/',
+  path: '/ahsp/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BoqRoute = BoqRouteImport.update({
-  id: '/boq',
-  path: '/boq',
+const BoqIndexRoute = BoqIndexRouteImport.update({
+  id: '/boq/',
+  path: '/boq/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProjectsRoute = ProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RabRoute = RabRouteImport.update({
-  id: '/rab',
-  path: '/rab',
+const RabIndexRoute = RabIndexRouteImport.update({
+  id: '/rab/',
+  path: '/rab/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ScheduleRoute = ScheduleRouteImport.update({
-  id: '/schedule',
-  path: '/schedule',
+const ScheduleIndexRoute = ScheduleIndexRouteImport.update({
+  id: '/schedule/',
+  path: '/schedule/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UnitPricesRoute = UnitPricesRouteImport.update({
-  id: '/unit-prices',
-  path: '/unit-prices',
+const UnitPricesIndexRoute = UnitPricesIndexRouteImport.update({
+  id: '/unit-prices/',
+  path: '/unit-prices/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VolumeRoute = VolumeRouteImport.update({
-  id: '/volume',
-  path: '/volume',
+const VolumeIndexRoute = VolumeIndexRouteImport.update({
+  id: '/volume/',
+  path: '/volume/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/ahsp': typeof AhspRoute
-  '/auth': typeof AuthRoute
-  '/boq': typeof BoqRoute
-  '/login': typeof LoginRoute
-  '/projects': typeof ProjectsRoute
-  '/rab': typeof RabRoute
-  '/schedule': typeof ScheduleRoute
-  '/unit-prices': typeof UnitPricesRoute
-  '/volume': typeof VolumeRoute
+  '/ahsp/': typeof AhspIndexRoute
+  '/auth/': typeof AuthIndexRoute
+  '/boq/': typeof BoqIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/rab/': typeof RabIndexRoute
+  '/schedule/': typeof ScheduleIndexRoute
+  '/unit-prices/': typeof UnitPricesIndexRoute
+  '/volume/': typeof VolumeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/ahsp': typeof AhspRoute
-  '/auth': typeof AuthRoute
-  '/boq': typeof BoqRoute
-  '/login': typeof LoginRoute
-  '/projects': typeof ProjectsRoute
-  '/rab': typeof RabRoute
-  '/schedule': typeof ScheduleRoute
-  '/unit-prices': typeof UnitPricesRoute
-  '/volume': typeof VolumeRoute
+  '/ahsp': typeof AhspIndexRoute
+  '/auth': typeof AuthIndexRoute
+  '/boq': typeof BoqIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/projects': typeof ProjectsIndexRoute
+  '/rab': typeof RabIndexRoute
+  '/schedule': typeof ScheduleIndexRoute
+  '/unit-prices': typeof UnitPricesIndexRoute
+  '/volume': typeof VolumeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/ahsp': typeof AhspRoute
-  '/auth': typeof AuthRoute
-  '/boq': typeof BoqRoute
-  '/login': typeof LoginRoute
-  '/projects': typeof ProjectsRoute
-  '/rab': typeof RabRoute
-  '/schedule': typeof ScheduleRoute
-  '/unit-prices': typeof UnitPricesRoute
-  '/volume': typeof VolumeRoute
+  '/ahsp/': typeof AhspIndexRoute
+  '/auth/': typeof AuthIndexRoute
+  '/boq/': typeof BoqIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/rab/': typeof RabIndexRoute
+  '/schedule/': typeof ScheduleIndexRoute
+  '/unit-prices/': typeof UnitPricesIndexRoute
+  '/volume/': typeof VolumeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/ahsp'
-    | '/auth'
-    | '/boq'
-    | '/login'
-    | '/projects'
-    | '/rab'
-    | '/schedule'
-    | '/unit-prices'
-    | '/volume'
+    | '/ahsp/'
+    | '/auth/'
+    | '/boq/'
+    | '/login/'
+    | '/projects/'
+    | '/rab/'
+    | '/schedule/'
+    | '/unit-prices/'
+    | '/volume/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -136,28 +136,28 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/ahsp'
-    | '/auth'
-    | '/boq'
-    | '/login'
-    | '/projects'
-    | '/rab'
-    | '/schedule'
-    | '/unit-prices'
-    | '/volume'
+    | '/ahsp/'
+    | '/auth/'
+    | '/boq/'
+    | '/login/'
+    | '/projects/'
+    | '/rab/'
+    | '/schedule/'
+    | '/unit-prices/'
+    | '/volume/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AhspRoute: typeof AhspRoute
-  AuthRoute: typeof AuthRoute
-  BoqRoute: typeof BoqRoute
-  LoginRoute: typeof LoginRoute
-  ProjectsRoute: typeof ProjectsRoute
-  RabRoute: typeof RabRoute
-  ScheduleRoute: typeof ScheduleRoute
-  UnitPricesRoute: typeof UnitPricesRoute
-  VolumeRoute: typeof VolumeRoute
+  AhspIndexRoute: typeof AhspIndexRoute
+  AuthIndexRoute: typeof AuthIndexRoute
+  BoqIndexRoute: typeof BoqIndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
+  RabIndexRoute: typeof RabIndexRoute
+  ScheduleIndexRoute: typeof ScheduleIndexRoute
+  UnitPricesIndexRoute: typeof UnitPricesIndexRoute
+  VolumeIndexRoute: typeof VolumeIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -169,67 +169,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ahsp': {
-      id: '/ahsp'
+    '/ahsp/': {
+      id: '/ahsp/'
       path: '/ahsp'
-      fullPath: '/ahsp'
-      preLoaderRoute: typeof AhspRouteImport
+      fullPath: '/ahsp/'
+      preLoaderRoute: typeof AhspIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
+    '/auth/': {
+      id: '/auth/'
       path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/boq': {
-      id: '/boq'
+    '/boq/': {
+      id: '/boq/'
       path: '/boq'
-      fullPath: '/boq'
-      preLoaderRoute: typeof BoqRouteImport
+      fullPath: '/boq/'
+      preLoaderRoute: typeof BoqIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
+    '/login/': {
+      id: '/login/'
       path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projects': {
-      id: '/projects'
+    '/projects/': {
+      id: '/projects/'
       path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsRouteImport
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rab': {
-      id: '/rab'
+    '/rab/': {
+      id: '/rab/'
       path: '/rab'
-      fullPath: '/rab'
-      preLoaderRoute: typeof RabRouteImport
+      fullPath: '/rab/'
+      preLoaderRoute: typeof RabIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/schedule': {
-      id: '/schedule'
+    '/schedule/': {
+      id: '/schedule/'
       path: '/schedule'
-      fullPath: '/schedule'
-      preLoaderRoute: typeof ScheduleRouteImport
+      fullPath: '/schedule/'
+      preLoaderRoute: typeof ScheduleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/unit-prices': {
-      id: '/unit-prices'
+    '/unit-prices/': {
+      id: '/unit-prices/'
       path: '/unit-prices'
-      fullPath: '/unit-prices'
-      preLoaderRoute: typeof UnitPricesRouteImport
+      fullPath: '/unit-prices/'
+      preLoaderRoute: typeof UnitPricesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/volume': {
-      id: '/volume'
+    '/volume/': {
+      id: '/volume/'
       path: '/volume'
-      fullPath: '/volume'
-      preLoaderRoute: typeof VolumeRouteImport
+      fullPath: '/volume/'
+      preLoaderRoute: typeof VolumeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -237,15 +237,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AhspRoute: AhspRoute,
-  AuthRoute: AuthRoute,
-  BoqRoute: BoqRoute,
-  LoginRoute: LoginRoute,
-  ProjectsRoute: ProjectsRoute,
-  RabRoute: RabRoute,
-  ScheduleRoute: ScheduleRoute,
-  UnitPricesRoute: UnitPricesRoute,
-  VolumeRoute: VolumeRoute,
+  AhspIndexRoute: AhspIndexRoute,
+  AuthIndexRoute: AuthIndexRoute,
+  BoqIndexRoute: BoqIndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
+  RabIndexRoute: RabIndexRoute,
+  ScheduleIndexRoute: ScheduleIndexRoute,
+  UnitPricesIndexRoute: UnitPricesIndexRoute,
+  VolumeIndexRoute: VolumeIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

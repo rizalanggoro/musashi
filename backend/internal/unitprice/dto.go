@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type UnitPriceDTO struct {
@@ -36,7 +37,7 @@ type UpdateUnitPriceInput struct {
 
 func toDTO(u *domain.UnitPrice) UnitPriceDTO {
 	return UnitPriceDTO{
-		ID:          u.ID.String(),
+		ID:          utils.FormatID(u.ID),
 		Code:        u.Code,
 		Category:    string(u.Category),
 		WorkItem:    u.WorkItem,

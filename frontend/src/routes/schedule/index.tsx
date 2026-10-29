@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth'
 
-export const Route = createFileRoute('/schedule')({
+export const Route = createFileRoute('/schedule/')({
   component: SchedulePage,
   validateSearch: (search: Record<string, unknown>): { projectId?: string } => ({
     projectId: (search.projectId as string) || undefined,

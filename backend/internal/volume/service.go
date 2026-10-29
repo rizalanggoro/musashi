@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 var (
@@ -19,10 +19,10 @@ var (
 )
 
 type Service interface {
-	List(projectID uuid.UUID, q string) ([]VolumeRowDTO, error)
-	Create(projectID uuid.UUID, input CreateVolumeInput) (*VolumeRowDTO, error)
-	Update(id uuid.UUID, input UpdateVolumeInput) (*VolumeRowDTO, error)
-	Delete(id uuid.UUID) error
+	List(projectID uint, q string) ([]VolumeRowDTO, error)
+	Create(projectID uint, input CreateVolumeInput) (*VolumeRowDTO, error)
+	Update(id uint, input UpdateVolumeInput) (*VolumeRowDTO, error)
+	Delete(id uint) error
 }
 
 type service struct {
@@ -49,7 +49,7 @@ func calcQuantities(length, width, height *float64, plannedVolume float64, unitW
 	return qty, totalQty
 }
 
-func (s *service) List(projectID uuid.UUID, q string) ([]VolumeRowDTO, error) {
+func (s *service) List(projectID uint, q string) ([]VolumeRowDTO, error) {
 	rows, err := s.repo.ListRows(projectID, strings.TrimSpace(q))
 	if err != nil {
 		return nil, err
@@ -67,10 +67,10 @@ func (s *service) List(projectID uuid.UUID, q string) ([]VolumeRowDTO, error) {
 	return data, nil
 }
 
-func (s *service) Create(projectID uuid.UUID, input CreateVolumeInput) (*VolumeRowDTO, error) {
+func (s *service) Create(projectID uint, input CreateVolumeInput) (*VolumeRowDTO, error) {
 	var boqItem domain.BoqItem
 	if input.BoqItemID != nil && *input.BoqItemID != "" {
-		bID, err := uuid.Parse(*input.BoqItemID)
+		bID, err := utils.ParseID(*input.BoqItemID)
 		if err != nil {
 			return nil, ErrBoqItemNotFound
 		}
@@ -88,9 +88,9 @@ func (s *service) Create(projectID uuid.UUID, input CreateVolumeInput) (*VolumeR
 		}
 		plannedVol, _ := strconv.ParseFloat(input.PlannedVolume, 64)
 
-		var ahspID *uuid.UUID
+		var ahspID *uint
 		if input.AhspID != nil && *input.AhspID != "" {
-			if parsed, err := uuid.Parse(*input.AhspID); err == nil {
+			if parsed, err := utils.ParseID(*input.AhspID); err == nil {
 				ahspID = &parsed
 			}
 		}
@@ -157,7 +157,7 @@ func (s *service) Create(projectID uuid.UUID, input CreateVolumeInput) (*VolumeR
 	return &dto, nil
 }
 
-func (s *service) Update(id uuid.UUID, input UpdateVolumeInput) (*VolumeRowDTO, error) {
+func (s *service) Update(id uint, input UpdateVolumeInput) (*VolumeRowDTO, error) {
 	vol, err := s.repo.FindVolumeByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -228,7 +228,7 @@ func (s *service) Update(id uuid.UUID, input UpdateVolumeInput) (*VolumeRowDTO, 
 	return &dto, nil
 }
 
-func (s *service) Delete(id uuid.UUID) error {
+func (s *service) Delete(id uint) error {
 	deleted, err := s.repo.DeleteVolume(id)
 	if err != nil {
 		return err

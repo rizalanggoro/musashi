@@ -1,18 +1,18 @@
 package schedule
 
 import (
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/internal/model"
 )
 
 type Repository interface {
-	FindByProjectID(projectID uuid.UUID) ([]domain.Schedule, error)
-	FindByID(id uuid.UUID) (*domain.Schedule, error)
+	FindByProjectID(projectID uint) ([]domain.Schedule, error)
+	FindByID(id uint) (*domain.Schedule, error)
 	Create(s *domain.Schedule) error
 	Update(s *domain.Schedule) error
-	Delete(id uuid.UUID) (bool, error)
+	Delete(id uint) (bool, error)
 }
 
 type repository struct {
@@ -23,32 +23,46 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) FindByProjectID(projectID uuid.UUID) ([]domain.Schedule, error) {
-	var schedules []domain.Schedule
-	if err := r.db.Where("project_id = ?", projectID).Order("start_date ASC, code ASC").Find(&schedules).Error; err != nil {
+func (r *repository) FindByProjectID(projectID uint) ([]domain.Schedule, error) {
+	var models []model.Schedule
+	if err := r.db.Where("project_id = ?", projectID).Order("start_date ASC, code ASC").Find(&models).Error; err != nil {
 		return nil, err
+	}
+	schedules := make([]domain.Schedule, len(models))
+	for i := range models {
+		schedules[i] = *models[i].ToDomain()
 	}
 	return schedules, nil
 }
 
-func (r *repository) FindByID(id uuid.UUID) (*domain.Schedule, error) {
-	var s domain.Schedule
-	if err := r.db.First(&s, id).Error; err != nil {
+func (r *repository) FindByID(id uint) (*domain.Schedule, error) {
+	var m model.Schedule
+	if err := r.db.First(&m, id).Error; err != nil {
 		return nil, err
 	}
-	return &s, nil
+	return m.ToDomain(), nil
 }
 
 func (r *repository) Create(s *domain.Schedule) error {
-	return r.db.Create(s).Error
+	m := model.FromScheduleDomain(s)
+	if err := r.db.Create(m).Error; err != nil {
+		return err
+	}
+	*s = *m.ToDomain()
+	return nil
 }
 
 func (r *repository) Update(s *domain.Schedule) error {
-	return r.db.Save(s).Error
+	m := model.FromScheduleDomain(s)
+	if err := r.db.Save(m).Error; err != nil {
+		return err
+	}
+	*s = *m.ToDomain()
+	return nil
 }
 
-func (r *repository) Delete(id uuid.UUID) (bool, error) {
-	res := r.db.Delete(&domain.Schedule{}, id)
+func (r *repository) Delete(id uint) (bool, error) {
+	res := r.db.Delete(&model.Schedule{}, id)
 	if res.Error != nil {
 		return false, res.Error
 	}

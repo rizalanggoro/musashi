@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
@@ -22,8 +21,8 @@ var (
 type Service interface {
 	List(q, category string) ([]UnitPriceDTO, error)
 	Create(input CreateUnitPriceInput) (*UnitPriceDTO, error)
-	Update(id uuid.UUID, input UpdateUnitPriceInput) (*UnitPriceDTO, error)
-	Delete(id uuid.UUID) error
+	Update(id uint, input UpdateUnitPriceInput) (*UnitPriceDTO, error)
+	Delete(id uint) error
 }
 
 type service struct {
@@ -77,7 +76,7 @@ func (s *service) Create(input CreateUnitPriceInput) (*UnitPriceDTO, error) {
 	return &dto, nil
 }
 
-func (s *service) Update(id uuid.UUID, input UpdateUnitPriceInput) (*UnitPriceDTO, error) {
+func (s *service) Update(id uint, input UpdateUnitPriceInput) (*UnitPriceDTO, error) {
 	item, err := s.repo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -121,7 +120,7 @@ func (s *service) Update(id uuid.UUID, input UpdateUnitPriceInput) (*UnitPriceDT
 	return &dto, nil
 }
 
-func (s *service) Delete(id uuid.UUID) error {
+func (s *service) Delete(id uint) error {
 	count, err := s.repo.CountAhspUsage(id)
 	if err != nil {
 		return err

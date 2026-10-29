@@ -21,7 +21,7 @@ import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 import { Plus, Trash2 } from 'lucide-react'
 
-export const Route = createFileRoute('/ahsp')({ component: AhspPage })
+export const Route = createFileRoute('/ahsp/')({ component: AhspPage })
 
 type LocalItem = CreateAhspItemInput & { id: string }
 

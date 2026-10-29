@@ -23,7 +23,7 @@ import { formatRupiah, formatDecimal } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 import { AlertCircle, Download } from 'lucide-react'
 
-export const Route = createFileRoute('/rab')({
+export const Route = createFileRoute('/rab/')({
   component: RabPage,
   validateSearch: (search: Record<string, unknown>): { projectId?: string } => ({
     projectId: (search.projectId as string) || undefined,

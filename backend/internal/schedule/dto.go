@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type ScheduleDTO struct {
@@ -41,8 +42,8 @@ type UpdateScheduleInput struct {
 
 func toDTO(s *domain.Schedule) ScheduleDTO {
 	return ScheduleDTO{
-		ID:        s.ID.String(),
-		ProjectID: s.ProjectID.String(),
+		ID:        utils.FormatID(s.ID),
+		ProjectID: utils.FormatID(s.ProjectID),
 		Code:      s.Code,
 		WorkItem:  s.WorkItem,
 		StartDate: s.StartDate.Format("2006-01-02"),

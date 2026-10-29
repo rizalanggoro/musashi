@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 type ProjectDTO struct {
@@ -50,7 +51,7 @@ type UpdateProjectInput struct {
 
 func toDTO(p *domain.Project) ProjectDTO {
 	dto := ProjectDTO{
-		ID:          p.ID.String(),
+		ID:          utils.FormatID(p.ID),
 		Name:        p.Name,
 		Section:     p.Section,
 		Plant:       p.Plant,

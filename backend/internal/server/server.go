@@ -22,6 +22,7 @@ import (
 	"musashi/backend/internal/schedule"
 	"musashi/backend/internal/unitprice"
 	"musashi/backend/internal/volume"
+	"musashi/backend/utils"
 )
 
 func New(db *gorm.DB, cfg config.Config) *fiber.App {
@@ -50,7 +51,8 @@ func New(db *gorm.DB, cfg config.Config) *fiber.App {
 	api.Get("/health", health(db))
 
 	// Feature handlers (Repository -> Service -> Handler)
-	authHandler := auth.NewHandler(auth.NewService(auth.NewRepository(db)))
+	authSvc := auth.NewService(auth.NewRepository(db))
+	authHandler := auth.NewHandler(authSvc)
 	projectHandler := project.NewHandler(project.NewService(project.NewRepository(db)))
 	scheduleHandler := schedule.NewHandler(schedule.NewService(schedule.NewRepository(db)))
 	unitPriceHandler := unitprice.NewHandler(unitprice.NewService(unitprice.NewRepository(db)))
@@ -64,11 +66,11 @@ func New(db *gorm.DB, cfg config.Config) *fiber.App {
 	// Auth
 	api.Post("/auth/login", authHandler.Login)
 	api.Post("/auth/logout", authHandler.Logout)
-	api.Get("/auth/me", authHandler.AuthMiddleware(), authHandler.Me)
+	api.Get("/auth/me", utils.AuthMiddleware(authSvc), authHandler.Me)
 
 	// Protected routes
-	authReq := authHandler.AuthMiddleware()
-	adminOnly := authHandler.RequireRole(domain.RoleAdmin)
+	authReq := utils.AuthMiddleware(authSvc)
+	adminOnly := utils.RequireRole(domain.RoleAdmin)
 
 	// Projects
 	api.Get("/projects", authReq, projectHandler.List)

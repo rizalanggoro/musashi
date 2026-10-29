@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/platform/httperr"
+	"musashi/backend/utils"
 )
 
 type Handler struct {
@@ -20,7 +20,7 @@ func NewHandler(svc Service) *Handler {
 }
 
 func (h *Handler) VolumeExcel(c fiber.Ctx) error {
-	projectID, err := uuid.Parse(c.Params("id"))
+	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
 		return httperr.BadRequest(c, "Invalid project ID", nil)
 	}
@@ -39,7 +39,7 @@ func (h *Handler) VolumeExcel(c fiber.Ctx) error {
 }
 
 func (h *Handler) RabExcel(c fiber.Ctx) error {
-	projectID, err := uuid.Parse(c.Params("id"))
+	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
 		return httperr.BadRequest(c, "Invalid project ID", nil)
 	}
@@ -58,7 +58,7 @@ func (h *Handler) RabExcel(c fiber.Ctx) error {
 }
 
 func (h *Handler) RabPdf(c fiber.Ctx) error {
-	projectID, err := uuid.Parse(c.Params("id"))
+	projectID, err := utils.ParseID(c.Params("id"))
 	if err != nil {
 		return httperr.BadRequest(c, "Invalid project ID", nil)
 	}

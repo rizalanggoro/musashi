@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 
-export const Route = createFileRoute('/unit-prices')({ component: UnitPricesPage })
+export const Route = createFileRoute('/unit-prices/')({ component: UnitPricesPage })
 
 const categories = ['ALL', 'LABOR', 'MATERIALS', 'EQUIPMENT', 'OTHER'] as const
 

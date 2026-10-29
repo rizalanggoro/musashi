@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
@@ -19,10 +18,10 @@ var (
 )
 
 type Service interface {
-	ListByProject(projectID uuid.UUID) ([]ScheduleDTO, error)
-	Create(projectID uuid.UUID, input CreateScheduleInput) (*ScheduleDTO, error)
-	Update(id uuid.UUID, input UpdateScheduleInput) (*ScheduleDTO, error)
-	Delete(id uuid.UUID) error
+	ListByProject(projectID uint) ([]ScheduleDTO, error)
+	Create(projectID uint, input CreateScheduleInput) (*ScheduleDTO, error)
+	Update(id uint, input UpdateScheduleInput) (*ScheduleDTO, error)
+	Delete(id uint) error
 }
 
 type service struct {
@@ -41,7 +40,7 @@ func calcDuration(start, end time.Time) int {
 	return days
 }
 
-func (s *service) ListByProject(projectID uuid.UUID) ([]ScheduleDTO, error) {
+func (s *service) ListByProject(projectID uint) ([]ScheduleDTO, error) {
 	schedules, err := s.repo.FindByProjectID(projectID)
 	if err != nil {
 		return nil, err
@@ -54,7 +53,7 @@ func (s *service) ListByProject(projectID uuid.UUID) ([]ScheduleDTO, error) {
 	return data, nil
 }
 
-func (s *service) Create(projectID uuid.UUID, input CreateScheduleInput) (*ScheduleDTO, error) {
+func (s *service) Create(projectID uint, input CreateScheduleInput) (*ScheduleDTO, error) {
 	if strings.TrimSpace(input.Code) == "" || strings.TrimSpace(input.WorkItem) == "" || input.StartDate == "" || input.EndDate == "" {
 		return nil, ErrRequiredFields
 	}
@@ -97,7 +96,7 @@ func (s *service) Create(projectID uuid.UUID, input CreateScheduleInput) (*Sched
 	return &dto, nil
 }
 
-func (s *service) Update(id uuid.UUID, input UpdateScheduleInput) (*ScheduleDTO, error) {
+func (s *service) Update(id uint, input UpdateScheduleInput) (*ScheduleDTO, error) {
 	sched, err := s.repo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -146,7 +145,7 @@ func (s *service) Update(id uuid.UUID, input UpdateScheduleInput) (*ScheduleDTO,
 	return &dto, nil
 }
 
-func (s *service) Delete(id uuid.UUID) error {
+func (s *service) Delete(id uint) error {
 	deleted, err := s.repo.Delete(id)
 	if err != nil {
 		return err

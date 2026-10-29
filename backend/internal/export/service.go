@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-pdf/fpdf"
-	"github.com/google/uuid"
 	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
 )
@@ -18,9 +17,9 @@ var (
 )
 
 type Service interface {
-	GenerateVolumeExcel(projectID uuid.UUID) (string, []byte, error)
-	GenerateRabExcel(projectID uuid.UUID) (string, []byte, error)
-	GenerateRabPdf(projectID uuid.UUID) (string, []byte, error)
+	GenerateVolumeExcel(projectID uint) (string, []byte, error)
+	GenerateRabExcel(projectID uint) (string, []byte, error)
+	GenerateRabPdf(projectID uint) (string, []byte, error)
 }
 
 type service struct {
@@ -44,7 +43,7 @@ func formatNumber(n int64) string {
 	return string(out)
 }
 
-func (s *service) GenerateVolumeExcel(projectID uuid.UUID) (string, []byte, error) {
+func (s *service) GenerateVolumeExcel(projectID uint) (string, []byte, error) {
 	project, err := s.repo.GetProject(projectID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -109,7 +108,7 @@ func (s *service) GenerateVolumeExcel(projectID uuid.UUID) (string, []byte, erro
 	return filename, buf.Bytes(), nil
 }
 
-func (s *service) GenerateRabExcel(projectID uuid.UUID) (string, []byte, error) {
+func (s *service) GenerateRabExcel(projectID uint) (string, []byte, error) {
 	project, err := s.repo.GetProject(projectID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -170,7 +169,7 @@ func (s *service) GenerateRabExcel(projectID uuid.UUID) (string, []byte, error) 
 	return filename, buf.Bytes(), nil
 }
 
-func (s *service) GenerateRabPdf(projectID uuid.UUID) (string, []byte, error) {
+func (s *service) GenerateRabPdf(projectID uint) (string, []byte, error) {
 	project, err := s.repo.GetProject(projectID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

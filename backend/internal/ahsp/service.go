@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 var (
@@ -21,10 +21,10 @@ var (
 
 type Service interface {
 	List(q string) ([]AhspDTO, error)
-	Get(id uuid.UUID) (*AhspDetailDTO, error)
+	Get(id uint) (*AhspDetailDTO, error)
 	Create(input CreateAhspInput) (*AhspDetailDTO, error)
-	Update(id uuid.UUID, input CreateAhspInput) (*AhspDetailDTO, error)
-	Delete(id uuid.UUID) error
+	Update(id uint, input CreateAhspInput) (*AhspDetailDTO, error)
+	Delete(id uint) error
 }
 
 type service struct {
@@ -75,9 +75,9 @@ func calculateAndBuild(input CreateAhspInput) (*domain.Ahsp, []domain.AhspItem, 
 			totalEquipment += cost
 		}
 
-		var upID *uuid.UUID
+		var upID *uint
 		if inItem.UnitPriceID != nil && *inItem.UnitPriceID != "" {
-			if parsed, err := uuid.Parse(*inItem.UnitPriceID); err == nil {
+			if parsed, err := utils.ParseID(*inItem.UnitPriceID); err == nil {
 				upID = &parsed
 			}
 		}
@@ -133,7 +133,7 @@ func (s *service) List(q string) ([]AhspDTO, error) {
 	return data, nil
 }
 
-func (s *service) Get(id uuid.UUID) (*AhspDetailDTO, error) {
+func (s *service) Get(id uint) (*AhspDetailDTO, error) {
 	a, err := s.repo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -179,7 +179,7 @@ func (s *service) Create(input CreateAhspInput) (*AhspDetailDTO, error) {
 	}, nil
 }
 
-func (s *service) Update(id uuid.UUID, input CreateAhspInput) (*AhspDetailDTO, error) {
+func (s *service) Update(id uint, input CreateAhspInput) (*AhspDetailDTO, error) {
 	existing, err := s.repo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -215,7 +215,7 @@ func (s *service) Update(id uuid.UUID, input CreateAhspInput) (*AhspDetailDTO, e
 	}, nil
 }
 
-func (s *service) Delete(id uuid.UUID) error {
+func (s *service) Delete(id uint) error {
 	deleted, err := s.repo.Delete(id)
 	if err != nil {
 		return err

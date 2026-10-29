@@ -2,11 +2,10 @@ package auth
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v3"
-	"gorm.io/gorm"
 
-	"musashi/backend/internal/domain"
 	"musashi/backend/internal/platform/httperr"
 )
 
@@ -45,7 +44,7 @@ func (h *Handler) Login(c fiber.Ctx) error {
 	})
 
 	return c.JSON(UserResponse{
-		ID:    user.ID.String(),
+		ID:    strconv.FormatUint(uint64(user.ID), 10),
 		Email: user.Email,
 		Name:  user.Name,
 		Role:  user.Role,
@@ -70,72 +69,9 @@ func (h *Handler) Me(c fiber.Ctx) error {
 		return httperr.Unauthorized(c, "Unauthenticated")
 	}
 	return c.JSON(UserResponse{
-		ID:    user.UserID.String(),
+		ID:    strconv.FormatUint(uint64(user.UserID), 10),
 		Email: user.Email,
 		Name:  user.Name,
 		Role:  user.Role,
 	})
-}
-
-func (h *Handler) AuthMiddleware() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		token := c.Cookies(CookieName)
-		if token == "" {
-			return httperr.Unauthorized(c, "Authentication required")
-		}
-		payload, err := h.svc.ParseToken(token)
-		if err != nil {
-			return httperr.Unauthorized(c, "Session invalid or expired")
-		}
-		c.Locals("user", payload)
-		return c.Next()
-	}
-}
-
-func (h *Handler) RequireRole(roles ...domain.UserRole) fiber.Handler {
-	return RequireRole(roles...)
-}
-
-// Backward-compatible standalone helpers
-
-func LoginHandler(db *gorm.DB) fiber.Handler {
-	return NewHandler(NewService(NewRepository(db))).Login
-}
-
-func LogoutHandler() fiber.Handler {
-	return (&Handler{}).Logout
-}
-
-func MeHandler() fiber.Handler {
-	return (&Handler{}).Me
-}
-
-func AuthMiddleware() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		token := c.Cookies(CookieName)
-		if token == "" {
-			return httperr.Unauthorized(c, "Authentication required")
-		}
-		payload, err := parseToken(token)
-		if err != nil {
-			return httperr.Unauthorized(c, "Session invalid or expired")
-		}
-		c.Locals("user", payload)
-		return c.Next()
-	}
-}
-
-func RequireRole(roles ...domain.UserRole) fiber.Handler {
-	return func(c fiber.Ctx) error {
-		user, ok := c.Locals("user").(*SessionPayload)
-		if !ok || user == nil {
-			return httperr.Unauthorized(c, "Authentication required")
-		}
-		for _, r := range roles {
-			if user.Role == r {
-				return c.Next()
-			}
-		}
-		return httperr.Forbidden(c, "Access denied: insufficient permissions")
-	}
 }

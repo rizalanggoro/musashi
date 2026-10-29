@@ -21,7 +21,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { formatDecimal } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 
-export const Route = createFileRoute('/volume')({
+export const Route = createFileRoute('/volume/')({
   component: VolumePage,
   validateSearch: (search: Record<string, unknown>): { projectId?: string } => ({
     projectId: (search.projectId as string) || undefined,

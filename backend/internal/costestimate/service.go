@@ -4,10 +4,10 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/utils"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 )
 
 type Service interface {
-	GetSummary(projectID uuid.UUID) (*CostEstimateDTO, error)
+	GetSummary(projectID uint) (*CostEstimateDTO, error)
 }
 
 type service struct {
@@ -26,7 +26,7 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) GetSummary(projectID uuid.UUID) (*CostEstimateDTO, error) {
+func (s *service) GetSummary(projectID uint) (*CostEstimateDTO, error) {
 	project, err := s.repo.GetProject(projectID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -52,7 +52,7 @@ func (s *service) GetSummary(projectID uuid.UUID) (*CostEstimateDTO, error) {
 	sisa := project.Budget - spb
 
 	return &CostEstimateDTO{
-		ProjectID: projectID.String(),
+		ProjectID: utils.FormatID(projectID),
 		Budget:    strconv.FormatInt(project.Budget, 10),
 		Rab:       strconv.FormatInt(totalRab, 10),
 		Spb:       strconv.FormatInt(spb, 10),

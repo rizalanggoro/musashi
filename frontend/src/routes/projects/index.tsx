@@ -17,7 +17,7 @@ import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 import { Check } from 'lucide-react'
 
-export const Route = createFileRoute('/projects')({ component: ProjectsPage })
+export const Route = createFileRoute('/projects/')({ component: ProjectsPage })
 
 function ProjectsPage() {
   const queryClient = useQueryClient()

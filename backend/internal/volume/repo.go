@@ -3,21 +3,21 @@ package volume
 import (
 	"strings"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
+	"musashi/backend/internal/model"
 )
 
 type Repository interface {
-	ListRows(projectID uuid.UUID, q string) ([]VolumeRowQueryResult, error)
-	FindVolumeByID(id uuid.UUID) (*domain.Volume, error)
-	FindBoqItemByID(id uuid.UUID) (*domain.BoqItem, error)
-	FindBoqItemInProject(id uuid.UUID, projectID uuid.UUID) (*domain.BoqItem, error)
+	ListRows(projectID uint, q string) ([]VolumeRowQueryResult, error)
+	FindVolumeByID(id uint) (*domain.Volume, error)
+	FindBoqItemByID(id uint) (*domain.BoqItem, error)
+	FindBoqItemInProject(id uint, projectID uint) (*domain.BoqItem, error)
 	CreateBoqItem(b *domain.BoqItem) error
 	CreateVolume(v *domain.Volume) error
 	UpdateVolume(v *domain.Volume) error
-	DeleteVolume(id uuid.UUID) (bool, error)
+	DeleteVolume(id uint) (bool, error)
 }
 
 type repository struct {
@@ -28,7 +28,7 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) ListRows(projectID uuid.UUID, q string) ([]VolumeRowQueryResult, error) {
+func (r *repository) ListRows(projectID uint, q string) ([]VolumeRowQueryResult, error) {
 	var rows []VolumeRowQueryResult
 
 	query := r.db.Table("volumes").
@@ -48,44 +48,59 @@ func (r *repository) ListRows(projectID uuid.UUID, q string) ([]VolumeRowQueryRe
 	return rows, nil
 }
 
-func (r *repository) FindVolumeByID(id uuid.UUID) (*domain.Volume, error) {
-	var vol domain.Volume
-	if err := r.db.First(&vol, id).Error; err != nil {
+func (r *repository) FindVolumeByID(id uint) (*domain.Volume, error) {
+	var v model.Volume
+	if err := r.db.First(&v, id).Error; err != nil {
 		return nil, err
 	}
-	return &vol, nil
+	return v.ToDomain(), nil
 }
 
-func (r *repository) FindBoqItemByID(id uuid.UUID) (*domain.BoqItem, error) {
-	var boqItem domain.BoqItem
-	if err := r.db.First(&boqItem, id).Error; err != nil {
+func (r *repository) FindBoqItemByID(id uint) (*domain.BoqItem, error) {
+	var b model.BoqItem
+	if err := r.db.First(&b, id).Error; err != nil {
 		return nil, err
 	}
-	return &boqItem, nil
+	return b.ToDomain(), nil
 }
 
-func (r *repository) FindBoqItemInProject(id uuid.UUID, projectID uuid.UUID) (*domain.BoqItem, error) {
-	var boqItem domain.BoqItem
-	if err := r.db.Where("id = ? AND project_id = ?", id, projectID).First(&boqItem).Error; err != nil {
+func (r *repository) FindBoqItemInProject(id uint, projectID uint) (*domain.BoqItem, error) {
+	var b model.BoqItem
+	if err := r.db.Where("id = ? AND project_id = ?", id, projectID).First(&b).Error; err != nil {
 		return nil, err
 	}
-	return &boqItem, nil
+	return b.ToDomain(), nil
 }
 
 func (r *repository) CreateBoqItem(b *domain.BoqItem) error {
-	return r.db.Create(b).Error
+	m := model.FromBoqItemDomain(b)
+	if err := r.db.Create(m).Error; err != nil {
+		return err
+	}
+	*b = *m.ToDomain()
+	return nil
 }
 
 func (r *repository) CreateVolume(v *domain.Volume) error {
-	return r.db.Create(v).Error
+	m := model.FromVolumeDomain(v)
+	if err := r.db.Create(m).Error; err != nil {
+		return err
+	}
+	*v = *m.ToDomain()
+	return nil
 }
 
 func (r *repository) UpdateVolume(v *domain.Volume) error {
-	return r.db.Save(v).Error
+	m := model.FromVolumeDomain(v)
+	if err := r.db.Save(m).Error; err != nil {
+		return err
+	}
+	*v = *m.ToDomain()
+	return nil
 }
 
-func (r *repository) DeleteVolume(id uuid.UUID) (bool, error) {
-	res := r.db.Delete(&domain.Volume{}, id)
+func (r *repository) DeleteVolume(id uint) (bool, error) {
+	res := r.db.Delete(&model.Volume{}, id)
 	if res.Error != nil {
 		return false, res.Error
 	}

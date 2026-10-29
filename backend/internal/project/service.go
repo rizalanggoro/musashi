@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"musashi/backend/internal/domain"
@@ -21,10 +20,10 @@ var (
 
 type Service interface {
 	List(q string, page, perPage int) ([]ProjectDTO, int64, error)
-	Get(id uuid.UUID) (*ProjectDTO, error)
+	Get(id uint) (*ProjectDTO, error)
 	Create(input CreateProjectInput) (*ProjectDTO, error)
-	Update(id uuid.UUID, input UpdateProjectInput) (*ProjectDTO, error)
-	Delete(id uuid.UUID) error
+	Update(id uint, input UpdateProjectInput) (*ProjectDTO, error)
+	Delete(id uint) error
 }
 
 type service struct {
@@ -55,7 +54,7 @@ func (s *service) List(q string, page, perPage int) ([]ProjectDTO, int64, error)
 	return data, total, nil
 }
 
-func (s *service) Get(id uuid.UUID) (*ProjectDTO, error) {
+func (s *service) Get(id uint) (*ProjectDTO, error) {
 	p, err := s.repo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -125,7 +124,7 @@ func (s *service) Create(input CreateProjectInput) (*ProjectDTO, error) {
 	return &dto, nil
 }
 
-func (s *service) Update(id uuid.UUID, input UpdateProjectInput) (*ProjectDTO, error) {
+func (s *service) Update(id uint, input UpdateProjectInput) (*ProjectDTO, error) {
 	p, err := s.repo.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -188,7 +187,7 @@ func (s *service) Update(id uuid.UUID, input UpdateProjectInput) (*ProjectDTO, e
 	return &dto, nil
 }
 
-func (s *service) Delete(id uuid.UUID) error {
+func (s *service) Delete(id uint) error {
 	deleted, err := s.repo.Delete(id)
 	if err != nil {
 		return err

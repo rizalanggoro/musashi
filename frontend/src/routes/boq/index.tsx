@@ -9,7 +9,7 @@ import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/u
 import { Badge } from '@/components/ui/badge'
 import { Download, Search } from 'lucide-react'
 
-export const Route = createFileRoute('/boq')({ component: BoqPage })
+export const Route = createFileRoute('/boq/')({ component: BoqPage })
 
 function BoqPage() {
   const navigate = useNavigate()
