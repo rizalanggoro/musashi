@@ -2123,7 +2123,7 @@ const docTemplate = `{
             "required": [
                 "category",
                 "code",
-                "information",
+                "note",
                 "unit",
                 "unit_price",
                 "work_item"
@@ -2135,7 +2135,7 @@ const docTemplate = `{
                 "code": {
                     "type": "string"
                 },
-                "information": {
+                "note": {
                     "type": "string"
                 },
                 "unit": {
@@ -2500,7 +2500,7 @@ const docTemplate = `{
                 "category",
                 "code",
                 "id",
-                "information",
+                "note",
                 "unit",
                 "unit_price",
                 "work_item"
@@ -2515,7 +2515,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "information": {
+                "note": {
                     "type": "string"
                 },
                 "unit": {
@@ -2637,7 +2637,7 @@ const docTemplate = `{
                 "code": {
                     "type": "string"
                 },
-                "information": {
+                "note": {
                     "type": "string"
                 },
                 "unit": {

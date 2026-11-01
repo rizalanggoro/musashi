@@ -2116,7 +2116,7 @@
             "required": [
                 "category",
                 "code",
-                "information",
+                "note",
                 "unit",
                 "unit_price",
                 "work_item"
@@ -2128,7 +2128,7 @@
                 "code": {
                     "type": "string"
                 },
-                "information": {
+                "note": {
                     "type": "string"
                 },
                 "unit": {
@@ -2493,7 +2493,7 @@
                 "category",
                 "code",
                 "id",
-                "information",
+                "note",
                 "unit",
                 "unit_price",
                 "work_item"
@@ -2508,7 +2508,7 @@
                 "id": {
                     "type": "string"
                 },
-                "information": {
+                "note": {
                     "type": "string"
                 },
                 "unit": {
@@ -2630,7 +2630,7 @@
                 "code": {
                     "type": "string"
                 },
-                "information": {
+                "note": {
                     "type": "string"
                 },
                 "unit": {

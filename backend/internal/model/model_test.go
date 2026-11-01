@@ -159,8 +159,8 @@ func TestUnitPriceModelMapping(t *testing.T) {
 			Category:    domain.CategoryLabor,
 			WorkItem:    "Tukang Batu",
 			Unit:        "OH",
-			UnitPrice:   120000,
-			Information: "info",
+			UnitPrice: 120000,
+			Note:      "info",
 		}
 
 		m := FromUnitPriceDomain(d)

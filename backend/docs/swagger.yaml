@@ -320,7 +320,7 @@ definitions:
         type: string
       code:
         type: string
-      information:
+      note:
         type: string
       unit:
         type: string
@@ -331,7 +331,7 @@ definitions:
     required:
     - category
     - code
-    - information
+    - note
     - unit
     - unit_price
     - work_item
@@ -587,7 +587,7 @@ definitions:
         type: string
       id:
         type: string
-      information:
+      note:
         type: string
       unit:
         type: string
@@ -599,7 +599,7 @@ definitions:
     - category
     - code
     - id
-    - information
+    - note
     - unit
     - unit_price
     - work_item
@@ -675,7 +675,7 @@ definitions:
         type: string
       code:
         type: string
-      information:
+      note:
         type: string
       unit:
         type: string

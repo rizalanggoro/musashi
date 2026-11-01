@@ -65,7 +65,7 @@ func (s *service) Create(input CreateUnitPriceInput) (*UnitPriceDTO, error) {
 		WorkItem:    input.WorkItem,
 		Unit:        input.Unit,
 		UnitPrice:   price,
-		Information: input.Information,
+		Note:        input.Note,
 	}
 
 	if err := s.repo.Create(&item); err != nil {
@@ -108,8 +108,8 @@ func (s *service) Update(id uint, input UpdateUnitPriceInput) (*UnitPriceDTO, er
 		p, _ := strconv.ParseInt(*input.UnitPrice, 10, 64)
 		item.UnitPrice = p
 	}
-	if input.Information != nil {
-		item.Information = *input.Information
+	if input.Note != nil {
+		item.Note = *input.Note
 	}
 
 	if err := s.repo.Update(item); err != nil {

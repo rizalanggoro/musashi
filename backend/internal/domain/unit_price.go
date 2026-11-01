@@ -20,5 +20,5 @@ type UnitPrice struct {
 	WorkItem    string            `json:"work_item"`
 	Unit        string            `json:"unit"`
 	UnitPrice   int64             `json:"unit_price"`
-	Information string            `json:"information"`
+	Note        string            `json:"note"`
 }

@@ -8,41 +8,41 @@ import (
 )
 
 type UnitPriceDTO struct {
-	ID          string `json:"id"`
-	Code        string `json:"code"`
-	Category    string `json:"category"`
-	WorkItem    string `json:"work_item"`
-	Unit        string `json:"unit"`
-	UnitPrice   string `json:"unit_price"`
-	Information string `json:"information"`
+	ID        string `json:"id"`
+	Code      string `json:"code"`
+	Category  string `json:"category"`
+	WorkItem  string `json:"work_item"`
+	Unit      string `json:"unit"`
+	UnitPrice string `json:"unit_price"`
+	Note      string `json:"note"`
 }
 
 type CreateUnitPriceInput struct {
-	Code        string `json:"code"`
-	Category    string `json:"category"`
-	WorkItem    string `json:"work_item"`
-	Unit        string `json:"unit"`
-	UnitPrice   string `json:"unit_price"`
-	Information string `json:"information"`
+	Code      string `json:"code"`
+	Category  string `json:"category"`
+	WorkItem  string `json:"work_item"`
+	Unit      string `json:"unit"`
+	UnitPrice string `json:"unit_price"`
+	Note      string `json:"note"`
 }
 
 type UpdateUnitPriceInput struct {
-	Code        *string `json:"code,omitempty"`
-	Category    *string `json:"category,omitempty"`
-	WorkItem    *string `json:"work_item,omitempty"`
-	Unit        *string `json:"unit,omitempty"`
-	UnitPrice   *string `json:"unit_price,omitempty"`
-	Information *string `json:"information,omitempty"`
+	Code      *string `json:"code,omitempty"`
+	Category  *string `json:"category,omitempty"`
+	WorkItem  *string `json:"work_item,omitempty"`
+	Unit      *string `json:"unit,omitempty"`
+	UnitPrice *string `json:"unit_price,omitempty"`
+	Note      *string `json:"note,omitempty"`
 }
 
 func toDTO(u *domain.UnitPrice) UnitPriceDTO {
 	return UnitPriceDTO{
-		ID:          utils.FormatID(u.ID),
-		Code:        u.Code,
-		Category:    string(u.Category),
-		WorkItem:    u.WorkItem,
-		Unit:        u.Unit,
-		UnitPrice:   strconv.FormatInt(u.UnitPrice, 10),
-		Information: u.Information,
+		ID:        utils.FormatID(u.ID),
+		Code:      u.Code,
+		Category:  string(u.Category),
+		WorkItem:  u.WorkItem,
+		Unit:      u.Unit,
+		UnitPrice: strconv.FormatInt(u.UnitPrice, 10),
+		Note:      u.Note,
 	}
 }

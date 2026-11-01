@@ -1,10 +1,22 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { listUnitPricesOptions, createUnitPriceMutation, deleteUnitPriceMutation } from '@/api/@tanstack/react-query.gen'
+import {
+  listUnitPricesOptions,
+  createUnitPriceMutation,
+  updateUnitPriceMutation,
+  deleteUnitPriceMutation,
+} from '@/api/@tanstack/react-query.gen'
+import type { UnitPriceDto } from '@/api/types.gen'
 import { PageHeader } from '@/components/page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
@@ -15,6 +27,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Badge } from '@/components/ui/badge'
 import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 
 export const Route = createFileRoute('/unit-prices/')({ component: UnitPricesPage })
 
@@ -26,7 +39,8 @@ function UnitPricesPage() {
 
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
-  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<UnitPriceDto | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
 
   // Form
@@ -35,7 +49,7 @@ function UnitPricesPage() {
   const [workItem, setWorkItem] = useState('')
   const [unit, setUnit] = useState('')
   const [unitPrice, setUnitPrice] = useState('')
-  const [information, setInformation] = useState('')
+  const [note, setNote] = useState('')
 
   const { data: items = [], isLoading } = useQuery({
     ...listUnitPricesOptions({
@@ -47,6 +61,7 @@ function UnitPricesPage() {
   })
 
   const createMut = useMutation(createUnitPriceMutation())
+  const updateMut = useMutation(updateUnitPriceMutation())
   const deleteMut = useMutation(deleteUnitPriceMutation())
 
   const handleOpenAdd = () => {
@@ -54,17 +69,34 @@ function UnitPricesPage() {
       openLoginModal()
       return
     }
+    setEditingItem(null)
     setCode('')
     setCategory('MATERIALS')
     setWorkItem('')
     setUnit('')
     setUnitPrice('')
-    setInformation('')
+    setNote('')
     setErrorMessage('')
-    setIsAddOpen(true)
+    setIsDialogOpen(true)
   }
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleOpenEdit = (item: UnitPriceDto) => {
+    if (!user) {
+      openLoginModal()
+      return
+    }
+    setEditingItem(item)
+    setCode(item.code)
+    setCategory((item.category as any) || 'MATERIALS')
+    setWorkItem(item.work_item)
+    setUnit(item.unit)
+    setUnitPrice(item.unit_price)
+    setNote(item.note || '')
+    setErrorMessage('')
+    setIsDialogOpen(true)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage('')
     if (!code.trim() || !workItem.trim() || !unit.trim()) {
@@ -73,20 +105,37 @@ function UnitPricesPage() {
     }
 
     try {
-      await createMut.mutateAsync({
-        body: {
-          code: code.trim(),
-          category,
-          work_item: workItem.trim(),
-          unit: unit.trim(),
-          unit_price: unitPrice.replace(/\D/g, '') || '0',
-          information: information.trim(),
-        },
-      })
+      if (editingItem) {
+        await updateMut.mutateAsync({
+          path: { id: editingItem.id },
+          body: {
+            code: code.trim(),
+            category,
+            work_item: workItem.trim(),
+            unit: unit.trim(),
+            unit_price: unitPrice.replace(/\D/g, '') || '0',
+            note: note.trim(),
+          },
+        })
+      } else {
+        await createMut.mutateAsync({
+          body: {
+            code: code.trim(),
+            category,
+            work_item: workItem.trim(),
+            unit: unit.trim(),
+            unit_price: unitPrice.replace(/\D/g, '') || '0',
+            note: note.trim(),
+          },
+        })
+      }
       await queryClient.invalidateQueries()
-      setIsAddOpen(false)
+      setIsDialogOpen(false)
+      setEditingItem(null)
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Gagal menyimpan harga satuan.')
+      setErrorMessage(
+        err?.message || (editingItem ? 'Gagal mengubah harga satuan.' : 'Gagal menyimpan harga satuan.')
+      )
     }
   }
 
@@ -132,7 +181,7 @@ function UnitPricesPage() {
               <TableHead>Work Item</TableHead>
               <TableHead className="w-20 text-center">Unit</TableHead>
               <TableHead className="w-36 text-right">Unit Price</TableHead>
-              <TableHead>Information</TableHead>
+              <TableHead>Note</TableHead>
               {isAdmin && <TableHead className="w-20 text-center">Action</TableHead>}
             </TableRow>
           </TableHeader>
@@ -169,17 +218,36 @@ function UnitPricesPage() {
                   <TableCell className="font-medium text-foreground">{item.work_item}</TableCell>
                   <TableCell className="text-center text-muted-foreground">{item.unit}</TableCell>
                   <TableCell className="text-right font-medium">{formatRupiah(item.unit_price)}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.information || '-'}</TableCell>
+                  <TableCell className="text-muted-foreground">{item.note || '-'}</TableCell>
                   {isAdmin && (
                     <TableCell className="text-center">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDelete(item.id, item.code)}
-                      >
-                        Delete
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 text-muted-foreground hover:text-foreground"
+                            />
+                          }
+                        >
+                          <MoreHorizontal className="size-4" />
+                          <span className="sr-only">Menu</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-32">
+                          <DropdownMenuItem onClick={() => handleOpenEdit(item)}>
+                            <Pencil className="size-4 mr-2" />
+                            <span>Ubah</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => handleDelete(item.id, item.code)}
+                          >
+                            <Trash2 className="size-4 mr-2" />
+                            <span>Hapus</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   )}
                 </TableRow>
@@ -189,12 +257,22 @@ function UnitPricesPage() {
         </Table>
       </div>
 
-      {/* Modal Add Unit Price */}
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+      {/* Modal Add / Edit Unit Price */}
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open)
+          if (!open) setEditingItem(null)
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Unit Price</DialogTitle>
-            <DialogDescription>Tambahkan harga satuan baru ke master database.</DialogDescription>
+            <DialogTitle>{editingItem ? 'Edit Unit Price' : 'Add Unit Price'}</DialogTitle>
+            <DialogDescription>
+              {editingItem
+                ? 'Perbarui data harga satuan.'
+                : 'Tambahkan harga satuan baru ke master database.'}
+            </DialogDescription>
           </DialogHeader>
 
           {errorMessage && (
@@ -203,7 +281,7 @@ function UnitPricesPage() {
             </Alert>
           )}
 
-          <form onSubmit={handleCreate} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <FieldGroup>
               <div className="grid grid-cols-2 gap-4">
                 <Field>
@@ -272,22 +350,38 @@ function UnitPricesPage() {
               </div>
 
               <Field>
-                <FieldLabel htmlFor="up-info">Information</FieldLabel>
+                <FieldLabel htmlFor="up-note">Note</FieldLabel>
                 <Input
-                  id="up-info"
-                  value={information}
-                  onChange={(e) => setInformation(e.target.value)}
-                  placeholder="Keterangan spesifikasi..."
+                  id="up-note"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Catatan spesifikasi..."
                 />
               </Field>
             </FieldGroup>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsDialogOpen(false)
+                  setEditingItem(null)
+                }}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={createMut.isPending}>
-                {createMut.isPending ? 'Saving...' : 'Save'}
+              <Button
+                type="submit"
+                disabled={editingItem ? updateMut.isPending : createMut.isPending}
+              >
+                {editingItem
+                  ? updateMut.isPending
+                    ? 'Saving...'
+                    : 'Save'
+                  : createMut.isPending
+                    ? 'Saving...'
+                    : 'Save'}
               </Button>
             </DialogFooter>
           </form>

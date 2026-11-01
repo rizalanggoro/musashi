@@ -133,7 +133,7 @@ export type CreateScheduleInput = {
 export type CreateUnitPriceInput = {
     category: string;
     code: string;
-    information: string;
+    note: string;
     unit: string;
     unit_price: string;
     work_item: string;
@@ -244,7 +244,7 @@ export type UnitPriceDto = {
     category: string;
     code: string;
     id: string;
-    information: string;
+    note: string;
     unit: string;
     unit_price: string;
     work_item: string;
@@ -290,7 +290,7 @@ export type UpdateScheduleInput = {
 export type UpdateUnitPriceInput = {
     category?: string;
     code?: string;
-    information?: string;
+    note?: string;
     unit?: string;
     unit_price?: string;
     work_item?: string;
