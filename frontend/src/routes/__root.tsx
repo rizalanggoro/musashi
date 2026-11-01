@@ -1,78 +1,85 @@
-import { useEffect } from 'react'
-import { createRootRoute, Link, Outlet, useLocation, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { getHealthOptions } from '@/api/@tanstack/react-query.gen'
-import { useAuth } from '@/lib/auth'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { getHealthOptions } from "@/api/@tanstack/react-query.gen";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
-  SidebarProvider,
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
+  SidebarGroupLabel,
+  SidebarHeader,
   SidebarInset,
-} from '@/components/ui/sidebar'
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAuth } from "@/lib/auth";
+import { useQuery } from "@tanstack/react-query";
 import {
-  FolderKanban,
-  Calendar,
-  Tag,
-  Calculator,
-  FileSpreadsheet,
+  createRootRoute,
+  Link,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "@tanstack/react-router";
+import {
   Box,
-  Receipt,
+  Calculator,
+  Calendar,
+  FileSpreadsheet,
+  FolderKanban,
   LogOut,
+  Receipt,
+  Tag,
   User as UserIcon,
-} from 'lucide-react'
+} from "lucide-react";
+import { useEffect } from "react";
 
 const nav = [
   {
-    group: 'Monitoring',
+    group: "Monitoring",
     items: [
-      { to: '/projects', label: 'Projects', icon: FolderKanban },
-      { to: '/schedule', label: 'Schedule', icon: Calendar },
+      { to: "/projects", label: "Projects", icon: FolderKanban },
+      { to: "/schedule", label: "Schedule", icon: Calendar },
     ],
   },
   {
-    group: 'Cost Estimate',
+    group: "Cost Estimate",
     items: [
-      { to: '/unit-prices', label: 'Unit Prices', icon: Tag },
-      { to: '/ahsp', label: 'AHSP', icon: Calculator },
-      { to: '/boq', label: 'BOQ', icon: FileSpreadsheet },
-      { to: '/volume', label: 'Volume Take-off', icon: Box },
-      { to: '/rab', label: 'RAB', icon: Receipt },
+      { to: "/unit-prices", label: "Unit Prices", icon: Tag },
+      { to: "/ahsp", label: "AHSP", icon: Calculator },
+      { to: "/boq", label: "BOQ", icon: FileSpreadsheet },
+      { to: "/volume", label: "Volume Take-off", icon: Box },
+      { to: "/rab", label: "RAB", icon: Receipt },
     ],
   },
-] as const
+] as const;
 
 export const Route = createRootRoute({
   component: Shell,
-})
+});
 
 function Shell() {
-  const { user, isLoading, logout } = useAuth()
-  const location = useLocation()
-  const navigate = useNavigate()
+  const { user, isLoading, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const isAuthPage = location.pathname === '/auth' || location.pathname === '/login'
+  const isAuthPage =
+    location.pathname === "/auth" || location.pathname === "/login";
 
   useEffect(() => {
     if (!isLoading) {
       if (!user && !isAuthPage) {
-        navigate({ to: '/auth', replace: true })
+        navigate({ to: "/auth", replace: true });
       } else if (user && isAuthPage) {
-        navigate({ to: '/projects', replace: true })
+        navigate({ to: "/projects", replace: true });
       }
     }
-  }, [user, isLoading, isAuthPage, navigate])
+  }, [user, isLoading, isAuthPage, navigate]);
 
   if (isLoading) {
     return (
@@ -82,15 +89,15 @@ function Shell() {
           <p className="text-xs text-muted-foreground">Memuat sesi...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (isAuthPage) {
-    return <Outlet />
+    return <Outlet />;
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -98,8 +105,11 @@ function Shell() {
       <SidebarProvider defaultOpen>
         <Sidebar variant="inset">
           <SidebarHeader className="h-14 justify-center border-b px-4">
-            <Link to="/projects" className="flex items-center gap-2 font-bold tracking-tight text-lg text-foreground">
-              <span>MUSASHI</span>
+            <Link
+              to="/projects"
+              className="flex items-center gap-2 font-bold tracking-tight text-lg text-foreground"
+            >
+              <span>Project Monitoring</span>
             </Link>
           </SidebarHeader>
 
@@ -110,8 +120,8 @@ function Shell() {
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {section.items.map((item) => {
-                      const Icon = item.icon
-                      const isActive = location.pathname === item.to
+                      const Icon = item.icon;
+                      const isActive = location.pathname === item.to;
                       return (
                         <SidebarMenuItem key={item.to}>
                           <SidebarMenuButton
@@ -122,7 +132,7 @@ function Shell() {
                             <span>{item.label}</span>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
-                      )
+                      );
                     })}
                   </SidebarMenu>
                 </SidebarGroupContent>
@@ -138,8 +148,12 @@ function Shell() {
                     <UserIcon className="size-4" />
                   </div>
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="truncate text-xs font-medium text-foreground">{user.name}</span>
-                    <span className="truncate text-[10px] uppercase font-semibold text-muted-foreground">{user.role}</span>
+                    <span className="truncate text-xs font-medium text-foreground">
+                      {user.name}
+                    </span>
+                    <span className="truncate text-[10px] uppercase font-semibold text-muted-foreground">
+                      {user.role}
+                    </span>
                   </div>
                 </div>
               </SidebarMenuItem>
@@ -177,17 +191,25 @@ function Shell() {
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
-  )
+  );
 }
 
 function HealthBadge() {
-  const { data, isError } = useQuery({ ...getHealthOptions(), refetchInterval: 30_000 })
-  const ok = !isError && data?.status === 'ok'
+  const { data, isError } = useQuery({
+    ...getHealthOptions(),
+    refetchInterval: 30_000,
+  });
+  const ok = !isError && data?.status === "ok";
 
   return (
-    <Badge variant={ok ? 'secondary' : 'destructive'} className="text-[11px] gap-1.5 font-normal">
-      <span className={`size-1.5 rounded-full ${ok ? 'bg-emerald-500' : 'bg-red-500'}`} />
-      {ok ? 'Online' : 'Offline'}
+    <Badge
+      variant={ok ? "secondary" : "destructive"}
+      className="text-[11px] gap-1.5 font-normal"
+    >
+      <span
+        className={`size-1.5 rounded-full ${ok ? "bg-emerald-500" : "bg-red-500"}`}
+      />
+      {ok ? "Online" : "Offline"}
     </Badge>
-  )
+  );
 }
