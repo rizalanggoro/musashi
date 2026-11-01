@@ -5,9 +5,8 @@ import {
   createAhspMutation,
   updateAhspMutation,
   getAhspOptions,
-  listUnitPricesOptions,
 } from '@/api/@tanstack/react-query.gen'
-import type { AhspDetailDto, CreateAhspItemInput } from '@/api/types.gen'
+import type { AhspDetailDto, CreateAhspItemInput, UnitPriceDto } from '@/api/types.gen'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
@@ -19,9 +18,21 @@ import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Badge } from '@/components/ui/badge'
 import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
-import { ArrowLeft, Plus, Trash2, Save, X, HardHat, Package, Wrench } from 'lucide-react'
+import { UnitPricePickerDialog } from './unit-price-picker-dialog'
+import {
+  ArrowLeft,
+  Plus,
+  Trash2,
+  Save,
+  X,
+  HardHat,
+  Package,
+  Wrench,
+  Link as LinkIcon,
+} from 'lucide-react'
 
 type LocalItem = CreateAhspItemInput & { id: string }
+type Category = 'LABOR' | 'MATERIALS' | 'EQUIPMENT'
 
 type AhspFormProps = {
   id?: string
@@ -54,6 +65,7 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
   const { user, openLoginModal } = useAuth()
 
   const [errorMessage, setErrorMessage] = useState('')
+  const [pickerCategory, setPickerCategory] = useState<Category | null>(null)
 
   // Header State
   const [code, setCode] = useState(initialData?.code || '')
@@ -76,72 +88,38 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
         unit_price_id: it.unit_price_id || undefined,
       }))
     }
-    if (isEdit) return []
-    return [
-      {
-        id: crypto.randomUUID(),
-        category: 'LABOR',
-        sort: 1,
-        description: 'Tukang',
-        code: '',
-        unit: 'OH',
-        coefficient: '0.2000',
-        unit_price: '120000',
-      },
-      {
-        id: crypto.randomUUID(),
-        category: 'MATERIALS',
-        sort: 2,
-        description: 'Semen Portland',
-        code: '',
-        unit: 'sak',
-        coefficient: '1.0000',
-        unit_price: '65000',
-      },
-    ]
-  })
-
-  // Master unit prices for auto-complete/selection
-  const { data: masterPrices = [] } = useQuery({
-    ...listUnitPricesOptions({}),
+    return []
   })
 
   const createMut = useMutation(createAhspMutation())
   const updateMut = useMutation(updateAhspMutation())
   const isPending = isEdit ? updateMut.isPending : createMut.isPending
 
-  const addItem = (category: 'LABOR' | 'MATERIALS' | 'EQUIPMENT') => {
-    setItems((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        category,
-        sort: prev.length + 1,
-        description: '',
-        code: '',
-        unit: '',
-        coefficient: '1.0000',
-        unit_price: '0',
-      },
-    ])
+  const handleOpenPicker = (category: Category) => {
+    setPickerCategory(category)
   }
 
-  const updateItem = (itemId: string, field: keyof LocalItem, value: any) => {
+  const handleAddItemsFromPicker = (selectedUnitPrices: UnitPriceDto[]) => {
+    if (!pickerCategory) return
+
+    const newItems: LocalItem[] = selectedUnitPrices.map((p, idx) => ({
+      id: crypto.randomUUID(),
+      category: pickerCategory,
+      sort: items.length + idx + 1,
+      description: p.work_item,
+      code: p.code,
+      unit: p.unit,
+      coefficient: '1.0000',
+      unit_price: p.unit_price,
+      unit_price_id: p.id,
+    }))
+
+    setItems((prev) => [...prev, ...newItems])
+  }
+
+  const updateCoefficient = (itemId: string, coefficient: string) => {
     setItems((prev) =>
-      prev.map((it) => {
-        if (it.id !== itemId) return it
-        const updated = { ...it, [field]: value }
-        if (field === 'unit_price_id' && value) {
-          const master = masterPrices.find((m) => m.id === value)
-          if (master) {
-            updated.description = master.work_item
-            updated.code = master.code
-            updated.unit = master.unit
-            updated.unit_price = master.unit_price
-          }
-        }
-        return updated
-      })
+      prev.map((it) => (it.id === itemId ? { ...it, coefficient } : it))
     )
   }
 
@@ -226,6 +204,11 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
     }
   }
 
+  const existingUnitPriceIds = useMemo(
+    () => items.map((it) => it.unit_price_id).filter(Boolean) as string[],
+    [items]
+  )
+
   return (
     <div className="flex flex-col gap-6 pb-16">
       {/* Top Navigation & Action Header */}
@@ -248,7 +231,7 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
             <p className="text-xs text-muted-foreground">
               {isEdit
                 ? `Perbarui rincian item koefisien dan harga untuk ${code || 'AHSP'}`
-                : 'Susun rincian koefisien komponen Tenaga Kerja (A), Bahan (B), dan Peralatan (C)'}
+                : 'Pilih item dari Master Unit Price (HSD) lalu tentukan koefisien masing-masing komponen'}
             </p>
           </div>
         </div>
@@ -368,7 +351,7 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
               <div>
                 <CardTitle>Rincian Komponen Koefisien & Harga Satuan</CardTitle>
                 <CardDescription>
-                  Masukkan koefisien dan harga satuan untuk setiap rincian tenaga kerja, bahan, dan peralatan.
+                  Item ditautkan langsung dari Master Unit Price (HSD). Anda cukup memasukkan koefisien kebutuhan.
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2 text-xs">
@@ -384,10 +367,10 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
                 <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead className="w-12 text-center">No</TableHead>
-                    <TableHead className="min-w-[280px]">Uraian Komponen & Master Harga</TableHead>
-                    <TableHead className="w-28">Kode</TableHead>
+                    <TableHead className="min-w-[280px]">Uraian Item (Terhubung ke Master HSD)</TableHead>
+                    <TableHead className="w-32">Kode</TableHead>
                     <TableHead className="w-20 text-center">Satuan</TableHead>
-                    <TableHead className="w-28 text-right">Koefisien</TableHead>
+                    <TableHead className="w-36 text-right">Koefisien</TableHead>
                     <TableHead className="w-36 text-right">Harga Satuan (Rp)</TableHead>
                     <TableHead className="w-36 text-right">Jumlah Biaya (Rp)</TableHead>
                     <TableHead className="w-12 text-center"></TableHead>
@@ -407,25 +390,26 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
-                        onClick={() => addItem('LABOR')}
-                        title="Tambah Tenaga Kerja"
-                        className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                        variant="outline"
+                        onClick={() => handleOpenPicker('LABOR')}
+                        title="Pilih Tenaga Kerja dari Master Unit Price"
+                        className="h-8 gap-1 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10"
                       >
-                        <Plus className="size-4" />
+                        <Plus className="size-3.5" />
+                        <span className="hidden sm:inline">Pilih</span>
                       </Button>
                     </TableCell>
                   </TableRow>
                   {items.filter((it) => it.category === 'LABOR').length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-3 text-xs text-muted-foreground italic">
+                      <TableCell colSpan={8} className="text-center py-4 text-xs text-muted-foreground italic">
                         Belum ada item tenaga kerja.{' '}
                         <button
                           type="button"
-                          onClick={() => addItem('LABOR')}
-                          className="text-primary underline hover:text-primary/80 font-medium ml-1"
+                          onClick={() => handleOpenPicker('LABOR')}
+                          className="text-primary underline hover:text-primary/80 font-medium ml-1 inline-flex items-center gap-1"
                         >
-                          + Tambah Tenaga Kerja
+                          <Plus className="size-3" /> Pilih dari Master Unit Price
                         </button>
                       </TableCell>
                     </TableRow>
@@ -437,8 +421,7 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
                           key={item.id}
                           item={item}
                           no={idx + 1}
-                          masterPrices={masterPrices}
-                          onUpdate={updateItem}
+                          onUpdateCoefficient={updateCoefficient}
                           onRemove={removeItem}
                         />
                       ))
@@ -466,25 +449,26 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
-                        onClick={() => addItem('MATERIALS')}
-                        title="Tambah Bahan"
-                        className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                        variant="outline"
+                        onClick={() => handleOpenPicker('MATERIALS')}
+                        title="Pilih Bahan dari Master Unit Price"
+                        className="h-8 gap-1 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10"
                       >
-                        <Plus className="size-4" />
+                        <Plus className="size-3.5" />
+                        <span className="hidden sm:inline">Pilih</span>
                       </Button>
                     </TableCell>
                   </TableRow>
                   {items.filter((it) => it.category === 'MATERIALS').length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-3 text-xs text-muted-foreground italic">
+                      <TableCell colSpan={8} className="text-center py-4 text-xs text-muted-foreground italic">
                         Belum ada item bahan.{' '}
                         <button
                           type="button"
-                          onClick={() => addItem('MATERIALS')}
-                          className="text-primary underline hover:text-primary/80 font-medium ml-1"
+                          onClick={() => handleOpenPicker('MATERIALS')}
+                          className="text-primary underline hover:text-primary/80 font-medium ml-1 inline-flex items-center gap-1"
                         >
-                          + Tambah Bahan
+                          <Plus className="size-3" /> Pilih dari Master Unit Price
                         </button>
                       </TableCell>
                     </TableRow>
@@ -496,8 +480,7 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
                           key={item.id}
                           item={item}
                           no={idx + 1}
-                          masterPrices={masterPrices}
-                          onUpdate={updateItem}
+                          onUpdateCoefficient={updateCoefficient}
                           onRemove={removeItem}
                         />
                       ))
@@ -525,25 +508,26 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
                       <Button
                         type="button"
                         size="sm"
-                        variant="ghost"
-                        onClick={() => addItem('EQUIPMENT')}
-                        title="Tambah Peralatan"
-                        className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                        variant="outline"
+                        onClick={() => handleOpenPicker('EQUIPMENT')}
+                        title="Pilih Peralatan dari Master Unit Price"
+                        className="h-8 gap-1 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10"
                       >
-                        <Plus className="size-4" />
+                        <Plus className="size-3.5" />
+                        <span className="hidden sm:inline">Pilih</span>
                       </Button>
                     </TableCell>
                   </TableRow>
                   {items.filter((it) => it.category === 'EQUIPMENT').length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-3 text-xs text-muted-foreground italic">
+                      <TableCell colSpan={8} className="text-center py-4 text-xs text-muted-foreground italic">
                         Belum ada item peralatan.{' '}
                         <button
                           type="button"
-                          onClick={() => addItem('EQUIPMENT')}
-                          className="text-primary underline hover:text-primary/80 font-medium ml-1"
+                          onClick={() => handleOpenPicker('EQUIPMENT')}
+                          className="text-primary underline hover:text-primary/80 font-medium ml-1 inline-flex items-center gap-1"
                         >
-                          + Tambah Peralatan
+                          <Plus className="size-3" /> Pilih dari Master Unit Price
                         </button>
                       </TableCell>
                     </TableRow>
@@ -555,8 +539,7 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
                           key={item.id}
                           item={item}
                           no={idx + 1}
-                          masterPrices={masterPrices}
-                          onUpdate={updateItem}
+                          onUpdateCoefficient={updateCoefficient}
                           onRemove={removeItem}
                         />
                       ))
@@ -658,6 +641,17 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
           </Button>
         </div>
       </form>
+
+      {/* Unit Price Picker Dialog */}
+      {pickerCategory && (
+        <UnitPricePickerDialog
+          open={Boolean(pickerCategory)}
+          onOpenChange={(open) => !open && setPickerCategory(null)}
+          category={pickerCategory}
+          existingUnitPriceIds={existingUnitPriceIds}
+          onSelectItems={handleAddItemsFromPicker}
+        />
+      )}
     </div>
   )
 }
@@ -665,86 +659,48 @@ function AhspFormContent({ id, initialData }: { id?: string; initialData?: AhspD
 function ComponentRow({
   item,
   no,
-  masterPrices,
-  onUpdate,
+  onUpdateCoefficient,
   onRemove,
 }: {
   item: LocalItem
   no: number
-  masterPrices: any[]
-  onUpdate: (id: string, field: keyof LocalItem, val: any) => void
+  onUpdateCoefficient: (id: string, coef: string) => void
   onRemove: (id: string) => void
 }) {
   const coef = parseFloat(item.coefficient || '0')
   const price = parseInt(item.unit_price || '0', 10)
   const cost = Math.round(coef * price)
 
-  // Filter master prices by category
-  const filteredPrices = masterPrices.filter((m) => m.category === item.category)
-
   return (
     <TableRow className="text-xs hover:bg-muted/30">
       <TableCell className="text-center text-muted-foreground font-mono">{no}</TableCell>
       <TableCell className="p-2">
-        <div className="flex flex-col sm:flex-row gap-2">
-          {filteredPrices.length > 0 && (
-            <NativeSelect
-              value={item.unit_price_id || ''}
-              onChange={(e) => onUpdate(item.id, 'unit_price_id', e.target.value)}
-              className="h-8 max-w-[180px] shrink-0 text-xs"
-            >
-              <NativeSelectOption value="">-- Pilih Master --</NativeSelectOption>
-              {filteredPrices.map((m) => (
-                <NativeSelectOption key={m.id} value={m.id}>
-                  {m.code} - {m.work_item}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          )}
-          <Input
-            value={item.description}
-            onChange={(e) => onUpdate(item.id, 'description', e.target.value)}
-            placeholder="Deskripsi uraian komponen..."
-            className="h-8 text-xs bg-card flex-1"
-            required
-          />
+        <div className="flex items-center gap-2">
+          <span title="Terhubung ke Master Unit Price">
+            <LinkIcon className="size-3.5 text-primary shrink-0" />
+          </span>
+          <span className="font-medium text-foreground">{item.description}</span>
         </div>
       </TableCell>
-      <TableCell className="p-2">
-        <Input
-          value={item.code || ''}
-          onChange={(e) => onUpdate(item.id, 'code', e.target.value)}
-          placeholder="Kode..."
-          className="h-8 text-xs font-mono bg-card"
-        />
+      <TableCell className="p-2 font-mono text-xs text-muted-foreground">
+        {item.code || '-'}
       </TableCell>
-      <TableCell className="p-2 text-center">
-        <Input
-          value={item.unit}
-          onChange={(e) => onUpdate(item.id, 'unit', e.target.value)}
-          placeholder="OH/m3"
-          className="h-8 text-xs text-center bg-card"
-          required
-        />
+      <TableCell className="p-2 text-center font-mono text-xs text-foreground">
+        {item.unit}
       </TableCell>
       <TableCell className="p-2 text-right">
         <Input
           type="number"
           step="any"
           value={item.coefficient}
-          onChange={(e) => onUpdate(item.id, 'coefficient', e.target.value)}
-          className="h-8 text-xs text-right font-mono bg-card"
+          onChange={(e) => onUpdateCoefficient(item.id, e.target.value)}
+          placeholder="0.0000"
+          className="h-8 text-xs text-right font-mono bg-card w-28 ml-auto"
           required
         />
       </TableCell>
-      <TableCell className="p-2 text-right">
-        <Input
-          type="number"
-          value={item.unit_price}
-          onChange={(e) => onUpdate(item.id, 'unit_price', e.target.value)}
-          className="h-8 text-xs text-right font-mono bg-card"
-          required
-        />
+      <TableCell className="p-2 text-right font-mono text-xs text-muted-foreground">
+        {formatRupiah(item.unit_price)}
       </TableCell>
       <TableCell className="text-right font-mono font-semibold text-foreground p-2">
         {formatRupiah(cost)}
