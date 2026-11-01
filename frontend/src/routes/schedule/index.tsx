@@ -240,7 +240,7 @@ function SchedulePage() {
 
       {/* Modal Add Schedule */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Schedule Item</DialogTitle>
             <DialogDescription>Tambahkan jadwal tahapan pekerjaan proyek.</DialogDescription>

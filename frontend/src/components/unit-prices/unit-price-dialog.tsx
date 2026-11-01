@@ -231,7 +231,7 @@ export function UnitPriceDialog({
 }: UnitPriceDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         {open && (
           <UnitPriceForm
             item={item ?? null}

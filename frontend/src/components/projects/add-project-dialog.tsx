@@ -114,7 +114,7 @@ function AddProjectForm({
   };
 
   return (
-    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>Add New Project</DialogTitle>
         <DialogDescription>

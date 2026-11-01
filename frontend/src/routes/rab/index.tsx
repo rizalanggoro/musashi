@@ -301,7 +301,7 @@ function RabPage() {
 
       {/* Modal Add RAB Item */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add RAB Item</DialogTitle>
             <DialogDescription>Tambahkan baris rencana anggaran biaya proyek.</DialogDescription>

@@ -277,7 +277,7 @@ function VolumePage() {
 
       {/* Modal Add Volume Take-off */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>Add Volume Take-off</DialogTitle>
             <DialogDescription>Input dimensi pengukuran untuk menghitung volume secara otomatis.</DialogDescription>

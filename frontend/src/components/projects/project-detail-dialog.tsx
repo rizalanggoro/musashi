@@ -35,7 +35,7 @@ export function ProjectDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <span>{project.name}</span>
@@ -49,7 +49,7 @@ export function ProjectDetailDialog({
         </DialogHeader>
 
         {/* Financial Breakdown (Vertical Stack) */}
-        <div className="flex flex-col gap-5 py-3">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col divide-y divide-border/60 rounded-lg border bg-muted/20 text-sm">
             <div className="flex items-center justify-between px-4 py-2.5">
               <span className="text-muted-foreground">Budget</span>
@@ -133,7 +133,7 @@ export function ProjectDetailDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
+        <DialogFooter className="sm:justify-between">
           <div className="flex gap-2">
             <Button
               size="sm"
