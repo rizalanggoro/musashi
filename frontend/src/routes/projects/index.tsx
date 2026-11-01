@@ -1,35 +1,17 @@
 import {
-  createProjectMutation,
   deleteProjectMutation,
-  getCostEstimateOptions,
   listProjectsOptions,
-  updateProjectMutation,
 } from "@/api/@tanstack/react-query.gen";
 import type { Project } from "@/api/types.gen";
 import { PageHeader } from "@/components/page-header";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AddProjectDialog,
+  EditProjectDialog,
+  PROGRESS_STAGES,
+  ProjectDetailDialog,
+} from "@/components/projects";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxValue,
-  useComboboxAnchor,
-} from "@/components/ui/combobox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,8 +24,6 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -59,37 +39,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Check, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-type ProgressKey =
-  | "progress_ppt"
-  | "progress_drawing"
-  | "progress_rab"
-  | "progress_vendor"
-  | "progress_spb"
-  | "progress_pr"
-  | "progress_ringi"
-  | "progress_po"
-  | "progress_construction"
-  | "progress_bast";
-
-interface StageOption {
-  key: ProgressKey;
-  value: string;
-  label: string;
-}
-
-const PROGRESS_STAGES: StageOption[] = [
-  { key: "progress_ppt", value: "progress_ppt", label: "PPT" },
-  { key: "progress_drawing", value: "progress_drawing", label: "Drawing" },
-  { key: "progress_rab", value: "progress_rab", label: "RAB" },
-  { key: "progress_vendor", value: "progress_vendor", label: "Vendor" },
-  { key: "progress_spb", value: "progress_spb", label: "SPB" },
-  { key: "progress_pr", value: "progress_pr", label: "PR" },
-  { key: "progress_ringi", value: "progress_ringi", label: "RINGI" },
-  { key: "progress_po", value: "progress_po", label: "PO" },
-  { key: "progress_construction", value: "progress_construction", label: "Construction" },
-  { key: "progress_bast", value: "progress_bast", label: "BAST" },
-];
-
 export const Route = createFileRoute("/projects/")({ component: ProjectsPage });
 
 function ProjectsPage() {
@@ -97,35 +46,11 @@ function ProjectsPage() {
   const navigate = useNavigate();
   const { isAdmin, user, openLoginModal } = useAuth();
 
-  const addAnchor = useComboboxAnchor();
-  const editAnchor = useComboboxAnchor();
-
   const [search, setSearch] = useState("");
   const [page] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-
-  // Add Form state
-  const [name, setName] = useState("");
-  const [section, setSection] = useState("");
-  const [plant, setPlant] = useState("");
-  const [planDate, setPlanDate] = useState("");
-  const [budget, setBudget] = useState("");
-  const [note, setNote] = useState("");
-  const [addStages, setAddStages] = useState<StageOption[]>([]);
-  const [formError, setFormError] = useState("");
-
-  // Edit Form state
-  const [editName, setEditName] = useState("");
-  const [editSection, setEditSection] = useState("");
-  const [editPlant, setEditPlant] = useState("");
-  const [editPlanDate, setEditPlanDate] = useState("");
-  const [editBudget, setEditBudget] = useState("");
-  const [editNote, setEditNote] = useState("");
-  const [editStages, setEditStages] = useState<StageOption[]>([]);
-  const [editFormError, setEditFormError] = useState("");
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const { data, isLoading } = useQuery({
     ...listProjectsOptions({
@@ -133,8 +58,6 @@ function ProjectsPage() {
     }),
   });
 
-  const createMut = useMutation(createProjectMutation());
-  const updateMut = useMutation(updateProjectMutation());
   const deleteMut = useMutation(deleteProjectMutation());
 
   const handleOpenAdd = () => {
@@ -142,14 +65,6 @@ function ProjectsPage() {
       openLoginModal();
       return;
     }
-    setName("");
-    setSection("");
-    setPlant("");
-    setPlanDate("");
-    setBudget("");
-    setNote("");
-    setAddStages([]);
-    setFormError("");
     setIsAddOpen(true);
   };
 
@@ -159,84 +74,6 @@ function ProjectsPage() {
       return;
     }
     setEditingProject(p);
-    setEditName(p.name);
-    setEditSection(p.section || "");
-    setEditPlant(p.plant || "");
-    setEditPlanDate(p.implementation_plan || "");
-    setEditBudget(p.budget || "");
-    setEditNote(p.note || "");
-    setEditStages(PROGRESS_STAGES.filter((s) => (p as any)[s.key] === "done"));
-    setEditFormError("");
-    setIsEditOpen(true);
-  };
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError("");
-    if (!name.trim()) {
-      setFormError("Nama project wajib diisi.");
-      return;
-    }
-    try {
-      const progressPayload = Object.fromEntries(
-        PROGRESS_STAGES.map((s) => [
-          s.key,
-          addStages.some((sel) => sel.key === s.key) ? "done" : "pending",
-        ])
-      );
-
-      await createMut.mutateAsync({
-        body: {
-          name: name.trim(),
-          section: section.trim(),
-          plant: plant.trim(),
-          implementation_plan: planDate || undefined,
-          budget: budget ? budget.replace(/\D/g, "") : "0",
-          note: note.trim(),
-          ...progressPayload,
-        },
-      });
-      await queryClient.invalidateQueries();
-      setIsAddOpen(false);
-    } catch (err: any) {
-      setFormError(err?.message || "Gagal membuat proyek.");
-    }
-  };
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingProject) return;
-    setEditFormError("");
-    if (!editName.trim()) {
-      setEditFormError("Nama project wajib diisi.");
-      return;
-    }
-    try {
-      const progressPayload = Object.fromEntries(
-        PROGRESS_STAGES.map((s) => [
-          s.key,
-          editStages.some((sel) => sel.key === s.key) ? "done" : "pending",
-        ])
-      );
-
-      await updateMut.mutateAsync({
-        path: { id: editingProject.id },
-        body: {
-          name: editName.trim(),
-          section: editSection.trim(),
-          plant: editPlant.trim(),
-          implementation_plan: editPlanDate || undefined,
-          budget: editBudget ? editBudget.replace(/\D/g, "") : "0",
-          note: editNote.trim(),
-          ...progressPayload,
-        },
-      });
-      await queryClient.invalidateQueries();
-      setIsEditOpen(false);
-      setEditingProject(null);
-    } catch (err: any) {
-      setEditFormError(err?.message || "Gagal mengubah proyek.");
-    }
   };
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
@@ -397,290 +234,23 @@ function ProjectsPage() {
         </Table>
       </div>
 
-      {/* Modal Add Project */}
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add New Project</DialogTitle>
-            <DialogDescription>
-              Masukkan rincian proyek baru dan tahapan monitoring.
-            </DialogDescription>
-          </DialogHeader>
+      <AddProjectDialog
+        open={isAddOpen}
+        onOpenChange={setIsAddOpen}
+      />
 
-          {formError && (
-            <Alert variant="destructive">
-              <AlertDescription>{formError}</AlertDescription>
-            </Alert>
-          )}
+      <EditProjectDialog
+        project={editingProject}
+        open={Boolean(editingProject)}
+        onOpenChange={(open) => {
+          if (!open) setEditingProject(null);
+        }}
+      />
 
-          <form onSubmit={handleCreate} className="flex flex-col gap-4">
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="proj-name">Project Name</FieldLabel>
-                <Input
-                  id="proj-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nama Proyek..."
-                  required
-                />
-              </Field>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="proj-section">Section</FieldLabel>
-                  <Input
-                    id="proj-section"
-                    value={section}
-                    onChange={(e) => setSection(e.target.value)}
-                    placeholder="Unit / Bagian..."
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="proj-plant">Plant</FieldLabel>
-                  <Input
-                    id="proj-plant"
-                    value={plant}
-                    onChange={(e) => setPlant(e.target.value)}
-                    placeholder="Lokasi Plant / Pabrik..."
-                  />
-                </Field>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="proj-plan">Plan Date</FieldLabel>
-                  <Input
-                    id="proj-plan"
-                    type="date"
-                    value={planDate}
-                    onChange={(e) => setPlanDate(e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="proj-budget">Budget (Rp)</FieldLabel>
-                  <Input
-                    id="proj-budget"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    placeholder="Contoh: 150000000"
-                  />
-                </Field>
-              </div>
-
-              <Field>
-                <FieldLabel htmlFor="proj-note">Note</FieldLabel>
-                <Input
-                  id="proj-note"
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Catatan tambahan..."
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel>Progress Stages</FieldLabel>
-                <Combobox
-                  multiple
-                  items={PROGRESS_STAGES}
-                  value={addStages}
-                  onValueChange={(val: StageOption[]) => setAddStages(val)}
-                  isItemEqualToValue={(a, b) => a.key === b.key}
-                >
-                  <ComboboxValue>
-                    {(values: StageOption[]) => (
-                      <ComboboxChips ref={addAnchor}>
-                        {values?.map((stage) => (
-                          <ComboboxChip key={stage.key}>
-                            {stage.label}
-                          </ComboboxChip>
-                        ))}
-                        <ComboboxChipsInput
-                          placeholder={
-                            !values || values.length === 0
-                              ? "Pilih tahapan progres..."
-                              : ""
-                          }
-                        />
-                      </ComboboxChips>
-                    )}
-                  </ComboboxValue>
-                  <ComboboxContent anchor={addAnchor}>
-                    <ComboboxEmpty>Tahapan tidak ditemukan</ComboboxEmpty>
-                    <ComboboxList>
-                      {(stage: StageOption) => (
-                        <ComboboxItem key={stage.key} value={stage}>
-                          {stage.label}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
-              </Field>
-            </FieldGroup>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsAddOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={createMut.isPending}>
-                {createMut.isPending ? "Saving..." : "Save Project"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal Edit Project */}
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Project</DialogTitle>
-            <DialogDescription>
-              Ubah data proyek dan perbarui tahapan progres.
-            </DialogDescription>
-          </DialogHeader>
-
-          {editFormError && (
-            <Alert variant="destructive">
-              <AlertDescription>{editFormError}</AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={handleUpdate} className="flex flex-col gap-4">
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="edit-proj-name">Project Name</FieldLabel>
-                <Input
-                  id="edit-proj-name"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  placeholder="Nama Proyek..."
-                  required
-                />
-              </Field>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="edit-proj-section">Section</FieldLabel>
-                  <Input
-                    id="edit-proj-section"
-                    value={editSection}
-                    onChange={(e) => setEditSection(e.target.value)}
-                    placeholder="Unit / Bagian..."
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="edit-proj-plant">Plant</FieldLabel>
-                  <Input
-                    id="edit-proj-plant"
-                    value={editPlant}
-                    onChange={(e) => setEditPlant(e.target.value)}
-                    placeholder="Lokasi Plant / Pabrik..."
-                  />
-                </Field>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="edit-proj-plan">Plan Date</FieldLabel>
-                  <Input
-                    id="edit-proj-plan"
-                    type="date"
-                    value={editPlanDate}
-                    onChange={(e) => setEditPlanDate(e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="edit-proj-budget">Budget (Rp)</FieldLabel>
-                  <Input
-                    id="edit-proj-budget"
-                    value={editBudget}
-                    onChange={(e) => setEditBudget(e.target.value)}
-                    placeholder="Contoh: 150000000"
-                  />
-                </Field>
-              </div>
-
-              <Field>
-                <FieldLabel htmlFor="edit-proj-note">Note</FieldLabel>
-                <Input
-                  id="edit-proj-note"
-                  value={editNote}
-                  onChange={(e) => setEditNote(e.target.value)}
-                  placeholder="Catatan tambahan..."
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel>Progress Stages</FieldLabel>
-                <Combobox
-                  multiple
-                  items={PROGRESS_STAGES}
-                  value={editStages}
-                  onValueChange={(val: StageOption[]) => setEditStages(val)}
-                  isItemEqualToValue={(a, b) => a.key === b.key}
-                >
-                  <ComboboxValue>
-                    {(values: StageOption[]) => (
-                      <ComboboxChips ref={editAnchor}>
-                        {values?.map((stage) => (
-                          <ComboboxChip key={stage.key}>
-                            {stage.label}
-                          </ComboboxChip>
-                        ))}
-                        <ComboboxChipsInput
-                          placeholder={
-                            !values || values.length === 0
-                              ? "Pilih tahapan progres..."
-                              : ""
-                          }
-                        />
-                      </ComboboxChips>
-                    )}
-                  </ComboboxValue>
-                  <ComboboxContent anchor={editAnchor}>
-                    <ComboboxEmpty>Tahapan tidak ditemukan</ComboboxEmpty>
-                    <ComboboxList>
-                      {(stage: StageOption) => (
-                        <ComboboxItem key={stage.key} value={stage}>
-                          {stage.label}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
-              </Field>
-            </FieldGroup>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setIsEditOpen(false);
-                  setEditingProject(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={updateMut.isPending}>
-                {updateMut.isPending ? "Saving..." : "Save Changes"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Project Detail Modal (Read-Only Detail) */}
       {selectedProject && (
         <ProjectDetailDialog
           project={selectedProject}
-          open={!!selectedProject}
+          open={Boolean(selectedProject)}
           onClose={() => setSelectedProject(null)}
           onNavigate={(path) => {
             setSelectedProject(null);
@@ -689,154 +259,5 @@ function ProjectsPage() {
         />
       )}
     </div>
-  );
-}
-
-function ProjectDetailDialog({
-  project,
-  open,
-  onClose,
-  onNavigate,
-}: {
-  project: Project;
-  open: boolean;
-  onClose: () => void;
-  onNavigate: (to: string) => void;
-}) {
-  const { data: cost } = useQuery({
-    ...getCostEstimateOptions({ path: { id: project.id } }),
-    enabled: open,
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <span>{project.name}</span>
-            <Badge variant="outline" className="font-normal">
-              {project.section || "General"} · {project.plant || "Site"}
-            </Badge>
-          </DialogTitle>
-          <DialogDescription>
-            Ringkasan estimasi biaya dan tahapan progres proyek.
-          </DialogDescription>
-        </DialogHeader>
-
-        {/* Financial Breakdown (Vertical Stack) */}
-        <div className="flex flex-col gap-5 py-3">
-          <div className="flex flex-col divide-y divide-border/60 rounded-lg border bg-muted/20 text-sm">
-            <div className="flex items-center justify-between px-4 py-2.5">
-              <span className="text-muted-foreground">Budget</span>
-              <span className="font-semibold text-foreground">
-                {formatRupiah(cost?.budget ?? project.budget)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-4 py-2.5">
-              <span className="text-muted-foreground">RAB (Rencana)</span>
-              <span className="font-medium text-foreground">
-                {formatRupiah(cost?.rab ?? "0")}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-4 py-2.5">
-              <span className="text-muted-foreground">SPB (Terbayar)</span>
-              <span className="font-medium text-foreground">
-                {formatRupiah(cost?.spb ?? "0")}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30">
-              <span className="text-muted-foreground">Variance (Budget - RAB)</span>
-              <span className="font-semibold text-foreground">
-                {formatRupiah(cost?.variance ?? "0")}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30">
-              <span className="text-muted-foreground">Sisa Anggaran (Budget - SPB)</span>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                {formatRupiah(cost?.sisa ?? "0")}
-              </span>
-            </div>
-          </div>
-
-          {/* Project Details */}
-          {(project.implementation_plan || project.note) && (
-            <div className="flex flex-col gap-1.5 text-xs text-muted-foreground px-1">
-              {project.implementation_plan && (
-                <div>
-                  <span className="font-medium text-foreground">Plan Date:</span>{" "}
-                  {project.implementation_plan}
-                </div>
-              )}
-              {project.note && (
-                <div>
-                  <span className="font-medium text-foreground">Note:</span>{" "}
-                  {project.note}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Read-Only Progress Stages Status */}
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Progress Stages
-            </span>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              {PROGRESS_STAGES.map((s) => {
-                const isDone = (project as any)[s.key] === "done";
-                return isDone ? (
-                  <Badge
-                    key={s.key}
-                    variant="secondary"
-                    className="h-auto flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
-                  >
-                    <Check className="size-3.5 stroke-[2.5]" />
-                    <span>{s.label}</span>
-                  </Badge>
-                ) : (
-                  <Badge
-                    key={s.key}
-                    variant="outline"
-                    className="h-auto flex items-center gap-1.5 px-2.5 py-1 text-xs text-muted-foreground border-dashed bg-muted/20 font-normal"
-                  >
-                    <span className="size-1.5 rounded-full bg-muted-foreground/40" />
-                    <span>{s.label}</span>
-                  </Badge>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onNavigate(`/schedule?projectId=${project.id}`)}
-            >
-              Schedule
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onNavigate(`/volume?projectId=${project.id}`)}
-            >
-              Volume Take-off
-            </Button>
-            <Button
-              size="sm"
-              variant="default"
-              onClick={() => onNavigate(`/rab?projectId=${project.id}`)}
-            >
-              RAB
-            </Button>
-          </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            Close
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }

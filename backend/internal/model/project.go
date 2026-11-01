@@ -11,8 +11,8 @@ import (
 type Project struct {
 	gorm.Model
 	Name               string                `gorm:"not null"`
-	Section            string                `gorm:"not null;default:''"`
-	Plant              string                `gorm:"not null;default:''"`
+	Section            string                `gorm:"not null;default:'GA Building'"`
+	Plant              string                `gorm:"not null;default:'Cikarang'"`
 	ImplementationPlan *time.Time            `gorm:"type:date"`
 	Budget             int64                 `gorm:"not null;default:0"`
 	Note               string                `gorm:"column:note;not null;default:''"`

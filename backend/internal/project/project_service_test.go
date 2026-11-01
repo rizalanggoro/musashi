@@ -134,12 +134,24 @@ func TestProjectService(t *testing.T) {
 			t.Fatalf("expected ErrProjectAlreadyExists, got %v", err)
 		}
 
+		// Invalid section
+		_, err = svc.Create(CreateProjectInput{Name: "New Proj", Section: "InvalidSec"})
+		if !errors.Is(err, ErrInvalidSection) {
+			t.Fatalf("expected ErrInvalidSection, got %v", err)
+		}
+
+		// Invalid plant
+		_, err = svc.Create(CreateProjectInput{Name: "New Proj", Section: "GA Building", Plant: "InvalidPlant"})
+		if !errors.Is(err, ErrInvalidPlant) {
+			t.Fatalf("expected ErrInvalidPlant, got %v", err)
+		}
+
 		// Success
 		plan := "2026-06-01"
 		created, err := svc.Create(CreateProjectInput{
 			Name:               "New Project",
-			Section:            "Sipil",
-			Plant:              "Plant 1",
+			Section:            "GA Building",
+			Plant:              "Cikarang",
 			Budget:             "1000000",
 			ImplementationPlan: &plan,
 		})
@@ -177,14 +189,28 @@ func TestProjectService(t *testing.T) {
 			t.Fatalf("expected ErrProjectAlreadyExists, got %v", err)
 		}
 
+		// Invalid section update
+		_, err = svc.Update(1, UpdateProjectInput{Section: strPtr("Wrong")})
+		if !errors.Is(err, ErrInvalidSection) {
+			t.Fatalf("expected ErrInvalidSection, got %v", err)
+		}
+
+		// Invalid plant update
+		_, err = svc.Update(1, UpdateProjectInput{Plant: strPtr("Wrong")})
+		if !errors.Is(err, ErrInvalidPlant) {
+			t.Fatalf("expected ErrInvalidPlant, got %v", err)
+		}
+
 		// Success update
 		updated, err := svc.Update(1, UpdateProjectInput{
 			Name:        strPtr("Updated Name"),
+			Section:     strPtr("EHS"),
+			Plant:       strPtr("Karawang"),
 			Budget:      strPtr("2000000"),
 			ProgressSPB: strPtr("done"),
 			Status:      strPtr("on_going"),
 		})
-		if err != nil || updated.Name != "Updated Name" || updated.ProgressSPB != "done" {
+		if err != nil || updated.Name != "Updated Name" || updated.Section != "EHS" || updated.Plant != "Karawang" || updated.ProgressSPB != "done" {
 			t.Fatalf("unexpected update error: %v", err)
 		}
 	})

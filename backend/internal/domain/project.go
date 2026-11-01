@@ -18,6 +18,39 @@ const (
 	ProgressDone    ProgressStatus = "done"
 )
 
+type ProjectSection string
+
+const (
+	ProjectSectionGABuilding ProjectSection = "GA Building"
+	ProjectSectionEHS        ProjectSection = "EHS"
+	ProjectSectionWellfare   ProjectSection = "Wellfare"
+)
+
+func IsValidSection(s string) bool {
+	switch s {
+	case string(ProjectSectionGABuilding), string(ProjectSectionEHS), string(ProjectSectionWellfare):
+		return true
+	default:
+		return false
+	}
+}
+
+type ProjectPlant string
+
+const (
+	ProjectPlantCikarang ProjectPlant = "Cikarang"
+	ProjectPlantKarawang ProjectPlant = "Karawang"
+)
+
+func IsValidPlant(p string) bool {
+	switch p {
+	case string(ProjectPlantCikarang), string(ProjectPlantKarawang):
+		return true
+	default:
+		return false
+	}
+}
+
 type Project struct {
 	ID                 uint           `json:"id"`
 	CreatedAt          time.Time      `json:"created_at"`

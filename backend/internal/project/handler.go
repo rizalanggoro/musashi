@@ -81,6 +81,12 @@ func (h *Handler) Create(c fiber.Ctx) error {
 		if errors.Is(err, ErrProjectNameRequired) {
 			return httperr.BadRequest(c, "Project name is required", map[string]string{"name": "Project name is required"})
 		}
+		if errors.Is(err, ErrInvalidSection) {
+			return httperr.BadRequest(c, err.Error(), map[string]string{"section": err.Error()})
+		}
+		if errors.Is(err, ErrInvalidPlant) {
+			return httperr.BadRequest(c, err.Error(), map[string]string{"plant": err.Error()})
+		}
 		if errors.Is(err, ErrProjectAlreadyExists) {
 			return httperr.Conflict(c, err.Error())
 		}
@@ -147,6 +153,12 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	if err != nil {
 		if errors.Is(err, ErrProjectNotFound) {
 			return httperr.NotFound(c, "Project not found")
+		}
+		if errors.Is(err, ErrInvalidSection) {
+			return httperr.BadRequest(c, err.Error(), map[string]string{"section": err.Error()})
+		}
+		if errors.Is(err, ErrInvalidPlant) {
+			return httperr.BadRequest(c, err.Error(), map[string]string{"plant": err.Error()})
 		}
 		if errors.Is(err, ErrProjectAlreadyExists) {
 			return httperr.Conflict(c, err.Error())

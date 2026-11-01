@@ -16,6 +16,8 @@ var (
 	ErrProjectNotFound      = errors.New("project not found")
 	ErrProjectNameRequired  = errors.New("project name is required")
 	ErrProjectAlreadyExists = errors.New("project with that name already exists")
+	ErrInvalidSection       = errors.New("section must be one of: GA Building, EHS, Wellfare")
+	ErrInvalidPlant         = errors.New("plant must be one of: Cikarang, Karawang")
 )
 
 type Service interface {
@@ -90,10 +92,26 @@ func (s *service) Create(input CreateProjectInput) (*ProjectDTO, error) {
 		}
 	}
 
+	sec := strings.TrimSpace(input.Section)
+	if sec == "" {
+		sec = string(domain.ProjectSectionGABuilding)
+	}
+	if !domain.IsValidSection(sec) {
+		return nil, ErrInvalidSection
+	}
+
+	pl := strings.TrimSpace(input.Plant)
+	if pl == "" {
+		pl = string(domain.ProjectPlantCikarang)
+	}
+	if !domain.IsValidPlant(pl) {
+		return nil, ErrInvalidPlant
+	}
+
 	p := domain.Project{
 		Name:                 name,
-		Section:              input.Section,
-		Plant:                input.Plant,
+		Section:              sec,
+		Plant:                pl,
 		ImplementationPlan:   planDate,
 		Budget:               budgetVal,
 		Note:                 input.Note,
@@ -138,10 +156,18 @@ func (s *service) Update(id uint, input UpdateProjectInput) (*ProjectDTO, error)
 		}
 	}
 	if input.Section != nil {
-		p.Section = *input.Section
+		sec := strings.TrimSpace(*input.Section)
+		if !domain.IsValidSection(sec) {
+			return nil, ErrInvalidSection
+		}
+		p.Section = sec
 	}
 	if input.Plant != nil {
-		p.Plant = *input.Plant
+		pl := strings.TrimSpace(*input.Plant)
+		if !domain.IsValidPlant(pl) {
+			return nil, ErrInvalidPlant
+		}
+		p.Plant = pl
 	}
 	if input.ImplementationPlan != nil {
 		if *input.ImplementationPlan != "" {
