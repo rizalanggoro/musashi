@@ -23,6 +23,7 @@ type Ahsp struct {
 	TotalCost         int64      `json:"total_cost"`
 	UnitPriceOfWork   int64      `json:"unit_price_of_work"`
 	Status            AhspStatus `json:"status"`
+	Note              string     `json:"note"`
 
 	Items []AhspItem `json:"items,omitempty"`
 }

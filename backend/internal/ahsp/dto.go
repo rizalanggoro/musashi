@@ -20,6 +20,7 @@ type AhspDTO struct {
 	TotalCost         string `json:"total_cost"`
 	UnitPriceOfWork   string `json:"unit_price_of_work"`
 	Status            string `json:"status"`
+	Note              string `json:"note"`
 }
 
 type AhspItemDTO struct {
@@ -57,6 +58,7 @@ type CreateAhspInput struct {
 	Unit              string                `json:"unit"`
 	OverheadProfitPct string                `json:"overhead_profit_pct"`
 	Status            string                `json:"status"`
+	Note              string                `json:"note"`
 	Items             []CreateAhspItemInput `json:"items"`
 }
 
@@ -73,6 +75,7 @@ func toAhspDTO(a *domain.Ahsp) AhspDTO {
 		TotalCost:         strconv.FormatInt(a.TotalCost, 10),
 		UnitPriceOfWork:   strconv.FormatInt(a.UnitPriceOfWork, 10),
 		Status:            string(a.Status),
+		Note:              a.Note,
 	}
 }
 

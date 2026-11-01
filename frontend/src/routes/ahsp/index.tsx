@@ -4,22 +4,29 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   listAhspsOptions,
   createAhspMutation,
+  updateAhspMutation,
   deleteAhspMutation,
   listUnitPricesOptions,
 } from '@/api/@tanstack/react-query.gen'
-import type { CreateAhspItemInput } from '@/api/types.gen'
+import { getAhsp } from '@/api/sdk.gen'
+import type { AhspDto, CreateAhspItemInput } from '@/api/types.gen'
 import { PageHeader } from '@/components/page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
-import { Badge } from '@/components/ui/badge'
 import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
-import { Plus, Trash2 } from 'lucide-react'
+import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
 
 export const Route = createFileRoute('/ahsp/')({ component: AhspPage })
 
@@ -31,6 +38,7 @@ function AhspPage() {
 
   const [search, setSearch] = useState('')
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingAhspId, setEditingAhspId] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
 
   // Form Header State
@@ -38,6 +46,7 @@ function AhspPage() {
   const [workItem, setWorkItem] = useState('')
   const [unit, setUnit] = useState('')
   const [overheadPct, setOverheadPct] = useState('10.00')
+  const [note, setNote] = useState('')
   const [status, setStatus] = useState<'draft' | 'final'>('draft')
   const [items, setItems] = useState<LocalItem[]>([])
 
@@ -52,6 +61,7 @@ function AhspPage() {
   })
 
   const createMut = useMutation(createAhspMutation())
+  const updateMut = useMutation(updateAhspMutation())
   const deleteMut = useMutation(deleteAhspMutation())
 
   const handleOpenAdd = () => {
@@ -59,10 +69,12 @@ function AhspPage() {
       openLoginModal()
       return
     }
+    setEditingAhspId(null)
     setCode('')
     setWorkItem('')
     setUnit('')
     setOverheadPct('10.00')
+    setNote('')
     setStatus('draft')
     setItems([
       {
@@ -88,6 +100,43 @@ function AhspPage() {
     ])
     setErrorMessage('')
     setIsFormOpen(true)
+  }
+
+  const handleOpenEdit = async (a: AhspDto) => {
+    if (!user) {
+      openLoginModal()
+      return
+    }
+    try {
+      const res = await getAhsp({ path: { id: a.id } })
+      const data = res.data
+      if (!data) return
+
+      setEditingAhspId(a.id)
+      setCode(data.code || '')
+      setWorkItem(data.work_item || '')
+      setUnit(data.unit || '')
+      setOverheadPct(data.overhead_profit_pct || '10.00')
+      setNote(data.note || '')
+      setStatus((data.status as any) || 'draft')
+      setItems(
+        (data.items || []).map((it) => ({
+          id: it.id || crypto.randomUUID(),
+          category: (it.category as any) || 'MATERIALS',
+          sort: it.sort || 1,
+          description: it.description || '',
+          code: it.code || '',
+          unit: it.unit || '',
+          coefficient: it.coefficient || '1.0000',
+          unit_price: it.unit_price || '0',
+          unit_price_id: it.unit_price_id || undefined,
+        }))
+      )
+      setErrorMessage('')
+      setIsFormOpen(true)
+    } catch (err: any) {
+      alert(err?.message || 'Gagal memuat detail AHSP.')
+    }
   }
 
   const addItem = (category: 'LABOR' | 'MATERIALS' | 'EQUIPMENT') => {
@@ -162,29 +211,42 @@ function AhspPage() {
     }
 
     try {
-      await createMut.mutateAsync({
-        body: {
-          code: code.trim(),
-          work_item: workItem.trim(),
-          unit: unit.trim(),
-          overhead_profit_pct: overheadPct,
-          status,
-          items: items.map((it, idx) => ({
-            unit_price_id: it.unit_price_id || undefined,
-            category: it.category,
-            sort: idx + 1,
-            description: it.description,
-            code: it.code,
-            unit: it.unit,
-            coefficient: it.coefficient,
-            unit_price: it.unit_price,
-          })),
-        },
-      })
+      const payload = {
+        code: code.trim(),
+        work_item: workItem.trim(),
+        unit: unit.trim(),
+        overhead_profit_pct: overheadPct,
+        status,
+        note: note.trim(),
+        items: items.map((it, idx) => ({
+          unit_price_id: it.unit_price_id || undefined,
+          category: it.category,
+          sort: idx + 1,
+          description: it.description,
+          code: it.code,
+          unit: it.unit,
+          coefficient: it.coefficient,
+          unit_price: it.unit_price,
+        })),
+      }
+
+      if (editingAhspId) {
+        await updateMut.mutateAsync({
+          path: { id: editingAhspId },
+          body: payload,
+        })
+      } else {
+        await createMut.mutateAsync({
+          body: payload,
+        })
+      }
       await queryClient.invalidateQueries()
       setIsFormOpen(false)
+      setEditingAhspId(null)
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Gagal menyimpan AHSP.')
+      setErrorMessage(
+        err?.message || (editingAhspId ? 'Gagal mengubah AHSP.' : 'Gagal menyimpan AHSP.')
+      )
     }
   }
 
@@ -210,8 +272,8 @@ function AhspPage() {
               <TableHead className="w-32">Code</TableHead>
               <TableHead>Work Item</TableHead>
               <TableHead className="w-24 text-center">Unit</TableHead>
-              <TableHead className="w-40 text-right">Unit Price of Work</TableHead>
-              <TableHead className="w-24 text-center">Status</TableHead>
+              <TableHead className="w-40 text-right">Unit Price</TableHead>
+              <TableHead>Note</TableHead>
               {isAdmin && <TableHead className="w-20 text-center">Action</TableHead>}
             </TableRow>
           </TableHeader>
@@ -245,21 +307,36 @@ function AhspPage() {
                   <TableCell className="text-right font-medium text-foreground">
                     {formatRupiah(a.unit_price_of_work)}
                   </TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant={a.status === 'final' ? 'default' : 'secondary'} className="capitalize text-xs font-normal">
-                      {a.status}
-                    </Badge>
-                  </TableCell>
+                  <TableCell className="text-muted-foreground">{a.note || '-'}</TableCell>
                   {isAdmin && (
                     <TableCell className="text-center">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDelete(a.id, a.code)}
-                      >
-                        Delete
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 text-muted-foreground hover:text-foreground"
+                            />
+                          }
+                        >
+                          <MoreHorizontal className="size-4" />
+                          <span className="sr-only">Menu</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-32">
+                          <DropdownMenuItem onClick={() => handleOpenEdit(a)}>
+                            <Pencil className="size-4 mr-2" />
+                            <span>Ubah</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => handleDelete(a.id, a.code)}
+                          >
+                            <Trash2 className="size-4 mr-2" />
+                            <span>Hapus</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   )}
                 </TableRow>
@@ -270,11 +347,25 @@ function AhspPage() {
       </div>
 
       {/* Modal Form AHSP Komponen A-F */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog
+        open={isFormOpen}
+        onOpenChange={(open) => {
+          setIsFormOpen(open)
+          if (!open) setEditingAhspId(null)
+        }}
+      >
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Analisa Harga Satuan Pekerjaan (AHSP)</DialogTitle>
-            <DialogDescription>Susun rincian koefisien komponen A (Tenaga), B (Bahan), dan C (Peralatan).</DialogDescription>
+            <DialogTitle>
+              {editingAhspId
+                ? 'Edit Analisa Harga Satuan Pekerjaan (AHSP)'
+                : 'Analisa Harga Satuan Pekerjaan (AHSP)'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingAhspId
+                ? 'Perbarui rincian koefisien komponen A (Tenaga), B (Bahan), dan C (Peralatan).'
+                : 'Susun rincian koefisien komponen A (Tenaga), B (Bahan), dan C (Peralatan).'}
+            </DialogDescription>
           </DialogHeader>
 
           {errorMessage && (
@@ -323,6 +414,17 @@ function AhspPage() {
                   />
                 </Field>
               </div>
+
+              <Field className="mt-3">
+                <FieldLabel htmlFor="ahsp-note">Note</FieldLabel>
+                <Input
+                  id="ahsp-note"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Catatan spesifikasi..."
+                  className="bg-card"
+                />
+              </Field>
             </FieldGroup>
 
             {/* Components Table A-F */}
@@ -461,40 +563,31 @@ function AhspPage() {
               </Table>
             </div>
 
-            {/* Status and Action Buttons */}
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 text-sm font-medium">
-                  <input
-                    type="radio"
-                    name="ahsp-status"
-                    checked={status === 'draft'}
-                    onChange={() => setStatus('draft')}
-                    className="size-4"
-                  />
-                  Draft
-                </label>
-                <label className="flex items-center gap-2 text-sm font-medium">
-                  <input
-                    type="radio"
-                    name="ahsp-status"
-                    checked={status === 'final'}
-                    onChange={() => setStatus('final')}
-                    className="size-4"
-                  />
-                  Final
-                </label>
-              </div>
-
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={createMut.isPending}>
-                  {createMut.isPending ? 'Saving...' : 'Save AHSP'}
-                </Button>
-              </DialogFooter>
-            </div>
+            {/* Dialog Footer */}
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsFormOpen(false)
+                  setEditingAhspId(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={editingAhspId ? updateMut.isPending : createMut.isPending}
+              >
+                {editingAhspId
+                  ? updateMut.isPending
+                    ? 'Saving...'
+                    : 'Save AHSP'
+                  : createMut.isPending
+                    ? 'Saving...'
+                    : 'Save AHSP'}
+              </Button>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

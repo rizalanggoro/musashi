@@ -115,6 +115,7 @@ func calculateAndBuild(input CreateAhspInput) (*domain.Ahsp, []domain.AhspItem, 
 		TotalCost:         totalCostD,
 		UnitPriceOfWork:   unitPriceOfWorkF,
 		Status:            status,
+		Note:              input.Note,
 	}
 
 	return ahsp, items, nil

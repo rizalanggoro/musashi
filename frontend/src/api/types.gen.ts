@@ -16,6 +16,7 @@ export type AhspDto = {
     unit: string;
     unit_price_of_work: string;
     work_item: string;
+    note?: string;
 };
 
 export type AhspDetailDto = {
@@ -31,6 +32,7 @@ export type AhspDetailDto = {
     unit: string;
     unit_price_of_work: string;
     work_item: string;
+    note?: string;
 };
 
 export type AhspItemDto = {
@@ -80,6 +82,7 @@ export type CreateAhspInput = {
     status: string;
     unit: string;
     work_item: string;
+    note?: string;
 };
 
 export type CreateAhspItemInput = {

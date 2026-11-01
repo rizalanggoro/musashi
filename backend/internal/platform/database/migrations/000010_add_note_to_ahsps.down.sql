@@ -1,0 +1,2 @@
+ALTER TABLE ahsps DROP COLUMN IF EXISTS note;
+

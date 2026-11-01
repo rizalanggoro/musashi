@@ -18,6 +18,7 @@ type Ahsp struct {
 	TotalCost         int64             `gorm:"not null;default:0"`
 	UnitPriceOfWork   int64             `gorm:"not null;default:0"`
 	Status            domain.AhspStatus `gorm:"type:text;default:'draft'"`
+	Note              string            `gorm:"not null;default:''"`
 
 	Items []AhspItem `gorm:"foreignKey:AhspID"`
 }
@@ -44,6 +45,7 @@ func (a *Ahsp) ToDomain() *domain.Ahsp {
 		TotalCost:         a.TotalCost,
 		UnitPriceOfWork:   a.UnitPriceOfWork,
 		Status:            a.Status,
+		Note:              a.Note,
 	}
 
 	if len(a.Items) > 0 {
@@ -71,6 +73,7 @@ func FromAhspDomain(d *domain.Ahsp) *Ahsp {
 		TotalCost:         d.TotalCost,
 		UnitPriceOfWork:   d.UnitPriceOfWork,
 		Status:            d.Status,
+		Note:              d.Note,
 	}
 	a.ID = d.ID
 	a.CreatedAt = d.CreatedAt
