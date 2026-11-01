@@ -2004,9 +2004,6 @@ const docTemplate = `{
                 "information",
                 "name",
                 "plant",
-                "progress_rab",
-                "progress_spb",
-                "progress_xxx",
                 "section"
             ],
             "properties": {
@@ -2025,13 +2022,34 @@ const docTemplate = `{
                 "plant": {
                     "type": "string"
                 },
+                "progress_bast": {
+                    "type": "string"
+                },
+                "progress_construction": {
+                    "type": "string"
+                },
+                "progress_drawing": {
+                    "type": "string"
+                },
+                "progress_po": {
+                    "type": "string"
+                },
+                "progress_ppt": {
+                    "type": "string"
+                },
+                "progress_pr": {
+                    "type": "string"
+                },
                 "progress_rab": {
+                    "type": "string"
+                },
+                "progress_ringi": {
                     "type": "string"
                 },
                 "progress_spb": {
                     "type": "string"
                 },
-                "progress_xxx": {
+                "progress_vendor": {
                     "type": "string"
                 },
                 "section": {
@@ -2273,9 +2291,16 @@ const docTemplate = `{
                 "information",
                 "name",
                 "plant",
+                "progress_bast",
+                "progress_construction",
+                "progress_drawing",
+                "progress_po",
+                "progress_ppt",
+                "progress_pr",
                 "progress_rab",
+                "progress_ringi",
                 "progress_spb",
-                "progress_xxx",
+                "progress_vendor",
                 "section",
                 "status",
                 "updated_at"
@@ -2302,13 +2327,34 @@ const docTemplate = `{
                 "plant": {
                     "type": "string"
                 },
+                "progress_bast": {
+                    "type": "string"
+                },
+                "progress_construction": {
+                    "type": "string"
+                },
+                "progress_drawing": {
+                    "type": "string"
+                },
+                "progress_po": {
+                    "type": "string"
+                },
+                "progress_ppt": {
+                    "type": "string"
+                },
+                "progress_pr": {
+                    "type": "string"
+                },
                 "progress_rab": {
+                    "type": "string"
+                },
+                "progress_ringi": {
                     "type": "string"
                 },
                 "progress_spb": {
                     "type": "string"
                 },
-                "progress_xxx": {
+                "progress_vendor": {
                     "type": "string"
                 },
                 "section": {
@@ -2501,13 +2547,34 @@ const docTemplate = `{
                 "plant": {
                     "type": "string"
                 },
+                "progress_bast": {
+                    "type": "string"
+                },
+                "progress_construction": {
+                    "type": "string"
+                },
+                "progress_drawing": {
+                    "type": "string"
+                },
+                "progress_po": {
+                    "type": "string"
+                },
+                "progress_ppt": {
+                    "type": "string"
+                },
+                "progress_pr": {
+                    "type": "string"
+                },
                 "progress_rab": {
+                    "type": "string"
+                },
+                "progress_ringi": {
                     "type": "string"
                 },
                 "progress_spb": {
                     "type": "string"
                 },
-                "progress_xxx": {
+                "progress_vendor": {
                     "type": "string"
                 },
                 "section": {

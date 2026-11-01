@@ -90,30 +90,24 @@ func (s *service) Create(input CreateProjectInput) (*ProjectDTO, error) {
 		}
 	}
 
-	spb := domain.ProgressPending
-	if input.ProgressSPB == "done" {
-		spb = domain.ProgressDone
-	}
-	rab := domain.ProgressPending
-	if input.ProgressRAB == "done" {
-		rab = domain.ProgressDone
-	}
-	xxx := domain.ProgressPending
-	if input.ProgressXXX == "done" {
-		xxx = domain.ProgressDone
-	}
-
 	p := domain.Project{
-		Name:               name,
-		Section:            input.Section,
-		Plant:              input.Plant,
-		ImplementationPlan: planDate,
-		Budget:             budgetVal,
-		Information:        input.Information,
-		Status:             domain.ProjectStatusPlanning,
-		ProgressSPB:        spb,
-		ProgressRAB:        rab,
-		ProgressXXX:        xxx,
+		Name:                 name,
+		Section:              input.Section,
+		Plant:                input.Plant,
+		ImplementationPlan:   planDate,
+		Budget:               budgetVal,
+		Information:          input.Information,
+		Status:               domain.ProjectStatusPlanning,
+		ProgressPPT:          parseProgress(input.ProgressPPT),
+		ProgressDrawing:      parseProgress(input.ProgressDrawing),
+		ProgressRAB:          parseProgress(input.ProgressRAB),
+		ProgressVendor:       parseProgress(input.ProgressVendor),
+		ProgressSPB:          parseProgress(input.ProgressSPB),
+		ProgressPR:           parseProgress(input.ProgressPR),
+		ProgressRINGI:        parseProgress(input.ProgressRINGI),
+		ProgressPO:           parseProgress(input.ProgressPO),
+		ProgressConstruction: parseProgress(input.ProgressConstruction),
+		ProgressBAST:         parseProgress(input.ProgressBAST),
 	}
 
 	if err := s.repo.Create(&p); err != nil {
@@ -169,14 +163,35 @@ func (s *service) Update(id uint, input UpdateProjectInput) (*ProjectDTO, error)
 	if input.Status != nil {
 		p.Status = domain.ProjectStatus(*input.Status)
 	}
-	if input.ProgressSPB != nil {
-		p.ProgressSPB = domain.ProgressStatus(*input.ProgressSPB)
+	if input.ProgressPPT != nil {
+		p.ProgressPPT = domain.ProgressStatus(*input.ProgressPPT)
+	}
+	if input.ProgressDrawing != nil {
+		p.ProgressDrawing = domain.ProgressStatus(*input.ProgressDrawing)
 	}
 	if input.ProgressRAB != nil {
 		p.ProgressRAB = domain.ProgressStatus(*input.ProgressRAB)
 	}
-	if input.ProgressXXX != nil {
-		p.ProgressXXX = domain.ProgressStatus(*input.ProgressXXX)
+	if input.ProgressVendor != nil {
+		p.ProgressVendor = domain.ProgressStatus(*input.ProgressVendor)
+	}
+	if input.ProgressSPB != nil {
+		p.ProgressSPB = domain.ProgressStatus(*input.ProgressSPB)
+	}
+	if input.ProgressPR != nil {
+		p.ProgressPR = domain.ProgressStatus(*input.ProgressPR)
+	}
+	if input.ProgressRINGI != nil {
+		p.ProgressRINGI = domain.ProgressStatus(*input.ProgressRINGI)
+	}
+	if input.ProgressPO != nil {
+		p.ProgressPO = domain.ProgressStatus(*input.ProgressPO)
+	}
+	if input.ProgressConstruction != nil {
+		p.ProgressConstruction = domain.ProgressStatus(*input.ProgressConstruction)
+	}
+	if input.ProgressBAST != nil {
+		p.ProgressBAST = domain.ProgressStatus(*input.ProgressBAST)
 	}
 
 	if err := s.repo.Update(p); err != nil {
@@ -196,4 +211,11 @@ func (s *service) Delete(id uint) error {
 		return ErrProjectNotFound
 	}
 	return nil
+}
+
+func parseProgress(val string) domain.ProgressStatus {
+	if strings.EqualFold(val, "done") {
+		return domain.ProgressDone
+	}
+	return domain.ProgressPending
 }

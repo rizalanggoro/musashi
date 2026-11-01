@@ -16,10 +16,17 @@ type Project struct {
 	ImplementationPlan *time.Time            `gorm:"type:date"`
 	Budget             int64                 `gorm:"not null;default:0"`
 	Information        string                `gorm:"not null;default:''"`
-	Status             domain.ProjectStatus  `gorm:"type:text;default:'planning'"`
-	ProgressSPB        domain.ProgressStatus `gorm:"column:progress_spb;type:text;default:'pending'"`
-	ProgressRAB        domain.ProgressStatus `gorm:"column:progress_rab;type:text;default:'pending'"`
-	ProgressXXX        domain.ProgressStatus `gorm:"column:progress_xxx;type:text;default:'pending'"`
+	Status               domain.ProjectStatus  `gorm:"type:text;default:'planning'"`
+	ProgressPPT          domain.ProgressStatus `gorm:"column:progress_ppt;type:text;default:'pending'"`
+	ProgressDrawing      domain.ProgressStatus `gorm:"column:progress_drawing;type:text;default:'pending'"`
+	ProgressRAB          domain.ProgressStatus `gorm:"column:progress_rab;type:text;default:'pending'"`
+	ProgressVendor       domain.ProgressStatus `gorm:"column:progress_vendor;type:text;default:'pending'"`
+	ProgressSPB          domain.ProgressStatus `gorm:"column:progress_spb;type:text;default:'pending'"`
+	ProgressPR           domain.ProgressStatus `gorm:"column:progress_pr;type:text;default:'pending'"`
+	ProgressRINGI        domain.ProgressStatus `gorm:"column:progress_ringi;type:text;default:'pending'"`
+	ProgressPO           domain.ProgressStatus `gorm:"column:progress_po;type:text;default:'pending'"`
+	ProgressConstruction domain.ProgressStatus `gorm:"column:progress_construction;type:text;default:'pending'"`
+	ProgressBAST         domain.ProgressStatus `gorm:"column:progress_bast;type:text;default:'pending'"`
 
 	Schedules []Schedule `gorm:"foreignKey:ProjectID"`
 	BoqItems  []BoqItem  `gorm:"foreignKey:ProjectID"`
@@ -44,10 +51,17 @@ func (p *Project) ToDomain() *domain.Project {
 		ImplementationPlan: p.ImplementationPlan,
 		Budget:             p.Budget,
 		Information:        p.Information,
-		Status:             p.Status,
-		ProgressSPB:        p.ProgressSPB,
-		ProgressRAB:        p.ProgressRAB,
-		ProgressXXX:        p.ProgressXXX,
+		Status:               p.Status,
+		ProgressPPT:          p.ProgressPPT,
+		ProgressDrawing:      p.ProgressDrawing,
+		ProgressRAB:          p.ProgressRAB,
+		ProgressVendor:       p.ProgressVendor,
+		ProgressSPB:          p.ProgressSPB,
+		ProgressPR:           p.ProgressPR,
+		ProgressRINGI:        p.ProgressRINGI,
+		ProgressPO:           p.ProgressPO,
+		ProgressConstruction: p.ProgressConstruction,
+		ProgressBAST:         p.ProgressBAST,
 	}
 
 	if len(p.Schedules) > 0 {
@@ -83,10 +97,17 @@ func FromProjectDomain(d *domain.Project) *Project {
 		ImplementationPlan: d.ImplementationPlan,
 		Budget:             d.Budget,
 		Information:        d.Information,
-		Status:             d.Status,
-		ProgressSPB:        d.ProgressSPB,
-		ProgressRAB:        d.ProgressRAB,
-		ProgressXXX:        d.ProgressXXX,
+		Status:               d.Status,
+		ProgressPPT:          d.ProgressPPT,
+		ProgressDrawing:      d.ProgressDrawing,
+		ProgressRAB:          d.ProgressRAB,
+		ProgressVendor:       d.ProgressVendor,
+		ProgressSPB:          d.ProgressSPB,
+		ProgressPR:           d.ProgressPR,
+		ProgressRINGI:        d.ProgressRINGI,
+		ProgressPO:           d.ProgressPO,
+		ProgressConstruction: d.ProgressConstruction,
+		ProgressBAST:         d.ProgressBAST,
 	}
 	p.ID = d.ID
 	p.CreatedAt = d.CreatedAt

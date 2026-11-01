@@ -28,10 +28,17 @@ type Project struct {
 	ImplementationPlan *time.Time     `json:"implementation_plan"`
 	Budget             int64          `json:"budget"`
 	Information        string         `json:"information"`
-	Status             ProjectStatus  `json:"status"`
-	ProgressSPB        ProgressStatus `json:"progress_spb"`
-	ProgressRAB        ProgressStatus `json:"progress_rab"`
-	ProgressXXX        ProgressStatus `json:"progress_xxx"`
+	Status               ProjectStatus  `json:"status"`
+	ProgressPPT          ProgressStatus `json:"progress_ppt"`
+	ProgressDrawing      ProgressStatus `json:"progress_drawing"`
+	ProgressRAB          ProgressStatus `json:"progress_rab"`
+	ProgressVendor       ProgressStatus `json:"progress_vendor"`
+	ProgressSPB          ProgressStatus `json:"progress_spb"`
+	ProgressPR           ProgressStatus `json:"progress_pr"`
+	ProgressRINGI        ProgressStatus `json:"progress_ringi"`
+	ProgressPO           ProgressStatus `json:"progress_po"`
+	ProgressConstruction ProgressStatus `json:"progress_construction"`
+	ProgressBAST         ProgressStatus `json:"progress_bast"`
 
 	Schedules []Schedule `json:"schedules,omitempty"`
 	BoqItems  []BoqItem  `json:"boq_items,omitempty"`

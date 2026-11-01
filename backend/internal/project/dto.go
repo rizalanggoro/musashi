@@ -27,10 +27,17 @@ type Project struct {
 	ImplementationPlan *string `json:"implementation_plan"`
 	Budget             string  `json:"budget"`
 	Information        string  `json:"information"`
-	Status             string  `json:"status"`
-	ProgressSPB        string  `json:"progress_spb"`
-	ProgressRAB        string  `json:"progress_rab"`
-	ProgressXXX        string  `json:"progress_xxx"`
+	Status               string  `json:"status"`
+	ProgressPPT          string  `json:"progress_ppt"`
+	ProgressDrawing      string  `json:"progress_drawing"`
+	ProgressRAB          string  `json:"progress_rab"`
+	ProgressVendor       string  `json:"progress_vendor"`
+	ProgressSPB          string  `json:"progress_spb"`
+	ProgressPR           string  `json:"progress_pr"`
+	ProgressRINGI        string  `json:"progress_ringi"`
+	ProgressPO           string  `json:"progress_po"`
+	ProgressConstruction string  `json:"progress_construction"`
+	ProgressBAST         string  `json:"progress_bast"`
 	CreatedAt          string  `json:"created_at"`
 	UpdatedAt          string  `json:"updated_at"`
 }
@@ -38,44 +45,65 @@ type Project struct {
 type ProjectDTO = Project
 
 type CreateProjectInput struct {
-	Name               string  `json:"name"`
-	Section            string  `json:"section"`
-	Plant              string  `json:"plant"`
-	ImplementationPlan *string `json:"implementation_plan,omitempty"`
-	Budget             string  `json:"budget"`
-	Information        string  `json:"information"`
-	ProgressSPB        string  `json:"progress_spb"`
-	ProgressRAB        string  `json:"progress_rab"`
-	ProgressXXX        string  `json:"progress_xxx"`
+	Name                 string  `json:"name"`
+	Section              string  `json:"section"`
+	Plant                string  `json:"plant"`
+	ImplementationPlan   *string `json:"implementation_plan,omitempty"`
+	Budget               string  `json:"budget"`
+	Information          string  `json:"information"`
+	ProgressPPT          string  `json:"progress_ppt,omitempty"`
+	ProgressDrawing      string  `json:"progress_drawing,omitempty"`
+	ProgressRAB          string  `json:"progress_rab,omitempty"`
+	ProgressVendor       string  `json:"progress_vendor,omitempty"`
+	ProgressSPB          string  `json:"progress_spb,omitempty"`
+	ProgressPR           string  `json:"progress_pr,omitempty"`
+	ProgressRINGI        string  `json:"progress_ringi,omitempty"`
+	ProgressPO           string  `json:"progress_po,omitempty"`
+	ProgressConstruction string  `json:"progress_construction,omitempty"`
+	ProgressBAST         string  `json:"progress_bast,omitempty"`
 }
 
 type UpdateProjectInput struct {
-	Name               *string `json:"name,omitempty"`
-	Section            *string `json:"section,omitempty"`
-	Plant              *string `json:"plant,omitempty"`
-	ImplementationPlan *string `json:"implementation_plan,omitempty"`
-	Budget             *string `json:"budget,omitempty"`
-	Information        *string `json:"information,omitempty"`
-	Status             *string `json:"status,omitempty"`
-	ProgressSPB        *string `json:"progress_spb,omitempty"`
-	ProgressRAB        *string `json:"progress_rab,omitempty"`
-	ProgressXXX        *string `json:"progress_xxx,omitempty"`
+	Name                 *string `json:"name,omitempty"`
+	Section              *string `json:"section,omitempty"`
+	Plant                *string `json:"plant,omitempty"`
+	ImplementationPlan   *string `json:"implementation_plan,omitempty"`
+	Budget               *string `json:"budget,omitempty"`
+	Information          *string `json:"information,omitempty"`
+	Status               *string `json:"status,omitempty"`
+	ProgressPPT          *string `json:"progress_ppt,omitempty"`
+	ProgressDrawing      *string `json:"progress_drawing,omitempty"`
+	ProgressRAB          *string `json:"progress_rab,omitempty"`
+	ProgressVendor       *string `json:"progress_vendor,omitempty"`
+	ProgressSPB          *string `json:"progress_spb,omitempty"`
+	ProgressPR           *string `json:"progress_pr,omitempty"`
+	ProgressRINGI        *string `json:"progress_ringi,omitempty"`
+	ProgressPO           *string `json:"progress_po,omitempty"`
+	ProgressConstruction *string `json:"progress_construction,omitempty"`
+	ProgressBAST         *string `json:"progress_bast,omitempty"`
 }
 
 func toDTO(p *domain.Project) ProjectDTO {
 	dto := ProjectDTO{
-		ID:          utils.FormatID(p.ID),
-		Name:        p.Name,
-		Section:     p.Section,
-		Plant:       p.Plant,
-		Budget:      strconv.FormatInt(p.Budget, 10),
-		Information: p.Information,
-		Status:      string(p.Status),
-		ProgressSPB: string(p.ProgressSPB),
-		ProgressRAB: string(p.ProgressRAB),
-		ProgressXXX: string(p.ProgressXXX),
-		CreatedAt:   p.CreatedAt.UTC().Format(time.RFC3339),
-		UpdatedAt:   p.UpdatedAt.UTC().Format(time.RFC3339),
+		ID:                   utils.FormatID(p.ID),
+		Name:                 p.Name,
+		Section:              p.Section,
+		Plant:                p.Plant,
+		Budget:               strconv.FormatInt(p.Budget, 10),
+		Information:          p.Information,
+		Status:               string(p.Status),
+		ProgressPPT:          string(p.ProgressPPT),
+		ProgressDrawing:      string(p.ProgressDrawing),
+		ProgressRAB:          string(p.ProgressRAB),
+		ProgressVendor:       string(p.ProgressVendor),
+		ProgressSPB:          string(p.ProgressSPB),
+		ProgressPR:           string(p.ProgressPR),
+		ProgressRINGI:        string(p.ProgressRINGI),
+		ProgressPO:           string(p.ProgressPO),
+		ProgressConstruction: string(p.ProgressConstruction),
+		ProgressBAST:         string(p.ProgressBAST),
+		CreatedAt:            p.CreatedAt.UTC().Format(time.RFC3339),
+		UpdatedAt:            p.UpdatedAt.UTC().Format(time.RFC3339),
 	}
 	if p.ImplementationPlan != nil {
 		d := p.ImplementationPlan.Format("2006-01-02")
