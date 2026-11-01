@@ -13,7 +13,7 @@ import (
 
 var (
 	ErrUnitPriceNotFound    = errors.New("unit price not found")
-	ErrRequiredFields       = errors.New("code, work item, and unit are required")
+	ErrRequiredFields       = errors.New("work item and unit are required")
 	ErrCodeAlreadyExists    = errors.New("unit price with that code already exists")
 	ErrReferencedByAhspItem = errors.New("cannot delete unit price: referenced by one or more AHSP items")
 )
@@ -48,13 +48,36 @@ func (s *service) List(q, category string) ([]UnitPriceDTO, error) {
 
 func (s *service) Create(input CreateUnitPriceInput) (*UnitPriceDTO, error) {
 	code := strings.TrimSpace(input.Code)
-	if code == "" || input.WorkItem == "" || input.Unit == "" {
+	if input.WorkItem == "" || input.Unit == "" {
 		return nil, ErrRequiredFields
 	}
 
-	existing, err := s.repo.FindByCode(code, nil)
-	if err == nil && existing != nil {
-		return nil, fmt.Errorf("%w: '%s'", ErrCodeAlreadyExists, code)
+	if code == "" {
+		prefix := "UP"
+		switch domain.UnitPriceCategory(input.Category) {
+		case domain.CategoryLabor:
+			prefix = "LBR"
+		case domain.CategoryMaterials:
+			prefix = "MTR"
+		case domain.CategoryEquipment:
+			prefix = "EQP"
+		case domain.CategoryOther:
+			prefix = "OTH"
+		}
+
+		for i := 1; ; i++ {
+			candidate := fmt.Sprintf("%s-%03d", prefix, i)
+			existing, err := s.repo.FindByCode(candidate, nil)
+			if err != nil || existing == nil {
+				code = candidate
+				break
+			}
+		}
+	} else {
+		existing, err := s.repo.FindByCode(code, nil)
+		if err == nil && existing != nil {
+			return nil, fmt.Errorf("%w: '%s'", ErrCodeAlreadyExists, code)
+		}
 	}
 
 	price, _ := strconv.ParseInt(input.UnitPrice, 10, 64)

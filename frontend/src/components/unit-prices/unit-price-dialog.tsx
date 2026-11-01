@@ -64,8 +64,13 @@ function UnitPriceForm({
     e.preventDefault();
     setErrorMessage("");
 
-    if (!code.trim() || !workItem.trim() || !unit.trim()) {
-      setErrorMessage("Code, item, dan unit wajib diisi.");
+    if (!workItem.trim() || !unit.trim()) {
+      setErrorMessage("Item dan unit wajib diisi.");
+      return;
+    }
+
+    if (item && !code.trim()) {
+      setErrorMessage("Code wajib diisi.");
       return;
     }
 
@@ -127,13 +132,15 @@ function UnitPriceForm({
         <FieldGroup>
           <div className="grid grid-cols-2 gap-4">
             <Field>
-              <FieldLabel htmlFor="up-code">Code</FieldLabel>
+              <FieldLabel htmlFor="up-code">
+                Code {!item && <span className="text-xs text-muted-foreground font-normal">(opsional)</span>}
+              </FieldLabel>
               <Input
                 id="up-code"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="MTR-001"
-                required
+                placeholder={item ? "MTR-001" : "Otomatis jika kosong"}
+                required={Boolean(item)}
               />
             </Field>
             <Field>

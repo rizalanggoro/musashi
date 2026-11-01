@@ -100,8 +100,8 @@ func TestUnitPriceService(t *testing.T) {
 		}
 		svc := NewService(repo)
 
-		// Required fields
-		_, err := svc.Create(CreateUnitPriceInput{Code: "", WorkItem: "Item", Unit: "m3"})
+		// Required fields (workItem and unit are required)
+		_, err := svc.Create(CreateUnitPriceInput{Code: "UP-01", WorkItem: "", Unit: "m3"})
 		if !errors.Is(err, ErrRequiredFields) {
 			t.Fatalf("expected ErrRequiredFields, got %v", err)
 		}
@@ -112,7 +112,19 @@ func TestUnitPriceService(t *testing.T) {
 			t.Fatalf("expected ErrCodeAlreadyExists, got %v", err)
 		}
 
-		// Success
+		// Auto generate code when code is empty
+		autoCreated, err := svc.Create(CreateUnitPriceInput{
+			Code:      "",
+			Category:  "MATERIALS",
+			WorkItem:  "Pasir",
+			Unit:      "m3",
+			UnitPrice: "200000",
+		})
+		if err != nil || autoCreated.Code != "MTR-001" {
+			t.Fatalf("expected auto code MTR-001, got %v, err: %v", autoCreated, err)
+		}
+
+		// Success with provided code
 		created, err := svc.Create(CreateUnitPriceInput{
 			Code:      "UP-NEW",
 			Category:  "LABOR",
