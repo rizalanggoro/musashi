@@ -12,3 +12,4 @@ skills-lock.json
 .claude/
 .tmp/
 .tanstack/
+tmp/
