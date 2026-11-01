@@ -96,7 +96,7 @@ func (s *service) Create(input CreateProjectInput) (*ProjectDTO, error) {
 		Plant:                input.Plant,
 		ImplementationPlan:   planDate,
 		Budget:               budgetVal,
-		Information:          input.Information,
+		Note:                 input.Note,
 		Status:               domain.ProjectStatusPlanning,
 		ProgressPPT:          parseProgress(input.ProgressPPT),
 		ProgressDrawing:      parseProgress(input.ProgressDrawing),
@@ -157,8 +157,8 @@ func (s *service) Update(id uint, input UpdateProjectInput) (*ProjectDTO, error)
 		b, _ := strconv.ParseInt(*input.Budget, 10, 64)
 		p.Budget = b
 	}
-	if input.Information != nil {
-		p.Information = *input.Information
+	if input.Note != nil {
+		p.Note = *input.Note
 	}
 	if input.Status != nil {
 		p.Status = domain.ProjectStatus(*input.Status)

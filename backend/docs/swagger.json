@@ -1994,8 +1994,8 @@
             "type": "object",
             "required": [
                 "budget",
-                "information",
                 "name",
+                "note",
                 "plant",
                 "section"
             ],
@@ -2006,10 +2006,10 @@
                 "implementation_plan": {
                     "type": "string"
                 },
-                "information": {
+                "name": {
                     "type": "string"
                 },
-                "name": {
+                "note": {
                     "type": "string"
                 },
                 "plant": {
@@ -2281,8 +2281,8 @@
                 "created_at",
                 "id",
                 "implementation_plan",
-                "information",
                 "name",
+                "note",
                 "plant",
                 "progress_bast",
                 "progress_construction",
@@ -2311,10 +2311,10 @@
                 "implementation_plan": {
                     "type": "string"
                 },
-                "information": {
+                "name": {
                     "type": "string"
                 },
-                "name": {
+                "note": {
                     "type": "string"
                 },
                 "plant": {
@@ -2531,10 +2531,10 @@
                 "implementation_plan": {
                     "type": "string"
                 },
-                "information": {
+                "name": {
                     "type": "string"
                 },
-                "name": {
+                "note": {
                     "type": "string"
                 },
                 "plant": {

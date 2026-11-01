@@ -236,9 +236,9 @@ definitions:
         type: string
       implementation_plan:
         type: string
-      information:
-        type: string
       name:
+        type: string
+      note:
         type: string
       plant:
         type: string
@@ -266,8 +266,8 @@ definitions:
         type: string
     required:
     - budget
-    - information
     - name
+    - note
     - plant
     - section
     type: object
@@ -436,9 +436,9 @@ definitions:
         type: string
       implementation_plan:
         type: string
-      information:
-        type: string
       name:
+        type: string
+      note:
         type: string
       plant:
         type: string
@@ -473,8 +473,8 @@ definitions:
     - created_at
     - id
     - implementation_plan
-    - information
     - name
+    - note
     - plant
     - progress_bast
     - progress_construction
@@ -610,9 +610,9 @@ definitions:
         type: string
       implementation_plan:
         type: string
-      information:
-        type: string
       name:
+        type: string
+      note:
         type: string
       plant:
         type: string

@@ -236,7 +236,7 @@ definitions:
         type: string
       implementation_plan:
         type: string
-      information:
+      note:
         type: string
       name:
         type: string
@@ -252,8 +252,8 @@ definitions:
         type: string
     required:
     - budget
-    - information
     - name
+    - note
     - plant
     - progress_rab
     - progress_spb
@@ -425,7 +425,7 @@ definitions:
         type: string
       implementation_plan:
         type: string
-      information:
+      note:
         type: string
       name:
         type: string
@@ -448,8 +448,8 @@ definitions:
     - created_at
     - id
     - implementation_plan
-    - information
     - name
+    - note
     - plant
     - progress_rab
     - progress_spb
@@ -578,7 +578,7 @@ definitions:
         type: string
       implementation_plan:
         type: string
-      information:
+      note:
         type: string
       name:
         type: string

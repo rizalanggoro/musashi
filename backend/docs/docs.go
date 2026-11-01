@@ -2001,8 +2001,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "budget",
-                "information",
                 "name",
+                "note",
                 "plant",
                 "section"
             ],
@@ -2013,10 +2013,10 @@ const docTemplate = `{
                 "implementation_plan": {
                     "type": "string"
                 },
-                "information": {
+                "name": {
                     "type": "string"
                 },
-                "name": {
+                "note": {
                     "type": "string"
                 },
                 "plant": {
@@ -2288,8 +2288,8 @@ const docTemplate = `{
                 "created_at",
                 "id",
                 "implementation_plan",
-                "information",
                 "name",
+                "note",
                 "plant",
                 "progress_bast",
                 "progress_construction",
@@ -2318,10 +2318,10 @@ const docTemplate = `{
                 "implementation_plan": {
                     "type": "string"
                 },
-                "information": {
+                "name": {
                     "type": "string"
                 },
-                "name": {
+                "note": {
                     "type": "string"
                 },
                 "plant": {
@@ -2538,10 +2538,10 @@ const docTemplate = `{
                 "implementation_plan": {
                     "type": "string"
                 },
-                "information": {
+                "name": {
                     "type": "string"
                 },
-                "name": {
+                "note": {
                     "type": "string"
                 },
                 "plant": {

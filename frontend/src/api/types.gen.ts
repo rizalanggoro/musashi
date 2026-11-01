@@ -96,8 +96,8 @@ export type CreateAhspItemInput = {
 export type CreateProjectInput = {
     budget: string;
     implementation_plan?: string;
-    information: string;
     name: string;
+    note: string;
     plant: string;
     progress_bast?: string;
     progress_construction?: string;
@@ -187,8 +187,8 @@ export type Project = {
     created_at: string;
     id: string;
     implementation_plan: string;
-    information: string;
     name: string;
+    note: string;
     plant: string;
     progress_bast: string;
     progress_construction: string;
@@ -253,8 +253,8 @@ export type UnitPriceDto = {
 export type UpdateProjectInput = {
     budget?: string;
     implementation_plan?: string;
-    information?: string;
     name?: string;
+    note?: string;
     plant?: string;
     progress_bast?: string;
     progress_construction?: string;

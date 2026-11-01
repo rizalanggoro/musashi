@@ -65,7 +65,7 @@ func TestProjectModelMapping(t *testing.T) {
 			Plant:              "Plant 2",
 			ImplementationPlan: &planDate,
 			Budget:             1000000,
-			Information:        "catatan",
+			Note:               "catatan",
 			Status:             domain.ProjectStatusPlanning,
 			ProgressSPB:          domain.ProgressPending,
 			ProgressRAB:          domain.ProgressDone,

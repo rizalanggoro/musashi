@@ -15,7 +15,7 @@ type Project struct {
 	Plant              string                `gorm:"not null;default:''"`
 	ImplementationPlan *time.Time            `gorm:"type:date"`
 	Budget             int64                 `gorm:"not null;default:0"`
-	Information        string                `gorm:"not null;default:''"`
+	Note               string                `gorm:"column:note;not null;default:''"`
 	Status               domain.ProjectStatus  `gorm:"type:text;default:'planning'"`
 	ProgressPPT          domain.ProgressStatus `gorm:"column:progress_ppt;type:text;default:'pending'"`
 	ProgressDrawing      domain.ProgressStatus `gorm:"column:progress_drawing;type:text;default:'pending'"`
@@ -50,7 +50,7 @@ func (p *Project) ToDomain() *domain.Project {
 		Plant:              p.Plant,
 		ImplementationPlan: p.ImplementationPlan,
 		Budget:             p.Budget,
-		Information:        p.Information,
+		Note:               p.Note,
 		Status:               p.Status,
 		ProgressPPT:          p.ProgressPPT,
 		ProgressDrawing:      p.ProgressDrawing,
@@ -96,7 +96,7 @@ func FromProjectDomain(d *domain.Project) *Project {
 		Plant:              d.Plant,
 		ImplementationPlan: d.ImplementationPlan,
 		Budget:             d.Budget,
-		Information:        d.Information,
+		Note:               d.Note,
 		Status:               d.Status,
 		ProgressPPT:          d.ProgressPPT,
 		ProgressDrawing:      d.ProgressDrawing,

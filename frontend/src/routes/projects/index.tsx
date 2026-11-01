@@ -86,11 +86,7 @@ const PROGRESS_STAGES: StageOption[] = [
   { key: "progress_pr", value: "progress_pr", label: "PR" },
   { key: "progress_ringi", value: "progress_ringi", label: "RINGI" },
   { key: "progress_po", value: "progress_po", label: "PO" },
-  {
-    key: "progress_construction",
-    value: "progress_construction",
-    label: "Construction",
-  },
+  { key: "progress_construction", value: "progress_construction", label: "Construction" },
   { key: "progress_bast", value: "progress_bast", label: "BAST" },
 ];
 
@@ -117,7 +113,7 @@ function ProjectsPage() {
   const [plant, setPlant] = useState("");
   const [planDate, setPlanDate] = useState("");
   const [budget, setBudget] = useState("");
-  const [information, setInformation] = useState("");
+  const [note, setNote] = useState("");
   const [addStages, setAddStages] = useState<StageOption[]>([]);
   const [formError, setFormError] = useState("");
 
@@ -127,7 +123,7 @@ function ProjectsPage() {
   const [editPlant, setEditPlant] = useState("");
   const [editPlanDate, setEditPlanDate] = useState("");
   const [editBudget, setEditBudget] = useState("");
-  const [editInformation, setEditInformation] = useState("");
+  const [editNote, setEditNote] = useState("");
   const [editStages, setEditStages] = useState<StageOption[]>([]);
   const [editFormError, setEditFormError] = useState("");
 
@@ -151,7 +147,7 @@ function ProjectsPage() {
     setPlant("");
     setPlanDate("");
     setBudget("");
-    setInformation("");
+    setNote("");
     setAddStages([]);
     setFormError("");
     setIsAddOpen(true);
@@ -168,7 +164,7 @@ function ProjectsPage() {
     setEditPlant(p.plant || "");
     setEditPlanDate(p.implementation_plan || "");
     setEditBudget(p.budget || "");
-    setEditInformation(p.information || "");
+    setEditNote(p.note || "");
     setEditStages(PROGRESS_STAGES.filter((s) => (p as any)[s.key] === "done"));
     setEditFormError("");
     setIsEditOpen(true);
@@ -186,7 +182,7 @@ function ProjectsPage() {
         PROGRESS_STAGES.map((s) => [
           s.key,
           addStages.some((sel) => sel.key === s.key) ? "done" : "pending",
-        ]),
+        ])
       );
 
       await createMut.mutateAsync({
@@ -196,7 +192,7 @@ function ProjectsPage() {
           plant: plant.trim(),
           implementation_plan: planDate || undefined,
           budget: budget ? budget.replace(/\D/g, "") : "0",
-          information: information.trim(),
+          note: note.trim(),
           ...progressPayload,
         },
       });
@@ -220,7 +216,7 @@ function ProjectsPage() {
         PROGRESS_STAGES.map((s) => [
           s.key,
           editStages.some((sel) => sel.key === s.key) ? "done" : "pending",
-        ]),
+        ])
       );
 
       await updateMut.mutateAsync({
@@ -231,7 +227,7 @@ function ProjectsPage() {
           plant: editPlant.trim(),
           implementation_plan: editPlanDate || undefined,
           budget: editBudget ? editBudget.replace(/\D/g, "") : "0",
-          information: editInformation.trim(),
+          note: editNote.trim(),
           ...progressPayload,
         },
       });
@@ -273,7 +269,7 @@ function ProjectsPage() {
               <TableHead>Plan Date</TableHead>
               <TableHead className="text-right">Budget</TableHead>
               <TableHead className="min-w-[240px]">Progress</TableHead>
-              <TableHead>Information</TableHead>
+              <TableHead>Note</TableHead>
               {isAdmin && (
                 <TableHead className="w-16 text-center">Action</TableHead>
               )}
@@ -291,7 +287,10 @@ function ProjectsPage() {
               </TableRow>
             ) : projects.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={colSpanCount} className="h-48 text-center">
+                <TableCell
+                  colSpan={colSpanCount}
+                  className="h-48 text-center"
+                >
                   <Empty>
                     <EmptyHeader>
                       <EmptyTitle>Belum ada proyek</EmptyTitle>
@@ -307,7 +306,7 @@ function ProjectsPage() {
             ) : (
               projects.map((p, idx) => {
                 const doneStages = PROGRESS_STAGES.filter(
-                  (s) => (p as any)[s.key] === "done",
+                  (s) => (p as any)[s.key] === "done"
                 );
 
                 return (
@@ -354,7 +353,7 @@ function ProjectsPage() {
                       </div>
                     </TableCell>
                     <TableCell className="max-w-xs truncate text-muted-foreground">
-                      {p.information || "-"}
+                      {p.note || "-"}
                     </TableCell>
                     {isAdmin && (
                       <TableCell
@@ -470,12 +469,12 @@ function ProjectsPage() {
               </div>
 
               <Field>
-                <FieldLabel htmlFor="proj-info">Information</FieldLabel>
+                <FieldLabel htmlFor="proj-note">Note</FieldLabel>
                 <Input
-                  id="proj-info"
-                  value={information}
-                  onChange={(e) => setInformation(e.target.value)}
-                  placeholder="Keterangan tambahan..."
+                  id="proj-note"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Catatan tambahan..."
                 />
               </Field>
 
@@ -597,9 +596,7 @@ function ProjectsPage() {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="edit-proj-budget">
-                    Budget (Rp)
-                  </FieldLabel>
+                  <FieldLabel htmlFor="edit-proj-budget">Budget (Rp)</FieldLabel>
                   <Input
                     id="edit-proj-budget"
                     value={editBudget}
@@ -610,12 +607,12 @@ function ProjectsPage() {
               </div>
 
               <Field>
-                <FieldLabel htmlFor="edit-proj-info">Information</FieldLabel>
+                <FieldLabel htmlFor="edit-proj-note">Note</FieldLabel>
                 <Input
-                  id="edit-proj-info"
-                  value={editInformation}
-                  onChange={(e) => setEditInformation(e.target.value)}
-                  placeholder="Keterangan tambahan..."
+                  id="edit-proj-note"
+                  value={editNote}
+                  onChange={(e) => setEditNote(e.target.value)}
+                  placeholder="Catatan tambahan..."
                 />
               </Field>
 
@@ -748,17 +745,13 @@ function ProjectDetailDialog({
               </span>
             </div>
             <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30">
-              <span className="text-muted-foreground">
-                Variance (Budget - RAB)
-              </span>
+              <span className="text-muted-foreground">Variance (Budget - RAB)</span>
               <span className="font-semibold text-foreground">
                 {formatRupiah(cost?.variance ?? "0")}
               </span>
             </div>
             <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30">
-              <span className="text-muted-foreground">
-                Sisa Anggaran (Budget - SPB)
-              </span>
+              <span className="text-muted-foreground">Sisa Anggaran (Budget - SPB)</span>
               <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                 {formatRupiah(cost?.sisa ?? "0")}
               </span>
@@ -766,22 +759,18 @@ function ProjectDetailDialog({
           </div>
 
           {/* Project Details */}
-          {(project.implementation_plan || project.information) && (
+          {(project.implementation_plan || project.note) && (
             <div className="flex flex-col gap-1.5 text-xs text-muted-foreground px-1">
               {project.implementation_plan && (
                 <div>
-                  <span className="font-medium text-foreground">
-                    Plan Date:
-                  </span>{" "}
+                  <span className="font-medium text-foreground">Plan Date:</span>{" "}
                   {project.implementation_plan}
                 </div>
               )}
-              {project.information && (
+              {project.note && (
                 <div>
-                  <span className="font-medium text-foreground">
-                    Keterangan:
-                  </span>{" "}
-                  {project.information}
+                  <span className="font-medium text-foreground">Note:</span>{" "}
+                  {project.note}
                 </div>
               )}
             </div>

@@ -27,7 +27,7 @@ type Project struct {
 	Plant              string         `json:"plant"`
 	ImplementationPlan *time.Time     `json:"implementation_plan"`
 	Budget             int64          `json:"budget"`
-	Information        string         `json:"information"`
+	Note               string         `json:"note"`
 	Status               ProjectStatus  `json:"status"`
 	ProgressPPT          ProgressStatus `json:"progress_ppt"`
 	ProgressDrawing      ProgressStatus `json:"progress_drawing"`

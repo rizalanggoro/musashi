@@ -26,7 +26,7 @@ type Project struct {
 	Plant              string  `json:"plant"`
 	ImplementationPlan *string `json:"implementation_plan"`
 	Budget             string  `json:"budget"`
-	Information        string  `json:"information"`
+	Note               string  `json:"note"`
 	Status               string  `json:"status"`
 	ProgressPPT          string  `json:"progress_ppt"`
 	ProgressDrawing      string  `json:"progress_drawing"`
@@ -50,7 +50,7 @@ type CreateProjectInput struct {
 	Plant                string  `json:"plant"`
 	ImplementationPlan   *string `json:"implementation_plan,omitempty"`
 	Budget               string  `json:"budget"`
-	Information          string  `json:"information"`
+	Note                 string  `json:"note"`
 	ProgressPPT          string  `json:"progress_ppt,omitempty"`
 	ProgressDrawing      string  `json:"progress_drawing,omitempty"`
 	ProgressRAB          string  `json:"progress_rab,omitempty"`
@@ -69,7 +69,7 @@ type UpdateProjectInput struct {
 	Plant                *string `json:"plant,omitempty"`
 	ImplementationPlan   *string `json:"implementation_plan,omitempty"`
 	Budget               *string `json:"budget,omitempty"`
-	Information          *string `json:"information,omitempty"`
+	Note                 *string `json:"note,omitempty"`
 	Status               *string `json:"status,omitempty"`
 	ProgressPPT          *string `json:"progress_ppt,omitempty"`
 	ProgressDrawing      *string `json:"progress_drawing,omitempty"`
@@ -90,7 +90,7 @@ func toDTO(p *domain.Project) ProjectDTO {
 		Section:              p.Section,
 		Plant:                p.Plant,
 		Budget:               strconv.FormatInt(p.Budget, 10),
-		Information:          p.Information,
+		Note:                 p.Note,
 		Status:               string(p.Status),
 		ProgressPPT:          string(p.ProgressPPT),
 		ProgressDrawing:      string(p.ProgressDrawing),
