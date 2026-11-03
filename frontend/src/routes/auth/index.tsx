@@ -6,6 +6,7 @@ import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ModeToggle } from '@/components/mode-toggle'
 import { LogIn, Construction } from 'lucide-react'
 
 export const Route = createFileRoute('/auth/')({
@@ -37,7 +38,10 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-muted/40 p-4">
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-muted/40 p-4">
+      <div className="absolute top-4 right-4">
+        <ModeToggle />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">

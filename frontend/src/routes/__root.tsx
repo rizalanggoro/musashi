@@ -1,4 +1,5 @@
 import { getHealthOptions } from "@/api/@tanstack/react-query.gen";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -181,6 +182,7 @@ function Shell() {
 
             <div className="flex items-center gap-3">
               <HealthBadge />
+              <ModeToggle />
             </div>
           </header>
 
