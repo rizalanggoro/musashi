@@ -87,7 +87,7 @@ function ProjectsPage() {
   const colSpanCount = isAdmin ? 9 : 8;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       <PageHeader
         title="Projects"
         onSearch={setSearch}
@@ -95,8 +95,8 @@ function ProjectsPage() {
         addLabel="Project"
       />
 
-      <div className="rounded-md border bg-card overflow-x-auto">
-        <Table>
+      <div className="rounded-md border bg-card overflow-hidden">
+        <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-12 text-center">No</TableHead>

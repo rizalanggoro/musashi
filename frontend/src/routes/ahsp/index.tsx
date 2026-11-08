@@ -53,11 +53,11 @@ function AhspPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       <PageHeader title="AHSP" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="AHSP" />
 
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="rounded-md border bg-card overflow-hidden">
+        <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-12 text-center">No</TableHead>

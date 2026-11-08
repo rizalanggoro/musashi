@@ -86,7 +86,7 @@ function VolumePage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       <PageHeader
         title="Volume Take-off"
         onSearch={setSearch}
@@ -151,8 +151,8 @@ function VolumePage() {
       </div>
 
       {/* Table Data Take-off */}
-      <div className="rounded-md border bg-card overflow-x-auto shadow-xs">
-        <Table>
+      <div className="rounded-md border bg-card overflow-hidden shadow-xs">
+        <Table className="min-w-[900px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-10 text-center">No</TableHead>

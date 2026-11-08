@@ -31,7 +31,7 @@ function BoqPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       {/* Header bar */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -64,8 +64,8 @@ function BoqPage() {
         </div>
       </div>
 
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="rounded-md border bg-card overflow-hidden">
+        <Table className="min-w-[650px]">
           <TableHeader>
             <TableRow>
               <TableHead rowSpan={2} className="w-12 text-center">No</TableHead>

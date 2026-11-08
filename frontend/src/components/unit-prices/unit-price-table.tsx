@@ -44,8 +44,8 @@ export function UnitPriceTable({
   const colSpan = isAdmin ? 8 : 7;
 
   return (
-    <div className="rounded-md border bg-card">
-      <Table>
+    <div className="rounded-md border bg-card overflow-hidden">
+      <Table className="min-w-[750px]">
         <TableHeader>
           <TableRow>
             <TableHead className="w-12 text-center">No</TableHead>

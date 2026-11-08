@@ -169,7 +169,7 @@ function Shell() {
           </SidebarFooter>
         </Sidebar>
 
-        <SidebarInset>
+        <SidebarInset className="min-w-0">
           {/* Top Navbar */}
           <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-2 border-b bg-background px-4 md:rounded-t-xl">
             <div className="flex items-center gap-2">
@@ -183,7 +183,7 @@ function Shell() {
           </header>
 
           {/* Main Page Area */}
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-6 min-w-0 overflow-x-hidden">
             <Outlet />
           </main>
         </SidebarInset>

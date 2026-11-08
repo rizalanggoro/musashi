@@ -70,7 +70,7 @@ function UnitPricesPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       <PageHeader
         title="Unit Prices"
         onSearch={setSearch}

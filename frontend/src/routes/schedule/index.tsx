@@ -142,7 +142,7 @@ function SchedulePage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       <PageHeader title="Schedule" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="Schedule" />
 
       {/* Project Selector Bar */}
@@ -172,8 +172,8 @@ function SchedulePage() {
         </div>
       </div>
 
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="rounded-md border bg-card overflow-hidden">
+        <Table className="min-w-[850px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-12 text-center">No</TableHead>

@@ -158,7 +158,7 @@ function RabPage() {
   const hasZeroPrice = items.some((it) => it.unit_price === '0')
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-0">
       <PageHeader title="RAB (Rencana Anggaran Biaya)" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="RAB Item" />
 
       {/* Project Selector Bar */}
@@ -222,8 +222,8 @@ function RabPage() {
         </Alert>
       )}
 
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="rounded-md border bg-card overflow-hidden">
+        <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-12 text-center">No</TableHead>
