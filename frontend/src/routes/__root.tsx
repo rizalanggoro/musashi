@@ -1,6 +1,4 @@
-import { getHealthOptions } from "@/api/@tanstack/react-query.gen";
 import { ModeToggle } from "@/components/mode-toggle";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
@@ -19,7 +17,6 @@ import {
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/lib/auth";
-import { useQuery } from "@tanstack/react-query";
 import {
   createRootRoute,
   Link,
@@ -181,7 +178,6 @@ function Shell() {
             </div>
 
             <div className="flex items-center gap-3">
-              <HealthBadge />
               <ModeToggle />
             </div>
           </header>
@@ -193,25 +189,5 @@ function Shell() {
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
-  );
-}
-
-function HealthBadge() {
-  const { data, isError } = useQuery({
-    ...getHealthOptions(),
-    refetchInterval: 30_000,
-  });
-  const ok = !isError && data?.status === "ok";
-
-  return (
-    <Badge
-      variant={ok ? "secondary" : "destructive"}
-      className="text-[11px] gap-1.5 font-normal"
-    >
-      <span
-        className={`size-1.5 rounded-full ${ok ? "bg-emerald-500" : "bg-red-500"}`}
-      />
-      {ok ? "Online" : "Offline"}
-    </Badge>
   );
 }
