@@ -32,6 +32,7 @@ export function UnitPriceCategoryFilter({
         </span>
       )}
       <Select
+        items={categories.map((cat) => ({ value: cat, label: cat }))}
         value={value}
         onValueChange={(val) => {
           if (val) {

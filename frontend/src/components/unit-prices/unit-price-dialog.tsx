@@ -146,6 +146,7 @@ function UnitPriceForm({
             <Field>
               <FieldLabel htmlFor="up-category">Category</FieldLabel>
               <Select
+                items={UNIT_PRICE_FORM_CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
                 value={category}
                 onValueChange={(val) => setCategory(val as UnitPriceFormCategory)}
               >

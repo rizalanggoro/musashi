@@ -8,6 +8,7 @@ import { Plus, Search } from "lucide-react";
 
 type Props = {
   title: string;
+  searchValue?: string;
   onSearch?: (value: string) => void;
   onAdd?: () => void;
   addLabel?: string;
@@ -15,6 +16,7 @@ type Props = {
 
 export function PageHeader({
   title,
+  searchValue,
   onSearch,
   onAdd,
   addLabel = "Add",
@@ -36,6 +38,7 @@ export function PageHeader({
               </InputGroupAddon>
               <InputGroupInput
                 placeholder="Search..."
+                {...(searchValue !== undefined ? { value: searchValue } : {})}
                 onChange={(e) => onSearch?.(e.target.value)}
               />
             </InputGroup>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   listProjectsOptions,
@@ -21,19 +21,18 @@ import { useAuth } from '@/lib/auth'
 
 export const Route = createFileRoute('/schedule/')({
   component: SchedulePage,
-  validateSearch: (search: Record<string, unknown>): { projectId?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { projectId?: string; q?: string } => ({
     projectId: (search.projectId as string) || undefined,
+    q: (search.q as string) || undefined,
   }),
 })
 
 function SchedulePage() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const searchParams = Route.useSearch()
-  const queryProjectId = searchParams.projectId || ''
+  const { projectId, q } = Route.useSearch()
   const { isAdmin, user, openLoginModal } = useAuth()
 
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(queryProjectId)
-  const [search, setSearch] = useState('')
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -54,7 +53,7 @@ function SchedulePage() {
     value: p.id,
     label: `${p.name} ${p.section ? `(${p.section})` : ''}`,
   }))
-  const activeProjectId = selectedProjectId || (projects.length > 0 ? projects[0].id : '')
+  const activeProjectId = projectId || (projects.length > 0 ? projects[0].id : '')
 
   const { data: schedules = [], isLoading } = useQuery({
     ...listSchedulesOptions({ path: { id: activeProjectId } }),
@@ -122,10 +121,11 @@ function SchedulePage() {
     }
   }
 
+  const searchQuery = (q || '').toLowerCase()
   const filtered = schedules.filter(
     (s) =>
-      s.work_item.toLowerCase().includes(search.toLowerCase()) ||
-      (s.code ? s.code.toLowerCase().includes(search.toLowerCase()) : false)
+      s.work_item.toLowerCase().includes(searchQuery) ||
+      (s.code ? s.code.toLowerCase().includes(searchQuery) : false)
   )
 
   const getStatusBadgeVariant = (st: string) => {
@@ -143,7 +143,18 @@ function SchedulePage() {
 
   return (
     <div className="flex flex-col gap-4 min-w-0">
-      <PageHeader title="Schedule" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="Schedule" />
+      <PageHeader
+        title="Schedule"
+        searchValue={q || ''}
+        onSearch={(val) => {
+          navigate({
+            search: ((prev: any) => ({ ...prev, q: val || undefined })) as any,
+            replace: true,
+          })
+        }}
+        onAdd={handleOpenAdd}
+        addLabel="Schedule"
+      />
 
       {/* Project Selector Bar */}
       <div className="flex items-center gap-4 rounded-lg border bg-card p-3">
@@ -153,7 +164,12 @@ function SchedulePage() {
             items={projectItems}
             value={activeProjectId}
             onValueChange={(val) => {
-              if (val) setSelectedProjectId(val)
+              if (val) {
+                navigate({
+                  search: ((prev: any) => ({ ...prev, projectId: val })) as any,
+                  replace: true,
+                })
+              }
             }}
           >
             <SelectTrigger className="w-full">
@@ -202,7 +218,7 @@ function SchedulePage() {
                     <EmptyHeader>
                       <EmptyTitle>Belum ada jadwal pekerjaan</EmptyTitle>
                       <EmptyDescription>
-                        {search ? `Tidak ada item cocok dengan "${search}".` : 'Tambahkan tahapan jadwal baru untuk proyek ini.'}
+                        {q ? `Tidak ada item cocok dengan "${q}".` : 'Tambahkan tahapan jadwal baru untuk proyek ini.'}
                       </EmptyDescription>
                     </EmptyHeader>
                   </Empty>

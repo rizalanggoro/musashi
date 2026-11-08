@@ -11,27 +11,32 @@ import {
 } from "@/components/unit-prices";
 import { useAuth } from "@/lib/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/unit-prices/")({
   component: UnitPricesPage,
+  validateSearch: (search: Record<string, unknown>): { q?: string; category?: string } => ({
+    q: (search.q as string) || undefined,
+    category: (search.category as string) || undefined,
+  }),
 });
 
 function UnitPricesPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { q, category } = Route.useSearch();
   const { isAdmin, user, openLoginModal } = useAuth();
 
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const currentCategory = category || "ALL";
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<UnitPriceDto | null>(null);
 
   const { data: items = [], isLoading } = useQuery({
     ...listUnitPricesOptions({
       query: {
-        q: search || undefined,
-        category: selectedCategory === "ALL" ? undefined : (selectedCategory as any),
+        q: q || undefined,
+        category: currentCategory === "ALL" ? undefined : (currentCategory as any),
       },
     }),
   });
@@ -73,21 +78,35 @@ function UnitPricesPage() {
     <div className="flex flex-col gap-4 min-w-0">
       <PageHeader
         title="Unit Prices"
-        onSearch={setSearch}
+        searchValue={q || ""}
+        onSearch={(val) => {
+          navigate({
+            search: ((prev: any) => ({ ...prev, q: val || undefined })) as any,
+            replace: true,
+          });
+        }}
         onAdd={handleOpenAdd}
         addLabel="Unit Price"
       />
 
       <UnitPriceCategoryFilter
-        value={selectedCategory}
-        onChange={setSelectedCategory}
+        value={currentCategory}
+        onChange={(val) => {
+          navigate({
+            search: ((prev: any) => ({
+              ...prev,
+              category: val === "ALL" ? undefined : val,
+            })) as any,
+            replace: true,
+          });
+        }}
       />
 
       <UnitPriceTable
         items={items}
         isLoading={isLoading}
         isAdmin={isAdmin}
-        search={search}
+        search={q || ""}
         onEdit={handleOpenEdit}
         onDelete={handleDelete}
       />

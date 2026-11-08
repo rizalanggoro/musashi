@@ -331,6 +331,10 @@ function VolumeNewPage() {
                           if (val) {
                             field.onChange(val)
                             setValue('boqItemId', 'custom')
+                            navigate({
+                              search: ((prev: any) => ({ ...prev, projectId: val })) as any,
+                              replace: true,
+                            })
                           }
                         }}
                       >

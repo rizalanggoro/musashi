@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -19,17 +18,21 @@ import { formatRupiah } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 
-export const Route = createFileRoute('/ahsp/')({ component: AhspPage })
+export const Route = createFileRoute('/ahsp/')({
+  component: AhspPage,
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: (search.q as string) || undefined,
+  }),
+})
 
 function AhspPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { q } = Route.useSearch()
   const { isAdmin, user, openLoginModal } = useAuth()
 
-  const [search, setSearch] = useState('')
-
   const { data: ahsps = [], isLoading } = useQuery({
-    ...listAhspsOptions({ query: { q: search || undefined } }),
+    ...listAhspsOptions({ query: { q: q || undefined } }),
   })
 
   const deleteMut = useMutation(deleteAhspMutation())
@@ -54,7 +57,18 @@ function AhspPage() {
 
   return (
     <div className="flex flex-col gap-4 min-w-0">
-      <PageHeader title="AHSP" onSearch={setSearch} onAdd={handleOpenAdd} addLabel="AHSP" />
+      <PageHeader
+        title="AHSP"
+        searchValue={q || ''}
+        onSearch={(val) => {
+          navigate({
+            search: ((prev: any) => ({ ...prev, q: val || undefined })) as any,
+            replace: true,
+          })
+        }}
+        onAdd={handleOpenAdd}
+        addLabel="AHSP"
+      />
 
       <div className="rounded-md border bg-card overflow-hidden">
         <Table className="min-w-[700px]">
@@ -83,7 +97,7 @@ function AhspPage() {
                     <EmptyHeader>
                       <EmptyTitle>Belum ada data AHSP</EmptyTitle>
                       <EmptyDescription>
-                        {search ? `Tidak ada AHSP yang cocok dengan "${search}".` : 'Mulai menyusun analisa harga satuan pekerjaan baru.'}
+                        {q ? `Tidak ada AHSP yang cocok dengan "${q}".` : 'Mulai menyusun analisa harga satuan pekerjaan baru.'}
                       </EmptyDescription>
                     </EmptyHeader>
                   </Empty>

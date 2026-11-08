@@ -145,6 +145,7 @@ function AddProjectForm({
             <Field>
               <FieldLabel htmlFor="proj-section">Section</FieldLabel>
               <Select
+                items={PROJECT_SECTIONS.map((sec) => ({ value: sec, label: sec }))}
                 value={section}
                 onValueChange={(val) => {
                   if (val && PROJECT_SECTIONS.includes(val as ProjectSection)) {
@@ -169,6 +170,7 @@ function AddProjectForm({
             <Field>
               <FieldLabel htmlFor="proj-plant">Plant</FieldLabel>
               <Select
+                items={PROJECT_PLANTS.map((pl) => ({ value: pl, label: pl }))}
                 value={plant}
                 onValueChange={(val) => {
                   if (val && PROJECT_PLANTS.includes(val as ProjectPlant)) {

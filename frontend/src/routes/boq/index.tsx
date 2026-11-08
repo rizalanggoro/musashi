@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { listBoqProjectsOptions } from '@/api/@tanstack/react-query.gen'
@@ -9,14 +8,19 @@ import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/u
 import { Badge } from '@/components/ui/badge'
 import { Download, Search } from 'lucide-react'
 
-export const Route = createFileRoute('/boq/')({ component: BoqPage })
+export const Route = createFileRoute('/boq/')({
+  component: BoqPage,
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: (search.q as string) || undefined,
+  }),
+})
 
 function BoqPage() {
   const navigate = useNavigate()
-  const [search, setSearch] = useState('')
+  const { q } = Route.useSearch()
 
   const { data: projects = [], isLoading } = useQuery({
-    ...listBoqProjectsOptions({ query: { q: search || undefined } }),
+    ...listBoqProjectsOptions({ query: { q: q || undefined } }),
   })
 
   const getStatusBadge = (status: string) => {
@@ -45,7 +49,14 @@ function BoqPage() {
             </InputGroupAddon>
             <InputGroupInput
               placeholder="Search projects..."
-              onChange={(e) => setSearch(e.target.value)}
+              value={q || ''}
+              onChange={(e) => {
+                const val = e.target.value
+                navigate({
+                  search: ((prev: any) => ({ ...prev, q: val || undefined })) as any,
+                  replace: true,
+                })
+              }}
             />
           </InputGroup>
           <Button
@@ -94,7 +105,7 @@ function BoqPage() {
                     <EmptyHeader>
                       <EmptyTitle>Belum ada proyek BOQ</EmptyTitle>
                       <EmptyDescription>
-                        {search ? `Tidak ada proyek yang cocok dengan "${search}".` : 'Belum ada data proyek.'}
+                        {q ? `Tidak ada proyek yang cocok dengan "${q}".` : 'Belum ada data proyek.'}
                       </EmptyDescription>
                     </EmptyHeader>
                   </Empty>

@@ -39,14 +39,19 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Check, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-export const Route = createFileRoute("/projects/")({ component: ProjectsPage });
+export const Route = createFileRoute("/projects/")({
+  component: ProjectsPage,
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: (search.q as string) || undefined,
+  }),
+});
 
 function ProjectsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { q } = Route.useSearch();
   const { isAdmin, user, openLoginModal } = useAuth();
 
-  const [search, setSearch] = useState("");
   const [page] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -54,7 +59,7 @@ function ProjectsPage() {
 
   const { data, isLoading } = useQuery({
     ...listProjectsOptions({
-      query: { q: search || undefined, page, per_page: 25 },
+      query: { q: q || undefined, page, per_page: 25 },
     }),
   });
 
@@ -90,7 +95,13 @@ function ProjectsPage() {
     <div className="flex flex-col gap-4 min-w-0">
       <PageHeader
         title="Projects"
-        onSearch={setSearch}
+        searchValue={q || ""}
+        onSearch={(val) => {
+          navigate({
+            search: ((prev: any) => ({ ...prev, q: val || undefined })) as any,
+            replace: true,
+          });
+        }}
         onAdd={handleOpenAdd}
         addLabel="Project"
       />
@@ -132,8 +143,8 @@ function ProjectsPage() {
                     <EmptyHeader>
                       <EmptyTitle>Belum ada proyek</EmptyTitle>
                       <EmptyDescription>
-                        {search
-                          ? `Tidak ada proyek yang cocok dengan "${search}".`
+                        {q
+                          ? `Tidak ada proyek yang cocok dengan "${q}".`
                           : "Mulai dengan menambahkan proyek baru."}
                       </EmptyDescription>
                     </EmptyHeader>

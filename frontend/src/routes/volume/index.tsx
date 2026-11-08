@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -20,20 +19,17 @@ import { FileSpreadsheet } from 'lucide-react'
 
 export const Route = createFileRoute('/volume/')({
   component: VolumePage,
-  validateSearch: (search: Record<string, unknown>): { projectId?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { projectId?: string; q?: string } => ({
     projectId: (search.projectId as string) || undefined,
+    q: (search.q as string) || undefined,
   }),
 })
 
 function VolumePage() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const searchParams = Route.useSearch()
-  const queryProjectId = searchParams.projectId || ''
+  const { projectId, q } = Route.useSearch()
   const { isAdmin, user, openLoginModal } = useAuth()
-
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(queryProjectId)
-  const [search, setSearch] = useState('')
 
   // Fetch projects for selector
   const { data: projectsData } = useQuery({
@@ -46,14 +42,14 @@ function VolumePage() {
   }))
 
   // Default project selection if not set
-  const activeProjectId = selectedProjectId || (projects.length > 0 ? projects[0].id : '')
+  const activeProjectId = projectId || (projects.length > 0 ? projects[0].id : '')
   const activeProject = projects.find((p) => p.id === activeProjectId)
 
   // Fetch volume rows for active project
   const { data: volumeRows = [], isLoading } = useQuery({
     ...listVolumesOptions({
       path: { id: activeProjectId },
-      query: { q: search || undefined },
+      query: { q: q || undefined },
     }),
     enabled: !!activeProjectId,
   })
@@ -89,7 +85,13 @@ function VolumePage() {
     <div className="flex flex-col gap-4 min-w-0">
       <PageHeader
         title="Volume Take-off"
-        onSearch={setSearch}
+        searchValue={q || ''}
+        onSearch={(val) => {
+          navigate({
+            search: ((prev: any) => ({ ...prev, q: val || undefined })) as any,
+            replace: true,
+          })
+        }}
         onAdd={handleOpenAdd}
         addLabel="Tambah Take-off"
       />
@@ -103,7 +105,12 @@ function VolumePage() {
               items={projectItems}
               value={activeProjectId}
               onValueChange={(val) => {
-                if (val) setSelectedProjectId(val)
+                if (val) {
+                  navigate({
+                    search: ((prev: any) => ({ ...prev, projectId: val })) as any,
+                    replace: true,
+                  })
+                }
               }}
             >
               <SelectTrigger className="w-full">
@@ -183,7 +190,7 @@ function VolumePage() {
                     <EmptyHeader>
                       <EmptyTitle>Tidak ada data take-off volume</EmptyTitle>
                       <EmptyDescription>
-                        {search ? `Tidak ada data cocok dengan "${search}".` : 'Mulai tambahkan perhitungan volume take-off untuk proyek ini.'}
+                        {q ? `Tidak ada data cocok dengan "${q}".` : 'Mulai tambahkan perhitungan volume take-off untuk proyek ini.'}
                       </EmptyDescription>
                     </EmptyHeader>
                   </Empty>
