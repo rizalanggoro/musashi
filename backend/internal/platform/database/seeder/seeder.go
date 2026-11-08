@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -293,6 +294,8 @@ func seedAhsps(db *gorm.DB, upMap map[string]model.UnitPrice) (map[string]model.
 	return resultMap, nil
 }
 
+func f(v float64) *float64 { return &v }
+
 func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 	now := time.Now()
 	planDate1 := now.AddDate(0, -1, 0) // 1 month ago
@@ -392,10 +395,13 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 						PlannedVolume: 120.0,
 					},
 					volume: model.Volume{
+						Formula:       "area_pt",
+						Length:        f(30.0),
+						Height:        f(4.0),
 						Quantity:      120.0,
 						UnitWeight:    1.0,
 						TotalQuantity: 120.0,
-						Description:   "Sisi Barat Koridor Utama",
+						Description:   "Sisi Barat Koridor Utama (P=30m, T=4m)",
 					},
 					rab: model.RabItem{
 						WorkItem:  "Pembongkaran 1 m2 Dinding Bata / Partisi Lama",
@@ -412,10 +418,13 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 						PlannedVolume: 240.0,
 					},
 					volume: model.Volume{
+						Formula:       "area_pt",
+						Length:        f(60.0),
+						Height:        f(4.0),
 						Quantity:      240.0,
 						UnitWeight:    1.0,
 						TotalQuantity: 240.0,
-						Description:   "Dinding Partisi Koridor Baru",
+						Description:   "Dinding Partisi Koridor Baru (P=60m, T=4m)",
 					},
 					rab: model.RabItem{
 						WorkItem:  "Pemasangan 1 m2 Dinding Bata Ringan Tebal 10 cm",
@@ -432,10 +441,13 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 						PlannedVolume: 180.0,
 					},
 					volume: model.Volume{
+						Formula:       "area_pl",
+						Length:        f(60.0),
+						Width:         f(3.0),
 						Quantity:      180.0,
 						UnitWeight:    1.0,
 						TotalQuantity: 180.0,
-						Description:   "Lantai Koridor Pejalan Kaki",
+						Description:   "Lantai Koridor Pejalan Kaki (P=60m, L=3m)",
 					},
 					rab: model.RabItem{
 						WorkItem:  "Pemasangan 1 m2 Lantai Keramik 40x40 cm Polished",
@@ -452,10 +464,13 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 						PlannedVolume: 480.0,
 					},
 					volume: model.Volume{
+						Formula:       "area_pt",
+						Length:        f(60.0),
+						Height:        f(4.0),
 						Quantity:      240.0,
 						UnitWeight:    2.0, // 2 sisi dinding
 						TotalQuantity: 480.0,
-						Description:   "Dinding Sisi Dalam dan Sisi Luar",
+						Description:   "Dinding Sisi Dalam dan Sisi Luar (2 sisi)",
 					},
 					rab: model.RabItem{
 						WorkItem:  "Pengecatan 1 m2 Dinding Interior Baru (1 Dasar, 2 Penutup)",
@@ -487,6 +502,101 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 				ProgressConstruction: domain.ProgressPending,
 				ProgressBAST:         domain.ProgressPending,
 			},
+			boqs: []struct {
+				boq    model.BoqItem
+				volume model.Volume
+				rab    model.RabItem
+			}{
+				{
+					boq: model.BoqItem{
+						WorkItem:      "Pengecoran Bore Pile D40 cm Kedalaman 6 m",
+						Unit:          "m3",
+						PlannedVolume: 9.0478,
+					},
+					volume: model.Volume{
+						Formula:       "cylinder",
+						Length:        f(0.40), // Diameter D
+						Height:        f(6.00), // Depth T
+						Quantity:      0.7540,
+						UnitWeight:    12.0, // 12 titik lubang bor
+						TotalQuantity: 9.0478,
+						Description:   "Titik Bore Pile P-01 s/d P-12 Pondasi Bak IPAL",
+					},
+					rab: model.RabItem{
+						WorkItem:  "Pengecoran Bore Pile D40 cm Kedalaman 6 m",
+						Unit:      "m3",
+						Volume:    9.0478,
+						UnitPrice: 1350000,
+						TotalCost: 12214530,
+					},
+				},
+				{
+					boq: model.BoqItem{
+						WorkItem:      "Pemasangan Tulangan Besi Beton Ulir D13",
+						Unit:          "kg",
+						PlannedVolume: 625.20,
+					},
+					volume: model.Volume{
+						Formula:       "weight_rebar",
+						Length:        f(12.00), // Panjang batang
+						Width:         f(1.042), // Berat jenis kg/m'
+						Quantity:      12.5040,
+						UnitWeight:    50.0, // 50 batang
+						TotalQuantity: 625.20,
+						Description:   "Pembesian Utama Bore Pile (50 btg @ 12m)",
+					},
+					rab: model.RabItem{
+						WorkItem:  "Pemasangan Tulangan Besi Beton Ulir D13",
+						Unit:      "kg",
+						Volume:    625.20,
+						UnitPrice: 18500,
+						TotalCost: 11566200,
+					},
+				},
+				{
+					boq: model.BoqItem{
+						WorkItem:      "Pekerjaan Pengukuran & Pasang Bowplank",
+						Unit:          "m'",
+						PlannedVolume: 150.0,
+					},
+					volume: model.Volume{
+						Formula:       "linear_p",
+						Length:        f(150.0),
+						Quantity:      150.0,
+						UnitWeight:    1.0,
+						TotalQuantity: 150.0,
+						Description:   "Keliling Saluran Drainase & Kolam IPAL",
+					},
+					rab: model.RabItem{
+						WorkItem:  "Pekerjaan Pengukuran & Pasang Bowplank",
+						Unit:      "m'",
+						Volume:    150.0,
+						UnitPrice: 35000,
+						TotalCost: 5250000,
+					},
+				},
+				{
+					boq: model.BoqItem{
+						WorkItem:      "Pembersihan Lapangan & Mobilisasi Alat",
+						Unit:          "lot",
+						PlannedVolume: 1.0,
+					},
+					volume: model.Volume{
+						Formula:       "unit_only",
+						Quantity:      1.0,
+						UnitWeight:    1.0,
+						TotalQuantity: 1.0,
+						Description:   "Awal Proyek IPAL Plant Karawang",
+					},
+					rab: model.RabItem{
+						WorkItem:  "Pembersihan Lapangan & Mobilisasi Alat",
+						Unit:      "lot",
+						Volume:    1.0,
+						UnitPrice: 15000000,
+						TotalCost: 15000000,
+					},
+				},
+			},
 		},
 		{
 			project: model.Project{
@@ -512,10 +622,10 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 	}
 
 	for _, entry := range projects {
-		var existing model.Project
-		err := db.Where("lower(name) = lower(?) AND deleted_at IS NULL", entry.project.Name).First(&existing).Error
+		var p model.Project
+		err := db.Where("lower(name) = lower(?) AND deleted_at IS NULL", entry.project.Name).First(&p).Error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			p := entry.project
+			p = entry.project
 			if err := db.Create(&p).Error; err != nil {
 				return err
 			}
@@ -528,9 +638,15 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 					return err
 				}
 			}
+		} else if err != nil {
+			return err
+		}
 
-			// Seed BoQ, Volume, RAB
-			for _, b := range entry.boqs {
+		// Ensure BoQ, Volume, and RAB exist for this project
+		for _, b := range entry.boqs {
+			var existingBoq model.BoqItem
+			bErr := db.Where("project_id = ? AND lower(work_item) = lower(?) AND deleted_at IS NULL", p.ID, b.boq.WorkItem).First(&existingBoq).Error
+			if errors.Is(bErr, gorm.ErrRecordNotFound) {
 				boq := b.boq
 				boq.ProjectID = p.ID
 
@@ -562,10 +678,43 @@ func seedProjects(db *gorm.DB, ahspMap map[string]model.Ahsp) error {
 				if err := db.Create(&rab).Error; err != nil {
 					return err
 				}
+				slog.Info("seeded boq & volume", "project", p.Name, "workItem", boq.WorkItem, "formula", vol.Formula)
 			}
-		} else if err != nil {
-			return err
 		}
+	}
+
+	// Backfill any existing volume with empty formula
+	var unassignedVols []model.Volume
+	if err := db.Where("formula = '' OR formula IS NULL").Find(&unassignedVols).Error; err == nil && len(unassignedVols) > 0 {
+		for _, v := range unassignedVols {
+			var b model.BoqItem
+			if err := db.First(&b, v.BoqItemID).Error; err == nil {
+				formula := "box"
+				u := strings.ToLower(strings.TrimSpace(b.Unit))
+				switch u {
+				case "lot", "ls", "lumpsum", "unit", "pcs", "titik", "buah", "set", "btg", "bh":
+					formula = "unit_only"
+				case "m2", "m²":
+					if v.Height != nil && *v.Height > 0 {
+						formula = "area_pt"
+					} else {
+						formula = "area_pl"
+					}
+				case "kg", "ton":
+					formula = "weight_rebar"
+				case "m'", "m", "meter", "ml":
+					formula = "linear_p"
+				case "m3", "m³":
+					if v.Width == nil || *v.Width == 0 {
+						formula = "cylinder"
+					} else {
+						formula = "box"
+					}
+				}
+				db.Model(&v).Update("formula", formula)
+			}
+		}
+		slog.Info("backfilled existing volume formulas", "count", len(unassignedVols))
 	}
 
 	return nil

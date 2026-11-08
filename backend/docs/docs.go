@@ -1681,6 +1681,7 @@ const docTemplate = `{
             "required": [
                 "code",
                 "id",
+                "note",
                 "overhead_profit_pct",
                 "status",
                 "total_cost",
@@ -1696,6 +1697,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "note": {
                     "type": "string"
                 },
                 "overhead_profit_pct": {
@@ -1733,6 +1737,7 @@ const docTemplate = `{
                 "code",
                 "id",
                 "items",
+                "note",
                 "overhead_profit_pct",
                 "status",
                 "total_cost",
@@ -1755,6 +1760,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/AhspItemDTO"
                     }
+                },
+                "note": {
+                    "type": "string"
                 },
                 "overhead_profit_pct": {
                     "type": "string"
@@ -1930,6 +1938,7 @@ const docTemplate = `{
             "required": [
                 "code",
                 "items",
+                "note",
                 "overhead_profit_pct",
                 "status",
                 "unit",
@@ -1944,6 +1953,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/CreateAhspItemInput"
                     }
+                },
+                "note": {
+                    "type": "string"
                 },
                 "overhead_profit_pct": {
                     "type": "string"
@@ -2171,6 +2183,9 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "formula": {
+                    "type": "string"
+                },
                 "height": {
                     "type": "string"
                 },
@@ -2178,6 +2193,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "planned_volume": {
+                    "type": "string"
+                },
+                "quantity": {
                     "type": "string"
                 },
                 "unit": {
@@ -2660,10 +2678,16 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "formula": {
+                    "type": "string"
+                },
                 "height": {
                     "type": "string"
                 },
                 "length": {
+                    "type": "string"
+                },
+                "quantity": {
                     "type": "string"
                 },
                 "unit_weight": {
@@ -2717,6 +2741,7 @@ const docTemplate = `{
                 "boq_item_id",
                 "date",
                 "description",
+                "formula",
                 "height",
                 "id",
                 "length",
@@ -2736,6 +2761,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "description": {
+                    "type": "string"
+                },
+                "formula": {
                     "type": "string"
                 },
                 "height": {

@@ -14,5 +14,6 @@ type Volume struct {
 	Quantity      float64    `json:"quantity"`
 	UnitWeight    float64    `json:"unit_weight"`
 	TotalQuantity float64    `json:"total_quantity"`
+	Formula       string     `json:"formula"`
 	Description   string     `json:"description"`
 }

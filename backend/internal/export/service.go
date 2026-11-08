@@ -72,7 +72,7 @@ func (s *service) GenerateVolumeExcel(projectID uint) (string, []byte, error) {
 	f.SetCellValue(sheet, "B4", time.Now().Format("2006-01-02"))
 
 	// Table headers
-	headers := []string{"NO", "WORK ITEM", "VOLUME", "UNIT", "LENGTH (m)", "WIDTH (m)", "HEIGHT (m)", "QUANTITY", "UNIT WEIGHT", "TOTAL QUANTITY"}
+	headers := []string{"NO", "WORK ITEM", "VOLUME", "UNIT", "FORMULA", "LENGTH (m)", "WIDTH (m)", "HEIGHT (m)", "QUANTITY", "UNIT WEIGHT", "TOTAL QUANTITY"}
 	for colIdx, h := range headers {
 		cell, _ := excelize.CoordinatesToCellName(colIdx+1, 6)
 		f.SetCellValue(sheet, cell, h)
@@ -85,18 +85,19 @@ func (s *service) GenerateVolumeExcel(projectID uint) (string, []byte, error) {
 		f.SetCellValue(sheet, fmt.Sprintf("B%d", rowNum), r.WorkItem)
 		f.SetCellValue(sheet, fmt.Sprintf("C%d", rowNum), r.PlannedVolume)
 		f.SetCellValue(sheet, fmt.Sprintf("D%d", rowNum), r.Unit)
+		f.SetCellValue(sheet, fmt.Sprintf("E%d", rowNum), r.Formula)
 		if r.Length != nil {
-			f.SetCellValue(sheet, fmt.Sprintf("E%d", rowNum), *r.Length)
+			f.SetCellValue(sheet, fmt.Sprintf("F%d", rowNum), *r.Length)
 		}
 		if r.Width != nil {
-			f.SetCellValue(sheet, fmt.Sprintf("F%d", rowNum), *r.Width)
+			f.SetCellValue(sheet, fmt.Sprintf("G%d", rowNum), *r.Width)
 		}
 		if r.Height != nil {
-			f.SetCellValue(sheet, fmt.Sprintf("G%d", rowNum), *r.Height)
+			f.SetCellValue(sheet, fmt.Sprintf("H%d", rowNum), *r.Height)
 		}
-		f.SetCellValue(sheet, fmt.Sprintf("H%d", rowNum), r.Quantity)
-		f.SetCellValue(sheet, fmt.Sprintf("I%d", rowNum), r.UnitWeight)
-		f.SetCellValue(sheet, fmt.Sprintf("J%d", rowNum), r.TotalQuantity)
+		f.SetCellValue(sheet, fmt.Sprintf("I%d", rowNum), r.Quantity)
+		f.SetCellValue(sheet, fmt.Sprintf("J%d", rowNum), r.UnitWeight)
+		f.SetCellValue(sheet, fmt.Sprintf("K%d", rowNum), r.TotalQuantity)
 	}
 
 	var buf bytes.Buffer

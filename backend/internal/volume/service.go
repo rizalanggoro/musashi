@@ -2,6 +2,7 @@ package volume
 
 import (
 	"errors"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -33,15 +34,136 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func calcQuantities(length, width, height *float64, plannedVolume float64, unitWeight float64) (float64, float64) {
+func calcQuantities(formula, unit string, length, width, height *float64, plannedVolume float64, unitWeight float64, customQty *float64) (float64, float64) {
 	if unitWeight <= 0 {
 		unitWeight = 1
 	}
 
+	if customQty != nil && *customQty > 0 {
+		return *customQty, (*customQty) * unitWeight
+	}
+
+	u := strings.ToLower(strings.TrimSpace(unit))
+	f := strings.ToLower(strings.TrimSpace(formula))
+
+	var l, w, h float64
+	if length != nil {
+		l = *length
+	}
+	if width != nil {
+		w = *width
+	}
+	if height != nil {
+		h = *height
+	}
+
 	var qty float64
-	if length != nil && width != nil && height != nil && *length > 0 && *width > 0 && *height > 0 {
-		qty = (*length) * (*width) * (*height)
-	} else {
+
+	switch f {
+	case "cylinder": // 1/4 * pi * D^2 * T (lubang bor / bore pile / tiang silinder)
+		depth := h
+		if depth <= 0 && w > 0 {
+			depth = w
+		}
+		if depth <= 0 {
+			depth = 1
+		}
+		qty = 0.25 * math.Pi * l * l * depth
+
+	case "area_circle": // 1/4 * pi * D^2 (lingkaran)
+		qty = 0.25 * math.Pi * l * l
+
+	case "area_pl": // P x L
+		qty = l * w
+
+	case "area_pt": // P x T
+		qty = l * h
+
+	case "area_lt": // L x T
+		qty = w * h
+
+	case "linear_p": // P (meter lari)
+		qty = l
+
+	case "linear_t": // T (meter lari tinggi)
+		qty = h
+
+	case "weight_rebar": // P * berat_jenis (kg)
+		bj := w
+		if bj <= 0 {
+			bj = 1
+		}
+		qty = l * bj
+
+	case "unit_only": // lot, pcs, unit
+		qty = 1.0
+
+	case "box": // P x L x T
+		qty = l * w * h
+
+	default:
+		// Smart auto-detection fallback if formula not explicitly set
+		switch u {
+		case "lot", "ls", "lumpsum", "unit", "pcs", "titik", "buah", "set", "btg", "bh":
+			if plannedVolume > 0 {
+				qty = plannedVolume
+			} else {
+				qty = 1.0
+			}
+		case "m'", "m", "meter", "ml":
+			if l > 0 {
+				qty = l
+			} else if h > 0 {
+				qty = h
+			} else if w > 0 {
+				qty = w
+			} else {
+				qty = plannedVolume
+			}
+		case "m2", "m²":
+			if l > 0 && w > 0 {
+				qty = l * w
+			} else if l > 0 && h > 0 {
+				qty = l * h
+			} else if w > 0 && h > 0 {
+				qty = w * h
+			} else if l > 0 {
+				qty = 0.25 * math.Pi * l * l
+			} else {
+				qty = plannedVolume
+			}
+		case "kg", "ton":
+			if l > 0 && w > 0 {
+				qty = l * w
+			} else if l > 0 {
+				qty = l
+			} else {
+				qty = plannedVolume
+			}
+		case "m3", "m³":
+			if l > 0 && w > 0 && h > 0 {
+				qty = l * w * h
+			} else if l > 0 && h > 0 { // silinder D x T
+				qty = 0.25 * math.Pi * l * l * h
+			} else {
+				qty = plannedVolume
+			}
+		default:
+			if l > 0 && w > 0 && h > 0 {
+				qty = l * w * h
+			} else if l > 0 && w > 0 {
+				qty = l * w
+			} else if l > 0 && h > 0 {
+				qty = l * h
+			} else if l > 0 {
+				qty = l
+			} else {
+				qty = plannedVolume
+			}
+		}
+	}
+
+	if qty <= 0 && plannedVolume > 0 {
 		qty = plannedVolume
 	}
 
@@ -128,7 +250,19 @@ func (s *service) Create(projectID uint, input CreateVolumeInput) (*VolumeRowDTO
 		}
 	}
 
-	qty, totalQty := calcQuantities(lVal, wVal, hVal, boqItem.PlannedVolume, uWeight)
+	formulaStr := ""
+	if input.Formula != nil {
+		formulaStr = *input.Formula
+	}
+
+	var customQty *float64
+	if input.Quantity != nil && *input.Quantity != "" {
+		if q, err := strconv.ParseFloat(*input.Quantity, 64); err == nil && q > 0 {
+			customQty = &q
+		}
+	}
+
+	qty, totalQty := calcQuantities(formulaStr, boqItem.Unit, lVal, wVal, hVal, boqItem.PlannedVolume, uWeight, customQty)
 
 	var dateVal *time.Time
 	if input.Date != nil && *input.Date != "" {
@@ -146,6 +280,7 @@ func (s *service) Create(projectID uint, input CreateVolumeInput) (*VolumeRowDTO
 		Quantity:      qty,
 		UnitWeight:    uWeight,
 		TotalQuantity: totalQty,
+		Formula:       formulaStr,
 		Description:   input.Description,
 	}
 
@@ -214,11 +349,21 @@ func (s *service) Update(id uint, input UpdateVolumeInput) (*VolumeRowDTO, error
 		}
 		vol.UnitWeight = w
 	}
+	if input.Formula != nil {
+		vol.Formula = *input.Formula
+	}
 	if input.Description != nil {
 		vol.Description = *input.Description
 	}
 
-	vol.Quantity, vol.TotalQuantity = calcQuantities(vol.Length, vol.Width, vol.Height, boqItem.PlannedVolume, vol.UnitWeight)
+	var customQty *float64
+	if input.Quantity != nil && *input.Quantity != "" {
+		if q, err := strconv.ParseFloat(*input.Quantity, 64); err == nil && q > 0 {
+			customQty = &q
+		}
+	}
+
+	vol.Quantity, vol.TotalQuantity = calcQuantities(vol.Formula, boqItem.Unit, vol.Length, vol.Width, vol.Height, boqItem.PlannedVolume, vol.UnitWeight, customQty)
 
 	if err := s.repo.UpdateVolume(vol); err != nil {
 		return nil, err

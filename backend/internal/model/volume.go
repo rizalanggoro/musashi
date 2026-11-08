@@ -18,6 +18,7 @@ type Volume struct {
 	Quantity      float64    `gorm:"type:numeric(14,4);not null;default:0"`
 	UnitWeight    float64    `gorm:"type:numeric(14,4);not null;default:1"`
 	TotalQuantity float64    `gorm:"type:numeric(14,4);not null;default:0"`
+	Formula       string     `gorm:"not null;default:''"`
 	Description   string     `gorm:"not null;default:''"`
 }
 
@@ -41,6 +42,7 @@ func (v *Volume) ToDomain() *domain.Volume {
 		Quantity:      v.Quantity,
 		UnitWeight:    v.UnitWeight,
 		TotalQuantity: v.TotalQuantity,
+		Formula:       v.Formula,
 		Description:   v.Description,
 	}
 }
@@ -58,6 +60,7 @@ func FromVolumeDomain(d *domain.Volume) *Volume {
 		Quantity:      d.Quantity,
 		UnitWeight:    d.UnitWeight,
 		TotalQuantity: d.TotalQuantity,
+		Formula:       d.Formula,
 		Description:   d.Description,
 	}
 	v.ID = d.ID

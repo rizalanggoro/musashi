@@ -7,6 +7,7 @@ export type ClientOptions = {
 export type AhspDto = {
     code: string;
     id: string;
+    note: string;
     overhead_profit_pct: string;
     status: string;
     total_cost: string;
@@ -16,13 +17,13 @@ export type AhspDto = {
     unit: string;
     unit_price_of_work: string;
     work_item: string;
-    note?: string;
 };
 
 export type AhspDetailDto = {
     code: string;
     id: string;
     items: Array<AhspItemDto>;
+    note: string;
     overhead_profit_pct: string;
     status: string;
     total_cost: string;
@@ -32,7 +33,6 @@ export type AhspDetailDto = {
     unit: string;
     unit_price_of_work: string;
     work_item: string;
-    note?: string;
 };
 
 export type AhspItemDto = {
@@ -78,11 +78,11 @@ export type CostEstimateDto = {
 export type CreateAhspInput = {
     code: string;
     items: Array<CreateAhspItemInput>;
+    note: string;
     overhead_profit_pct: string;
     status: string;
     unit: string;
     work_item: string;
-    note?: string;
 };
 
 export type CreateAhspItemInput = {
@@ -147,9 +147,11 @@ export type CreateVolumeInput = {
     boq_item_id?: string;
     date?: string;
     description: string;
+    formula?: string;
     height?: string;
     length?: string;
     planned_volume: string;
+    quantity?: string;
     unit: string;
     unit_weight: string;
     width?: string;
@@ -302,8 +304,10 @@ export type UpdateUnitPriceInput = {
 export type UpdateVolumeInput = {
     date?: string;
     description?: string;
+    formula?: string;
     height?: string;
     length?: string;
+    quantity?: string;
     unit_weight?: string;
     width?: string;
 };
@@ -322,6 +326,7 @@ export type VolumeRowDto = {
     boq_item_id: string;
     date: string;
     description: string;
+    formula: string;
     height: string;
     id: string;
     length: string;

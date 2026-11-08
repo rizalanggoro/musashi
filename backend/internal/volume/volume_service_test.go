@@ -2,6 +2,7 @@ package volume
 
 import (
 	"errors"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -84,9 +85,9 @@ func (m *mockVolumeRepo) DeleteVolume(id uint) (bool, error) {
 }
 
 func TestCalcQuantities(t *testing.T) {
-	t.Run("with dimensions", func(t *testing.T) {
+	t.Run("with dimensions box", func(t *testing.T) {
 		l, w, h := 10.0, 2.0, 3.0
-		qty, total := calcQuantities(&l, &w, &h, 0, 2.5)
+		qty, total := calcQuantities("box", "m3", &l, &w, &h, 0, 2.5, nil)
 		if qty != 60.0 {
 			t.Errorf("expected qty 60, got %f", qty)
 		}
@@ -95,8 +96,44 @@ func TestCalcQuantities(t *testing.T) {
 		}
 	})
 
+	t.Run("cylinder bore pile", func(t *testing.T) {
+		d, h := 0.4, 6.0 // D=0.4m, Depth=6m
+		qty, total := calcQuantities("cylinder", "m3", &d, nil, &h, 0, 10, nil)
+		expectedQty := 0.25 * 3.141592653589793 * 0.4 * 0.4 * 6.0
+		if math.Abs(qty-expectedQty) > 0.001 {
+			t.Errorf("expected qty %f, got %f", expectedQty, qty)
+		}
+		if math.Abs(total-(expectedQty*10)) > 0.001 {
+			t.Errorf("expected total %f, got %f", expectedQty*10, total)
+		}
+	})
+
+	t.Run("area P x L", func(t *testing.T) {
+		l, w := 12.0, 5.0
+		qty, total := calcQuantities("area_pl", "m2", &l, &w, nil, 0, 1, nil)
+		if qty != 60.0 || total != 60.0 {
+			t.Errorf("expected 60/60, got %f/%f", qty, total)
+		}
+	})
+
+	t.Run("weight rebar P x BJ", func(t *testing.T) {
+		l, bj := 12.0, 1.042 // 12m length, 1.042 kg/m
+		qty, total := calcQuantities("weight_rebar", "kg", &l, &bj, nil, 0, 20, nil)
+		expectedQty := 12.0 * 1.042
+		if math.Abs(qty-expectedQty) > 0.0001 || math.Abs(total-(expectedQty*20)) > 0.0001 {
+			t.Errorf("expected %f/%f, got %f/%f", expectedQty, expectedQty*20, qty, total)
+		}
+	})
+
+	t.Run("lot and unit", func(t *testing.T) {
+		qty, total := calcQuantities("unit_only", "lot", nil, nil, nil, 0, 1, nil)
+		if qty != 1.0 || total != 1.0 {
+			t.Errorf("expected 1/1, got %f/%f", qty, total)
+		}
+	})
+
 	t.Run("without dimensions uses planned volume", func(t *testing.T) {
-		qty, total := calcQuantities(nil, nil, nil, 45.0, 0)
+		qty, total := calcQuantities("", "", nil, nil, nil, 45.0, 0, nil)
 		if qty != 45.0 || total != 45.0 {
 			t.Errorf("expected 45/45, got %f/%f", qty, total)
 		}

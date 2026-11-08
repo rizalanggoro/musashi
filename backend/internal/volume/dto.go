@@ -20,6 +20,7 @@ type VolumeRowDTO struct {
 	Quantity      string  `json:"quantity"`
 	UnitWeight    string  `json:"unit_weight"`
 	TotalQuantity string  `json:"total_quantity"`
+	Formula       string  `json:"formula"`
 	Description   string  `json:"description"`
 }
 
@@ -33,6 +34,8 @@ type CreateVolumeInput struct {
 	Length        *string `json:"length,omitempty"`
 	Width         *string `json:"width,omitempty"`
 	Height        *string `json:"height,omitempty"`
+	Formula       *string `json:"formula,omitempty"`
+	Quantity      *string `json:"quantity,omitempty"`
 	UnitWeight    string  `json:"unit_weight"`
 	Description   string  `json:"description"`
 }
@@ -42,6 +45,8 @@ type UpdateVolumeInput struct {
 	Length      *string `json:"length,omitempty"`
 	Width       *string `json:"width,omitempty"`
 	Height      *string `json:"height,omitempty"`
+	Formula     *string `json:"formula,omitempty"`
+	Quantity    *string `json:"quantity,omitempty"`
 	UnitWeight  *string `json:"unit_weight,omitempty"`
 	Description *string `json:"description,omitempty"`
 }
@@ -63,6 +68,7 @@ func toRowDTO(v *domain.Volume, b *domain.BoqItem) VolumeRowDTO {
 		Quantity:      fmt.Sprintf("%.4f", v.Quantity),
 		UnitWeight:    fmt.Sprintf("%.4f", v.UnitWeight),
 		TotalQuantity: fmt.Sprintf("%.4f", v.TotalQuantity),
+		Formula:       v.Formula,
 		Description:   v.Description,
 	}
 	if v.Date != nil {

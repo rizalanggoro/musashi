@@ -1674,6 +1674,7 @@
             "required": [
                 "code",
                 "id",
+                "note",
                 "overhead_profit_pct",
                 "status",
                 "total_cost",
@@ -1689,6 +1690,9 @@
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "note": {
                     "type": "string"
                 },
                 "overhead_profit_pct": {
@@ -1726,6 +1730,7 @@
                 "code",
                 "id",
                 "items",
+                "note",
                 "overhead_profit_pct",
                 "status",
                 "total_cost",
@@ -1748,6 +1753,9 @@
                     "items": {
                         "$ref": "#/definitions/AhspItemDTO"
                     }
+                },
+                "note": {
+                    "type": "string"
                 },
                 "overhead_profit_pct": {
                     "type": "string"
@@ -1923,6 +1931,7 @@
             "required": [
                 "code",
                 "items",
+                "note",
                 "overhead_profit_pct",
                 "status",
                 "unit",
@@ -1937,6 +1946,9 @@
                     "items": {
                         "$ref": "#/definitions/CreateAhspItemInput"
                     }
+                },
+                "note": {
+                    "type": "string"
                 },
                 "overhead_profit_pct": {
                     "type": "string"
@@ -2164,6 +2176,9 @@
                 "description": {
                     "type": "string"
                 },
+                "formula": {
+                    "type": "string"
+                },
                 "height": {
                     "type": "string"
                 },
@@ -2171,6 +2186,9 @@
                     "type": "string"
                 },
                 "planned_volume": {
+                    "type": "string"
+                },
+                "quantity": {
                     "type": "string"
                 },
                 "unit": {
@@ -2653,10 +2671,16 @@
                 "description": {
                     "type": "string"
                 },
+                "formula": {
+                    "type": "string"
+                },
                 "height": {
                     "type": "string"
                 },
                 "length": {
+                    "type": "string"
+                },
+                "quantity": {
                     "type": "string"
                 },
                 "unit_weight": {
@@ -2710,6 +2734,7 @@
                 "boq_item_id",
                 "date",
                 "description",
+                "formula",
                 "height",
                 "id",
                 "length",
@@ -2729,6 +2754,9 @@
                     "type": "string"
                 },
                 "description": {
+                    "type": "string"
+                },
+                "formula": {
                     "type": "string"
                 },
                 "height": {
