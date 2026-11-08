@@ -1,4 +1,12 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "cn";
 import { UNIT_PRICE_CATEGORIES } from "./constants";
 
 export interface UnitPriceCategoryFilterProps {
@@ -6,6 +14,7 @@ export interface UnitPriceCategoryFilterProps {
   onChange: (value: string) => void;
   categories?: readonly string[];
   className?: string;
+  showLabel?: boolean;
 }
 
 export function UnitPriceCategoryFilter({
@@ -13,24 +22,36 @@ export function UnitPriceCategoryFilter({
   onChange,
   categories = UNIT_PRICE_CATEGORIES,
   className,
+  showLabel = true,
 }: UnitPriceCategoryFilterProps) {
   return (
-    <ToggleGroup
-      value={[value]}
-      onValueChange={(val) => {
-        if (val && val.length > 0) {
-          onChange(val[0]);
-        }
-      }}
-      spacing={2}
-      className={className || "flex flex-wrap"}
-    >
-      {categories.map((cat) => (
-        <ToggleGroupItem key={cat} value={cat} className="h-8 px-3 text-xs">
-          {cat}
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
+    <div className={cn("flex items-center gap-2", className)}>
+      {showLabel && (
+        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+          Category:
+        </span>
+      )}
+      <Select
+        value={value}
+        onValueChange={(val) => {
+          if (val) {
+            onChange(val);
+          }
+        }}
+      >
+        <SelectTrigger className="w-44">
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
-
