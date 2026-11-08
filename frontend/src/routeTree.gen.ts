@@ -21,6 +21,7 @@ import { Route as UnitPricesIndexRouteImport } from './routes/unit-prices/index'
 import { Route as VolumeIndexRouteImport } from './routes/volume/index'
 import { Route as AhspIdEditRouteImport } from './routes/ahsp/$id/edit'
 import { Route as AhspNewIndexRouteImport } from './routes/ahsp/new/index'
+import { Route as VolumeNewIndexRouteImport } from './routes/volume/new/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const AhspNewIndexRoute = AhspNewIndexRouteImport.update({
   path: '/ahsp/new/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VolumeNewIndexRoute = VolumeNewIndexRouteImport.update({
+  id: '/volume/new/',
+  path: '/volume/new/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/volume/': typeof VolumeIndexRoute
   '/ahsp/$id/edit': typeof AhspIdEditRoute
   '/ahsp/new/': typeof AhspNewIndexRoute
+  '/volume/new/': typeof VolumeNewIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/volume': typeof VolumeIndexRoute
   '/ahsp/$id/edit': typeof AhspIdEditRoute
   '/ahsp/new': typeof AhspNewIndexRoute
+  '/volume/new': typeof VolumeNewIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/volume/': typeof VolumeIndexRoute
   '/ahsp/$id/edit': typeof AhspIdEditRoute
   '/ahsp/new/': typeof AhspNewIndexRoute
+  '/volume/new/': typeof VolumeNewIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/volume/'
     | '/ahsp/$id/edit'
     | '/ahsp/new/'
+    | '/volume/new/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/volume'
     | '/ahsp/$id/edit'
     | '/ahsp/new'
+    | '/volume/new'
   id:
     | '__root__'
     | '/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/volume/'
     | '/ahsp/$id/edit'
     | '/ahsp/new/'
+    | '/volume/new/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   VolumeIndexRoute: typeof VolumeIndexRoute
   AhspIdEditRoute: typeof AhspIdEditRoute
   AhspNewIndexRoute: typeof AhspNewIndexRoute
+  VolumeNewIndexRoute: typeof VolumeNewIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AhspNewIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volume/new/': {
+      id: '/volume/new/'
+      path: '/volume/new'
+      fullPath: '/volume/new/'
+      preLoaderRoute: typeof VolumeNewIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   VolumeIndexRoute: VolumeIndexRoute,
   AhspIdEditRoute: AhspIdEditRoute,
   AhspNewIndexRoute: AhspNewIndexRoute,
+  VolumeNewIndexRoute: VolumeNewIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,7 +3,6 @@ import {
   detectFormula,
   computeVolume,
   renderDimensions,
-  FORMULA_CONFIGS,
 } from './index'
 
 describe('detectFormula', () => {

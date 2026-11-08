@@ -1,28 +1,20 @@
-import { useState, useMemo } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   listProjectsOptions,
   listVolumesOptions,
-  createVolumeMutation,
   deleteVolumeMutation,
-  listAhspsOptions,
-  getProjectBoqOptions,
 } from '@/api/@tanstack/react-query.gen'
 import { PageHeader } from '@/components/page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDecimal } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
-import { Calculator, FileSpreadsheet } from 'lucide-react'
+import { FileSpreadsheet } from 'lucide-react'
 
 export const Route = createFileRoute('/volume/')({
   component: VolumePage,
@@ -310,28 +302,13 @@ function getFormulaBadge(f?: string) {
 
 function VolumePage() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const searchParams = Route.useSearch()
   const queryProjectId = searchParams.projectId || ''
   const { isAdmin, user, openLoginModal } = useAuth()
 
   const [selectedProjectId, setSelectedProjectId] = useState<string>(queryProjectId)
   const [search, setSearch] = useState('')
-  const [isAddOpen, setIsAddOpen] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
-
-  // Form state
-  const [selectedBoqId, setSelectedBoqId] = useState<string>('custom')
-  const [selectedAhspId, setSelectedAhspId] = useState('')
-  const [workItem, setWorkItem] = useState('')
-  const [unit, setUnit] = useState('')
-  const [formula, setFormula] = useState<FormulaType>('box')
-  const [plannedVolume, setPlannedVolume] = useState('0')
-  const [date, setDate] = useState('')
-  const [length, setLength] = useState('')
-  const [width, setWidth] = useState('')
-  const [height, setHeight] = useState('')
-  const [unitWeight, setUnitWeight] = useState('1')
-  const [description, setDescription] = useState('')
 
   // Fetch projects for selector
   const { data: projectsData } = useQuery({
@@ -352,19 +329,6 @@ function VolumePage() {
     enabled: !!activeProjectId,
   })
 
-  // Fetch project's existing BoQ items so volume can link directly to project work items!
-  const { data: projectBoqItems = [] } = useQuery({
-    ...getProjectBoqOptions({ path: { id: activeProjectId } }),
-    enabled: !!activeProjectId && isAddOpen,
-  })
-
-  // Fetch AHSPs for master auto-complete when creating custom item
-  const { data: ahsps = [] } = useQuery({
-    ...listAhspsOptions({}),
-    enabled: isAddOpen,
-  })
-
-  const createMut = useMutation(createVolumeMutation())
   const deleteMut = useMutation(deleteVolumeMutation())
 
   const handleOpenAdd = () => {
@@ -376,103 +340,10 @@ function VolumePage() {
       alert('Pilih proyek terlebih dahulu.')
       return
     }
-    setSelectedBoqId('custom')
-    setSelectedAhspId('')
-    setWorkItem('')
-    setUnit('')
-    setFormula('box')
-    setPlannedVolume('0')
-    setDate(new Date().toISOString().slice(0, 10))
-    setLength('')
-    setWidth('')
-    setHeight('')
-    setUnitWeight('1')
-    setDescription('')
-    setErrorMessage('')
-    setIsAddOpen(true)
-  }
-
-  // Handle choosing an existing BoQ item from this project
-  const handleSelectBoqItem = (boqId: string) => {
-    setSelectedBoqId(boqId)
-    if (boqId === 'custom') {
-      // Free text mode
-      setWorkItem('')
-      setUnit('')
-      setPlannedVolume('0')
-      return
-    }
-
-    const item = projectBoqItems.find((b) => b.id === boqId)
-    if (item) {
-      setWorkItem(item.work_item)
-      setUnit(item.unit)
-      setPlannedVolume(item.planned_volume || '0')
-      setSelectedAhspId(item.ahsp_id || '')
-      const detected = detectFormula(item.unit)
-      setFormula(detected)
-    }
-  }
-
-  const handleSelectAhsp = (ahspId: string) => {
-    setSelectedAhspId(ahspId)
-    const ahsp = ahsps.find((a) => a.id === ahspId)
-    if (ahsp) {
-      setWorkItem(ahsp.work_item)
-      setUnit(ahsp.unit)
-      const detected = detectFormula(ahsp.unit)
-      setFormula(detected)
-    }
-  }
-
-  // Automatically update formula suggestion when user manually edits unit
-  const handleUnitChange = (newUnit: string) => {
-    setUnit(newUnit)
-    if (newUnit.trim()) {
-      setFormula(detectFormula(newUnit))
-    }
-  }
-
-  // Active formula configuration
-  const currentFormulaConfig = FORMULA_CONFIGS[formula] || FORMULA_CONFIGS.box
-
-  // Live calculation preview
-  const preview = useMemo(() => {
-    return computeVolume(formula, length, width, height, unitWeight, plannedVolume)
-  }, [formula, length, width, height, unitWeight, plannedVolume])
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrorMessage('')
-    if (!workItem.trim() || !unit.trim()) {
-      setErrorMessage('Nama pekerjaan (Work Item) dan Satuan (Unit) wajib diisi.')
-      return
-    }
-
-    try {
-      await createMut.mutateAsync({
-        path: { id: activeProjectId },
-        body: {
-          boq_item_id: selectedBoqId !== 'custom' ? selectedBoqId : undefined,
-          ahsp_id: selectedAhspId || undefined,
-          work_item: workItem.trim(),
-          unit: unit.trim(),
-          planned_volume: plannedVolume || '0',
-          date: date || undefined,
-          length: currentFormulaConfig.fields.length ? length || undefined : undefined,
-          width: currentFormulaConfig.fields.width ? width || undefined : undefined,
-          height: currentFormulaConfig.fields.height ? height || undefined : undefined,
-          formula: formula,
-          quantity: preview.qty.toFixed(4),
-          unit_weight: unitWeight || '1',
-          description: description.trim(),
-        },
-      })
-      await queryClient.invalidateQueries()
-      setIsAddOpen(false)
-    } catch (err: any) {
-      setErrorMessage(err?.message || 'Gagal menyimpan data volume take-off.')
-    }
+    navigate({
+      to: '/volume/new',
+      search: { projectId: activeProjectId },
+    })
   }
 
   const handleDelete = async (id: string, name: string) => {
@@ -624,257 +495,6 @@ function VolumePage() {
           </TableBody>
         </Table>
       </div>
-
-      {/* Modal Add Volume Take-off */}
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Calculator className="size-5 text-primary" />
-              <span>Tambah Volume Take-off</span>
-            </DialogTitle>
-            <DialogDescription>
-              Perhitungan take-off volume yang terhubung langsung ke proyek{' '}
-              <strong className="text-foreground">{activeProject?.name || ''}</strong>.
-            </DialogDescription>
-          </DialogHeader>
-
-          {errorMessage && (
-            <Alert variant="destructive">
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={handleCreate} className="flex flex-col gap-4">
-            <FieldGroup>
-              {/* Link langsung ke BOQ Proyek */}
-              <Field>
-                <FieldLabel htmlFor="vol-boq">Pilih Item Pekerjaan Proyek (BoQ)</FieldLabel>
-                <Select value={selectedBoqId} onValueChange={(val) => { if (val) handleSelectBoqItem(val) }}>
-                  <SelectTrigger id="vol-boq">
-                    <SelectValue placeholder="-- Pilih Item Pekerjaan Proyek --" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="custom">+ Buat Item Baru (Input Manual / Master AHSP)</SelectItem>
-                      {projectBoqItems.map((b) => (
-                        <SelectItem key={b.id} value={b.id}>
-                          {b.work_item} ({b.unit}) — Plan: {formatDecimal(b.planned_volume)}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </Field>
-
-              {/* Master AHSP (muncul saat buat item manual) */}
-              {selectedBoqId === 'custom' && ahsps.length > 0 && (
-                <Field>
-                  <FieldLabel htmlFor="vol-ahsp">Pilih dari Master AHSP (Opsional)</FieldLabel>
-                  <Select value={selectedAhspId} onValueChange={(val) => { if (val) handleSelectAhsp(val) }}>
-                    <SelectTrigger id="vol-ahsp">
-                      <SelectValue placeholder="-- Salin nama pekerjaan dari AHSP --" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {ahsps.map((a) => (
-                          <SelectItem key={a.id} value={a.id}>
-                            {a.code} - {a.work_item} ({a.unit})
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              )}
-
-              {/* Work Item & Unit */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
-                  <Field>
-                    <FieldLabel htmlFor="vol-workitem">Nama Pekerjaan (Work Item)</FieldLabel>
-                    <Input
-                      id="vol-workitem"
-                      value={workItem}
-                      onChange={(e) => setWorkItem(e.target.value)}
-                      placeholder="Contoh: Pengecoran Bore Pile D40 cm..."
-                      required
-                    />
-                  </Field>
-                </div>
-                <Field>
-                  <FieldLabel htmlFor="vol-unit">Satuan (Unit)</FieldLabel>
-                  <Input
-                    id="vol-unit"
-                    value={unit}
-                    onChange={(e) => handleUnitChange(e.target.value)}
-                    placeholder="m3, m2, m', kg, lot..."
-                    required
-                  />
-                </Field>
-              </div>
-
-              {/* Dropdown Metode Rumus (Formula) */}
-              <div className="rounded-lg border bg-muted/30 p-3 flex flex-col gap-2">
-                <Field>
-                  <div className="flex items-center justify-between">
-                    <FieldLabel htmlFor="vol-formula" className="text-xs font-semibold">
-                      Metode Rumus / Bentuk Perhitungan
-                    </FieldLabel>
-                    <span className="text-[11px] text-muted-foreground font-mono">
-                      Kategori: {currentFormulaConfig.category}
-                    </span>
-                  </div>
-                  <Select value={formula} onValueChange={(val) => { if (val) setFormula(val as FormulaType) }}>
-                    <SelectTrigger id="vol-formula">
-                      <SelectValue placeholder="Pilih Rumus" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {Object.values(FORMULA_CONFIGS).map((cfg) => (
-                          <SelectItem key={cfg.id} value={cfg.id}>
-                            {cfg.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[11px] text-muted-foreground mt-1">
-                    {currentFormulaConfig.description}
-                  </p>
-                </Field>
-              </div>
-
-              {/* Planned Volume & Date */}
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="vol-planned">Target Volume (Planned)</FieldLabel>
-                  <Input
-                    id="vol-planned"
-                    type="number"
-                    step="0.0001"
-                    value={plannedVolume}
-                    onChange={(e) => setPlannedVolume(e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="vol-date">Tanggal Pengukuran</FieldLabel>
-                  <Input
-                    id="vol-date"
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                  />
-                </Field>
-              </div>
-
-              {/* Dynamic Dimension Inputs sesuai rumus yang dipilih */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                {currentFormulaConfig.fields.length && (
-                  <Field>
-                    <FieldLabel htmlFor="vol-l">{currentFormulaConfig.fields.length}</FieldLabel>
-                    <Input
-                      id="vol-l"
-                      type="number"
-                      step="0.0001"
-                      value={length}
-                      onChange={(e) => setLength(e.target.value)}
-                      placeholder="0.0000"
-                    />
-                  </Field>
-                )}
-
-                {currentFormulaConfig.fields.width && (
-                  <Field>
-                    <FieldLabel htmlFor="vol-w">{currentFormulaConfig.fields.width}</FieldLabel>
-                    <Input
-                      id="vol-w"
-                      type="number"
-                      step="0.0001"
-                      value={width}
-                      onChange={(e) => setWidth(e.target.value)}
-                      placeholder="0.0000"
-                    />
-                  </Field>
-                )}
-
-                {currentFormulaConfig.fields.height && (
-                  <Field>
-                    <FieldLabel htmlFor="vol-h">{currentFormulaConfig.fields.height}</FieldLabel>
-                    <Input
-                      id="vol-h"
-                      type="number"
-                      step="0.0001"
-                      value={height}
-                      onChange={(e) => setHeight(e.target.value)}
-                      placeholder="0.0000"
-                    />
-                  </Field>
-                )}
-
-                <Field>
-                  <FieldLabel htmlFor="vol-uw">{currentFormulaConfig.fields.weight}</FieldLabel>
-                  <Input
-                    id="vol-uw"
-                    type="number"
-                    step="0.0001"
-                    value={unitWeight}
-                    onChange={(e) => setUnitWeight(e.target.value)}
-                    placeholder="1"
-                    required
-                  />
-                </Field>
-              </div>
-
-              <Field>
-                <FieldLabel htmlFor="vol-desc">Keterangan / Catatan Lokasi Pengukuran</FieldLabel>
-                <Input
-                  id="vol-desc"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Contoh: Titik Bor P-01 s/d P-12 Sisi Timur Pabrik..."
-                />
-              </Field>
-
-              {/* Calculated preview card */}
-              <Card className="bg-primary/5 border-primary/20">
-                <CardContent className="p-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-primary">Persamaan Hitung:</span>
-                      <span className="font-mono text-muted-foreground text-[11px]">
-                        {preview.expression}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 bg-background/80 px-3 py-1.5 rounded-md border">
-                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] text-muted-foreground uppercase">Kuantitas Satuan:</span>
-                        <strong className="text-foreground font-mono">{formatDecimal(preview.qty)} {unit}</strong>
-                      </div>
-                      <div className="h-6 w-px bg-border" />
-                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] text-muted-foreground uppercase">Total Kuantitas:</span>
-                        <strong className="text-emerald-600 dark:text-emerald-400 font-bold font-mono text-sm">
-                          {formatDecimal(preview.totalQty)} {unit}
-                        </strong>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </FieldGroup>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
-                Batal
-              </Button>
-              <Button type="submit" disabled={createMut.isPending}>
-                {createMut.isPending ? 'Menyimpan...' : 'Simpan Take-off'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
