@@ -24,7 +24,7 @@ import {
   detectFormula,
   computeVolume,
   type FormulaType,
-} from '@/routes/volume/index'
+} from '@/lib/volume'
 import { ArrowLeft, Calculator, Save, Building2, Ruler } from 'lucide-react'
 
 export const Route = createFileRoute('/volume/new/')({
