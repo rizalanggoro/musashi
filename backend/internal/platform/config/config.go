@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	AppEnv         string
 	Port           string
 	DatabaseURL    string
 	DBHost         string
@@ -18,6 +19,12 @@ type Config struct {
 	DBSSLMode      string
 	AllowedOrigins string
 	AutoMigrate    bool
+	AutoSeed       bool
+}
+
+func (c Config) IsDev() bool {
+	env := strings.ToLower(strings.TrimSpace(c.AppEnv))
+	return env == "" || env == "development" || env == "dev" || env == "local"
 }
 
 func loadDotEnv(files ...string) {
@@ -64,6 +71,7 @@ func Load() Config {
 	}
 
 	return Config{
+		AppEnv:         env("APP_ENV", "development"),
 		Port:           env("PORT", "8080"),
 		DatabaseURL:    dbURL,
 		DBHost:         host,
@@ -74,6 +82,7 @@ func Load() Config {
 		DBSSLMode:      sslMode,
 		AllowedOrigins: env("ALLOWED_ORIGINS", "http://localhost:5173"),
 		AutoMigrate:    env("AUTO_MIGRATE", "true") == "true",
+		AutoSeed:       env("AUTO_SEED", "true") == "true",
 	}
 }
 

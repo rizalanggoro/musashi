@@ -16,6 +16,7 @@ import (
 
 	"musashi/backend/internal/platform/config"
 	"musashi/backend/internal/platform/database"
+	"musashi/backend/internal/platform/database/seeder"
 	"musashi/backend/internal/server"
 )
 
@@ -34,6 +35,12 @@ func main() {
 			os.Exit(1)
 		}
 		slog.Info("database migrations applied")
+	}
+
+	if cfg.IsDev() && cfg.AutoSeed {
+		if err := seeder.Seed(db); err != nil {
+			slog.Error("seed database", "err", err)
+		}
 	}
 
 	app := server.New(db, cfg)
