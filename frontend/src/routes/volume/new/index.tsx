@@ -132,6 +132,44 @@ function VolumeNewPage() {
     ...listAhspsOptions({}),
   })
 
+  const projectItems = useMemo(
+    () =>
+      projects.map((p) => ({
+        value: p.id,
+        label: `${p.name} (${p.plant} - ${p.section})`,
+      })),
+    [projects]
+  )
+
+  const boqSelectItems = useMemo(
+    () => [
+      { value: 'custom', label: '+ Buat Item Baru (Input Bebas / Master AHSP)' },
+      ...projectBoqItems.map((b) => ({
+        value: b.id,
+        label: `${b.work_item} (${b.unit}) — Plan: ${formatDecimal(b.planned_volume)}`,
+      })),
+    ],
+    [projectBoqItems]
+  )
+
+  const ahspSelectItems = useMemo(
+    () =>
+      ahsps.map((a) => ({
+        value: a.id,
+        label: `${a.code} - ${a.work_item} (${a.unit})`,
+      })),
+    [ahsps]
+  )
+
+  const formulaSelectItems = useMemo(
+    () =>
+      Object.values(FORMULA_CONFIGS).map((cfg) => ({
+        value: cfg.id,
+        label: cfg.label,
+      })),
+    []
+  )
+
   const createMut = useMutation(createVolumeMutation())
 
   // Handle selecting an existing BoQ item
@@ -287,6 +325,7 @@ function VolumeNewPage() {
                     control={control}
                     render={({ field }) => (
                       <Select
+                        items={projectItems}
                         value={field.value}
                         onValueChange={(val) => {
                           if (val) {
@@ -295,14 +334,14 @@ function VolumeNewPage() {
                           }
                         }}
                       >
-                        <SelectTrigger id="new-vol-project">
+                        <SelectTrigger id="new-vol-project" className="w-full">
                           <SelectValue placeholder="Pilih Proyek" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="w-full min-w-72">
                           <SelectGroup>
-                            {projects.map((p) => (
-                              <SelectItem key={p.id} value={p.id}>
-                                {p.name} ({p.plant} - {p.section})
+                            {projectItems.map((p) => (
+                              <SelectItem key={p.value} value={p.value}>
+                                {p.label}
                               </SelectItem>
                             ))}
                           </SelectGroup>
@@ -316,16 +355,15 @@ function VolumeNewPage() {
                 {/* BoQ Selector */}
                 <Field>
                   <FieldLabel htmlFor="new-vol-boq">Pilih dari Item BoQ Proyek</FieldLabel>
-                  <Select value={selectedBoqId} onValueChange={(val) => { if (val) handleSelectBoqItem(val) }}>
-                    <SelectTrigger id="new-vol-boq">
+                  <Select items={boqSelectItems} value={selectedBoqId} onValueChange={(val) => { if (val) handleSelectBoqItem(val) }}>
+                    <SelectTrigger id="new-vol-boq" className="w-full">
                       <SelectValue placeholder="-- Pilih Item BoQ Proyek --" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="w-full min-w-72">
                       <SelectGroup>
-                        <SelectItem value="custom">+ Buat Item Baru (Input Bebas / Master AHSP)</SelectItem>
-                        {projectBoqItems.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>
-                            {b.work_item} ({b.unit}) — Plan: {formatDecimal(b.planned_volume)}
+                        {boqSelectItems.map((b) => (
+                          <SelectItem key={b.value} value={b.value}>
+                            {b.label}
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -337,15 +375,15 @@ function VolumeNewPage() {
                 {selectedBoqId === 'custom' && ahsps.length > 0 && (
                   <Field>
                     <FieldLabel htmlFor="new-vol-ahsp">Pilih dari Master AHSP (Opsional)</FieldLabel>
-                    <Select value={selectedAhspId} onValueChange={(val) => { if (val) handleSelectAhsp(val) }}>
-                      <SelectTrigger id="new-vol-ahsp">
+                    <Select items={ahspSelectItems} value={selectedAhspId} onValueChange={(val) => { if (val) handleSelectAhsp(val) }}>
+                      <SelectTrigger id="new-vol-ahsp" className="w-full">
                         <SelectValue placeholder="-- Salin nama pekerjaan dari AHSP --" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="w-full min-w-72">
                         <SelectGroup>
-                          {ahsps.map((a) => (
-                            <SelectItem key={a.id} value={a.id}>
-                              {a.code} - {a.work_item} ({a.unit})
+                          {ahspSelectItems.map((a) => (
+                            <SelectItem key={a.value} value={a.value}>
+                              {a.label}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -429,18 +467,19 @@ function VolumeNewPage() {
                     control={control}
                     render={({ field }) => (
                       <Select
+                        items={formulaSelectItems}
                         value={field.value}
                         onValueChange={(val) => {
                           if (val) field.onChange(val as FormulaType)
                         }}
                       >
-                        <SelectTrigger id="new-vol-formula">
+                        <SelectTrigger id="new-vol-formula" className="w-full">
                           <SelectValue placeholder="Pilih Rumus" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="w-full min-w-72">
                           <SelectGroup>
-                            {Object.values(FORMULA_CONFIGS).map((cfg) => (
-                              <SelectItem key={cfg.id} value={cfg.id}>
+                            {formulaSelectItems.map((cfg) => (
+                              <SelectItem key={cfg.value} value={cfg.value}>
                                 {cfg.label}
                               </SelectItem>
                             ))}

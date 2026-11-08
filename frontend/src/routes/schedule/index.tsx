@@ -50,6 +50,10 @@ function SchedulePage() {
     ...listProjectsOptions({ query: { per_page: 100 } }),
   })
   const projects = projectsData?.data ?? []
+  const projectItems = projects.map((p) => ({
+    value: p.id,
+    label: `${p.name} ${p.section ? `(${p.section})` : ''}`,
+  }))
   const activeProjectId = selectedProjectId || (projects.length > 0 ? projects[0].id : '')
 
   const { data: schedules = [], isLoading } = useQuery({
@@ -146,19 +150,20 @@ function SchedulePage() {
         <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Proyek:</span>
         <div className="w-80">
           <Select
+            items={projectItems}
             value={activeProjectId}
             onValueChange={(val) => {
               if (val) setSelectedProjectId(val)
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Pilih Proyek" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="w-80">
               <SelectGroup>
-                {projects.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name} {p.section ? `(${p.section})` : ''}
+                {projectItems.map((p) => (
+                  <SelectItem key={p.value} value={p.value}>
+                    {p.label}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -325,13 +330,19 @@ function SchedulePage() {
                 <Field>
                   <FieldLabel htmlFor="sch-status">Status</FieldLabel>
                   <Select
+                    items={[
+                      { value: 'planning', label: 'Planning' },
+                      { value: 'on_going', label: 'On Going' },
+                      { value: 'done', label: 'Done' },
+                      { value: 'late', label: 'Late' },
+                    ]}
                     value={status}
                     onValueChange={(val) => setStatus(val as any)}
                   >
-                    <SelectTrigger id="sch-status">
+                    <SelectTrigger id="sch-status" className="w-full">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="w-full min-w-36">
                       <SelectGroup>
                         <SelectItem value="planning">Planning</SelectItem>
                         <SelectItem value="on_going">On Going</SelectItem>

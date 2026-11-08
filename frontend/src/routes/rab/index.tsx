@@ -53,6 +53,10 @@ function RabPage() {
     ...listProjectsOptions({ query: { per_page: 100 } }),
   })
   const projects = projectsData?.data ?? []
+  const projectItems = projects.map((p) => ({
+    value: p.id,
+    label: `${p.name} ${p.section ? `(${p.section})` : ''}`,
+  }))
   const activeProjectId = selectedProjectId || (projects.length > 0 ? projects[0].id : '')
 
   // Fetch RAB items & total
@@ -163,19 +167,20 @@ function RabPage() {
           <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Proyek:</span>
           <div className="w-80">
             <Select
+              items={projectItems}
               value={activeProjectId}
               onValueChange={(val) => {
                 if (val) setSelectedProjectId(val)
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Proyek..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-80">
                 <SelectGroup>
-                  {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name} {p.section ? `(${p.section})` : ''}
+                  {projectItems.map((p) => (
+                    <SelectItem key={p.value} value={p.value}>
+                      {p.label}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -318,11 +323,20 @@ function RabPage() {
               {boqItems.length > 0 && (
                 <Field>
                   <FieldLabel htmlFor="rab-boq">Pilih dari BOQ (Opsional)</FieldLabel>
-                  <Select value={selectedBoqId} onValueChange={(val) => { if (val) handleSelectBoqItem(val) }}>
-                    <SelectTrigger id="rab-boq">
+                  <Select
+                    items={boqItems.map((b) => ({
+                      value: b.id,
+                      label: `${b.work_item} (${b.planned_volume} ${b.unit})`,
+                    }))}
+                    value={selectedBoqId}
+                    onValueChange={(val) => {
+                      if (val) handleSelectBoqItem(val)
+                    }}
+                  >
+                    <SelectTrigger id="rab-boq" className="w-full">
                       <SelectValue placeholder="-- Pilih Item BOQ --" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="w-full min-w-72">
                       <SelectGroup>
                         {boqItems.map((b) => (
                           <SelectItem key={b.id} value={b.id}>

@@ -40,6 +40,10 @@ function VolumePage() {
     ...listProjectsOptions({ query: { per_page: 100 } }),
   })
   const projects = projectsData?.data ?? []
+  const projectItems = projects.map((p) => ({
+    value: p.id,
+    label: `${p.name} ${p.section ? `(${p.section})` : ''}`,
+  }))
 
   // Default project selection if not set
   const activeProjectId = selectedProjectId || (projects.length > 0 ? projects[0].id : '')
@@ -96,19 +100,20 @@ function VolumePage() {
           <span className="text-sm font-semibold text-foreground whitespace-nowrap">Proyek:</span>
           <div className="w-72">
             <Select
+              items={projectItems}
               value={activeProjectId}
               onValueChange={(val) => {
                 if (val) setSelectedProjectId(val)
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Proyek" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-80">
                 <SelectGroup>
-                  {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name}
+                  {projectItems.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
                     </SelectItem>
                   ))}
                 </SelectGroup>
